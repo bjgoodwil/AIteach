@@ -1,0 +1,136 @@
+html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td, iframe,hr{margin:0;padding:0;}
+body{font:12px/1.6 Tahoma,microsoft yahei,"微软雅黑","宋体";*font-family:"微软雅黑","宋体";}
+fieldset, img { border:0; }
+address, caption, cite, dfn, em, th, var{font-style:normal;font-weight:normal;}
+ol, ul { list-style:none; }
+caption, th { text-align:left; }
+h1, h2, h3, h4, h5, h6 { font-size:100%; }
+table {border-collapse:collapse;border-spacing:0;}
+select,input,label,button,textarea{margin:0;padding:0;font:normal normal normal "微软雅黑",arial,Simsun,Arial Unicode MS,Mingliu,Arial;overflow:visible;}
+/*外边距*/
+.m-l-10 {
+    margin-left: 10px;
+}
+.m-l-20 {
+    margin-left: 20px;
+}
+.m-l-30 {
+    margin-left: 30px;
+}
+.m-l-40 {
+    margin-left: 40px;
+}
+.m-t-10 {
+    margin-top: 10px;
+}
+.m-t-14 {
+    margin-top: 14px;
+}
+.m-t-15 {
+    margin-top: 15px;
+}
+.m-t-20 {
+    margin-top: 20px;
+}
+.m-t-30 {
+    margin-top: 30px;
+}
+.m-r-10 {
+    margin-right: 10px;
+}
+.m-r-20 {
+    margin-right: 20px;
+}
+.m-r-30 {
+    margin-right: 30px;
+}
+.m-b-30 {
+    margin-bottom: 30px;
+}
+.m-b-20{
+    margin-bottom: 30px;
+}
+.m-b-10{
+    margin-bottom: 10px;
+}
+/*内边距*/
+.p-10 {
+    padding: 10px;
+}
+.p-20 {
+    padding: 20px;
+}
+.p-30 {
+    padding: 20px;
+}
+.p-t-0 {
+    padding-top: 0;
+}
+.p-t-10 {
+    padding-top: 10px;
+}
+.p-t-20 {
+    padding-top: 20px;
+}
+.p-b-10 {
+    padding-bottom: 10px;
+}
+.p-b-20 {
+    padding-bottom: 20px;
+}
+.p-b-30 {
+    padding-bottom: 30px;
+}
+.p-l-20{
+    padding-left: 20px;
+}
+.p-r-20{
+    padding-right: 20px;
+}
+.p-r-5{
+    padding-right: 10px;
+}
+
+
+/*兼容IE*/
+
+.el-main{
+    display: inline-block;
+}
+/*可点击样式*/
+.click {
+    cursor: pointer;
+}
+/*单行显示*/
+.line-ellipsis-1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.textCenter {
+    text-align: center;
+}
+.textRight {
+    text-align: right;
+}
+.textLeft{
+    text-align: left;
+}
+.floatLeft {
+    float: left;
+}
+.floatRight {
+    float: right;
+}
+.clearfix:after {
+    content: " ";
+    display: block;
+    clear: both;
+    height: 0;
+}
+.pos-a{
+    position: absolute;
+}
+.pos-r{
+    position: relative;
+}
