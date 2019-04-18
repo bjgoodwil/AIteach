@@ -3,7 +3,7 @@
 		
 		<el-tabs v-model="activeName">
 		    <el-tab-pane label="病例列表" name="病例列表">
-		    	<el-form ref="form" :inline="true" :model="form" label-width="40px" class="clearfix">
+		    	<el-form ref="form" :inline="true" :model="form" label-width="40px" size="small" class="clearfix">
 			
 					<el-form-item label="专业" class="floatLeft">
 					    <el-cascader
@@ -14,7 +14,7 @@
 						</el-cascader>
 					</el-form-item>
 					<el-form-item label="疾病" class="floatLeft">
-						<el-select v-model="form.caseName" clearable clearable placeholder="请选择" @change="selectDisease">
+						<el-select v-model="form.caseName" clearable placeholder="请选择" size="small" @change="selectDisease">
 
 						    <el-option
 						      v-for="item in optionsDis1"
@@ -44,7 +44,7 @@
 		</el-tabs>
 
     	
-    	<el-table :data="tableData" class="m-t-20" stripe>
+    	<el-table :data="tableData" class="m-t-20" stripe v-loading="loading">
     		<el-table-column
 		      type="index"
 		      label="序号"
@@ -141,6 +141,7 @@ export default {
 	data () {
 		
 	    return {
+	    	loading:true,
 	    	disabled:false,
 	    	activeName:'病例列表',
 	    	form:{
@@ -181,8 +182,8 @@ export default {
   	methods: {
   		getListRecord(params){
   			recordApi.listRecord(params).then(response=>{
-
 				this.tableData = response.data.data.diseaseRecord;
+				this.loading = false;
 			})
   		},
 	    //改变病例状态
@@ -209,6 +210,7 @@ export default {
 	    },
 	    //选择疾病
 	    selectDisease(val){
+	    	this.loading = true;
 	    	this.form.diseaseId = val;
 	    	if (val == '') this.form.selectedOptions = [];
 	    	
@@ -216,10 +218,12 @@ export default {
 	    },
 	    //选择状态
 	    selectStatus(val){
+	    	this.loading = true;
 	    	this.getListRecord({diseaseId:this.form.diseaseId,status:val,gender:this.form.gender});
 	    },
 	    //选择性别
 	    selectGender(val){
+	    	this.loading = true;
 	    	this.getListRecord({diseaseId:this.form.diseaseId,status:this.form.status,gender:val});
 	    },
 	    /**

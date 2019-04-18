@@ -1,6 +1,6 @@
 <template>
     <div class="mapTable">
-
+		<!-- <el-button type="primary" round size="small" @click="addMapRelation">新增映射关系</el-button> -->
     	<el-tree 
     		:data="dataTree" 
     		:props="defaultProps" 
@@ -39,6 +39,30 @@
 		        </span>
 		    </span>
     	</el-tree>
+    	<!-- 新增映射弹出框 -->
+		<!-- <el-dialog
+		  title="新增映射"
+		  :visible.sync="dialogVisibleTree"
+		  width="600px"
+		  @close="dialogClose">
+		  	<el-form label-width="80px" :model="questionForm">
+				<el-form-item label="问题类型">
+				    <el-input v-model="questionForm.name" placeholder="请输入问题"></el-input>
+				</el-form-item>
+			  	<el-form-item label="映射">
+			    
+			    
+			  	</el-form-item>
+			</el-form>
+
+			
+			<span slot="footer" class="dialog-footer">
+			    <el-button @click="dialogVisibleTree = false">取 消</el-button>
+			    <el-button type="primary" @click="addCase(activeClass)">确 定</el-button>
+
+			</span>
+			
+		</el-dialog> -->
     </div>
 </template>
 <script>
@@ -98,6 +122,9 @@ export default {
 				parentId: "14912",
 				parms:[{questionName: "住院入院记录_主诉_症状_症状名称"}]
 	    	})
+	    },
+	    addMapRelation(){
+
 	    }    	
     },
     watch:{

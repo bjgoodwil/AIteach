@@ -15,7 +15,10 @@
 		    </el-table-column>
 	        <el-table-column prop="gender" label="性别" width="100">
 	        </el-table-column>
-	        <el-table-column prop="age" label="年龄" width="100">
+	        <el-table-column label="年龄" width="100">
+	        	<template slot-scope="scope">
+					{{scope.row.age}}
+	        	</template>
 	        </el-table-column>
 	        <el-table-column label="主诉">
 	        	<template slot-scope="scope">
@@ -49,7 +52,7 @@ import {recordApi} from '@/services/apis/record/record';
 export default {
 	name: 'search',
 	data () {
-
+		console.log()
 	    return {
 	    	loading: true,
 	    	tableData:[],//病历列表数据
@@ -60,15 +63,23 @@ export default {
 	    		disease:'',
 
 	    	},//参数
-	        result:''
+	        result:'',
+
 	    }
 	},
 	mounted() {
-		this.param.disease = this.$route.query.disease
+		//this.param.disease = this.$route.query.disease
 		this.getData(this.param);
-		console.log(this.$route.query)
+		
 		//this.result = this.$route.query.keywords;
 	},
+	beforeRouteEnter(to, from, next) {
+	   next(vm=>{          //  这里的vm指的就是vue实例，可以用来当做this使用
+	      //console.log(to)
+	      //console.log(from)
+	    })
+	},
+
   	methods: {
       	getData(param){
       		ywd.search(param).then(response=>{
@@ -83,6 +94,7 @@ export default {
 	        console.log(`每页 ${val} 条`);
 	    },
 	    handleCurrentChange(val) {
+	    	this.loading = true;
 	    	let v = JSON.parse(this.param.keywords);
 	    	v.page = val-1;
 	    	this.param.keywords = JSON.stringify(v);

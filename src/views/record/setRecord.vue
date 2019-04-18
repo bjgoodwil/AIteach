@@ -11,29 +11,31 @@
 			</el-form-item>
 			<el-form-item label="年龄：">
 				
-			    {{formInline.age}}
+			    {{formInline.age}} {{formInline.ageunit}}
 			</el-form-item> &nbsp;&nbsp;
-			<el-button type="primary" round size="small" @click="open">查看病历详情</el-button> <el-button type="primary" round size="small" @click="openImg">查看影像</el-button><br>
+			<el-button type="primary" round size="small" @click="open">查看病历详情</el-button>
+			<el-button type="primary" round size="small" @click="openImg">查看影像</el-button>
+			<el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button><br>
 			<el-form-item label="参考时间">
-			    <el-input type="number" v-model="formInline.time" placeholder="时间"  style="width: 200px">
+			    <el-input type="number" v-model="formInline.time" placeholder="时间" size="small" style="width: 200px">
 					<template slot="append">分钟</template>
 			    </el-input>
 			</el-form-item>
 			<el-form-item label="病历难度">
-			    <el-select v-model="formInline.grade" placeholder="活动区域" @change="change" style="width: 200px">
+			    <el-select v-model="formInline.grade" placeholder="活动区域" @change="change" size="small" style="width: 200px">
 			      	<el-option label="初级" value="0" ></el-option>
 			      	<el-option label="中级" value="1" ></el-option>
 			      	<el-option label="高级" value="2" ></el-option>
 			    </el-select>
 			</el-form-item>
 			<el-form-item label="疾病">
-			    <el-input v-model="formInline.disease" placeholder="疾病" :disabled="true"></el-input>
+			    <el-input v-model="formInline.disease" placeholder="疾病" size="small" :disabled="true"></el-input>
 			</el-form-item>
 			<el-form-item label="症状">
-			    <el-input v-model="formInline.symptoms" placeholder="症状"></el-input>
+			    <el-input v-model="formInline.symptoms" placeholder="症状" size="small"></el-input>
 			</el-form-item>
 			<el-form-item label="主诉">
-			    <el-input v-model="formInline.chiefComplaint" placeholder="主诉" style="width: 496px"></el-input>
+			    <el-input v-model="formInline.chiefComplaint" placeholder="主诉" size="small" style="width: 496px"></el-input>
 			</el-form-item>			
 		</el-form>
 		<el-alert
@@ -42,10 +44,18 @@
 		    :closable="false">
 		</el-alert>
 		<el-tabs v-model="activeName" @tab-click="tabClick1">
-		    <el-tab-pane v-for="item in data" :key="item.id" :label="item.name" :name="item.name">
+		    <el-tab-pane v-for="item in data.trees" :key="item.id" :label="item.name" :name="item.name">	
+		    	<p v-if="item.name == '查体'" class="history"><span>体格检查：</span>{{data.chatisrc}}</p>
 				<el-tabs tab-position="left" v-model="activeClass" @tab-click="tabClick2">
 					<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.name">
-						<!-- {{it.parms}} -->
+						<div class="scroll-y">
+						<p v-if="it.name == '出生史'" class="history"><span>出生史：</span>{{data.chushengshisrc}}</p>
+						<p v-if="it.name == '婚育史'" class="history"><span>婚育史：</span>{{data.hunyushisrc}}</p>
+						<p v-if="it.name == '现病史'" class="history"><span>现病史：</span>{{data.xianbingshisrc}}</p>
+						<p v-if="it.name == '既往史'" class="history"><span>既往史：</span>{{data.jiwangshisrc}}</p>
+						<p v-if="it.name == '个人史'" class="history"><span>个人史：</span>{{data.gerenshisrc}}</p>
+						<p v-if="it.name == '家族史'" class="history"><span>家族史：</span>{{data.jiazushisrc}}</p>
+						
 						<table style="width: 100%;">
 							<thead>
 								<th style="width: 8%">序号</th>
@@ -59,11 +69,11 @@
 							<tbody>
 							<draggable v-model="it.parms" @update="datadragEnd" :options = "{animation:500}">
 								<!-- <transition-group> -->
-								<tr v-for="(i,index) in it.parms" :key="i.questionId" class="questionList" >
+								<tr v-for="(i,index) in it.parms" :key="i.questionName" class="questionList" >
 									<td style="width: 8%">{{index+1}}</td>
 									<td class="questionName" style="width: 36%;"><el-input type="textarea" autosize v-model="i.questionName" placeholder="请输入问题" ></el-input></td>
-									<td class="questionAnswer" style="width: 36%;"><el-input type="textarea" autosize v-model="i.questionAnswer" placeholder="请输入答案"></el-input></td>
-									<td style="width: 10%"><el-input v-model="i.score" type="number" placeholder="请输入得分"></el-input></td>
+									<td class="questionAnswer" style="width: 36%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></td>
+									<td style="width: 10%"><el-input v-model="i.score" type="number" size="small" placeholder="请输入得分"></el-input></td>
 									<td style="width: 10%">
 										<el-button
 								          title="删除"
@@ -75,6 +85,7 @@
 							</draggable>
 							</tbody>
 						</table>
+						</div>
 						<!-- <el-table :data="it.parms">
 						
 				    		<el-table-column
@@ -111,8 +122,9 @@
 		    <el-tab-pane label="诊断" name="诊断">
 		    	<el-tabs tab-position="left" v-model="activeClass1">
 		    		<el-tab-pane label="诊断" name="诊断">
+		    			<div class="scroll-y">
 						<div class="zhenduanItem" v-for="(item,index) in zhenduan.support">
-							<p class="clearfix p-10">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
+							<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
 								<span class="pos-a" style="right: 60px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 								<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan.support,index)">删除</a>
 							</p>
@@ -143,11 +155,14 @@
 						        </el-table-column>
 						    </el-table>
 						</div>
+						</div>
 					</el-tab-pane>
 					<el-tab-pane label="鉴别诊断" name="鉴别诊断">
+						<div class="scroll-y">
+
 						<div class="zhenduanItem" v-for="(item,index) in zhenduan.unsupport">
-							<p class="clearfix p-10">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
-								<span class="pos-a" style="right: 100px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+							<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
+								<span class="pos-a" style="right: 60px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 								<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan.unsupport,index)">删除</a>
 							</p>
 							<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
@@ -203,13 +218,14 @@
 						        </el-table-column>
 						    </el-table>
 						</div>
-						
+						</div>
 					</el-tab-pane>
 				</el-tabs>
 		    </el-tab-pane>
 		    <el-tab-pane label="处置" name="处置">
 				<el-tabs tab-position="left" v-model="activeClass2">
 		    		<el-tab-pane v-for="(item,index) in chuzhi" :key="item.diagnosisName" :label="item.diagnosisName+'('+item.supportQuestions.length+')'" :name="item.diagnosisName">
+		    			<div class="scroll-y">
 						<el-table :data="item.supportQuestions">
 				    		<el-table-column
 						      type="index"
@@ -237,6 +253,7 @@
 					        	</template>
 					        </el-table-column>
 					    </el-table>
+						</div>
 					</el-tab-pane>
 				
 				</el-tabs>
@@ -250,7 +267,7 @@
 		  width="600px"
 		  @close="dialogClose">
 		  	<el-collapse accordion>
-		  		<div v-for="item in data" class="m-b-20" :key="item.id">
+		  		<div v-for="item in data.trees" class="m-b-20" :key="item.id">
 					<el-collapse-item>
 						<template slot="title">
 						    <p style="color: rgb(245, 108, 108);font-size: 16px;"><i class="header-icon el-icon-menu"></i> {{item.name}} </p>
@@ -277,6 +294,7 @@
 			    <el-button type="primary" @click="reasonSure">确 定</el-button>
 			</span>
 		</el-dialog>
+		
 		<div class="clearfix m-t-20">
 			<el-button type="success" round class="floatRight m-l-10" size="small" @click="save('1')"> 发 布 </el-button>
 			<el-button type="primary" round class="floatRight " size="small" @click="save('0')"> 保 存 </el-button>
@@ -310,6 +328,7 @@ export default {
 	    	formInline:{
 	    		gender:'',
 	    		age:'',
+	    		ageunit:'',
 	    		time:20,
 	    		grade:"0",
 	    		disease:'',
@@ -345,10 +364,21 @@ export default {
 				patientId:this.$route.query.patientId,
 				visitId:this.$route.query.visitId
 			}).then(response=>{
-				this.setDefaultData(response.data.data);
-				this.formInline.mrKey = this.$route.query.mrKey;
-				this.formInline.profession = this.$route.query.profession;
-				this.formInline.hospitalizedTime = this.$route.query.hospitalizedTime;
+				if (response.data.errCode == "0") {
+	    			this.setDefaultData(response.data.data);
+					this.formInline.mrKey = this.$route.query.mrKey;
+					this.formInline.profession = this.$route.query.profession;
+					this.formInline.hospitalizedTime = this.$route.query.hospitalizedTime;
+				
+	    		}else{
+	    			this.$message({
+				        message: response.data.errMsg,
+				        type: 'warning'
+			        });
+	    			
+			        this.$router.go(-1);
+	    		}
+				
 				
 			})
 		}
@@ -368,13 +398,14 @@ export default {
 			this.patientId = data.patientId
 			this.formInline.gender = data.gender;
 			this.formInline.age = data.age;
+			this.formInline.ageunit = data.ageunit;
 			this.formInline.chiefComplaint = data.chiefComplaint;
 			this.formInline.symptoms = data.symptoms;
 			this.formInline.time = data.suggestDuration;
      		this.formInline.grade = data.difficultyDegree;
 			this.activeName = data.trees[0].name;
 			this.activeClass = data.trees[0].children[0].name;
-			this.data = data.trees;
+			this.data = data;
 			this.zhenduan = data.zhenduan;
 			this.chuzhi = data.chuzhi;
   		},
@@ -391,7 +422,7 @@ export default {
      		}else if (tag.index == '4') {
      			this.activeClass2 = this.chuzhi[0].diagnosisName;
      		}else{
-     			this.activeClass = this.data[tag.index].children[0].name;
+     			this.activeClass = this.data.trees[tag.index].children[0].name;
      		}
      		
      	},
@@ -492,6 +523,9 @@ export default {
      	//保存
      	save(type){
      		this.loading = true;
+     		if (this.params.diagnosis == '') {
+     			this.params.diagnosis = this.formInline.disease
+     		}
      		this.params.symptoms = this.formInline.symptoms;
      		this.params.chiefComplaint = this.formInline.chiefComplaint;
      		this.params.suggestDuration = this.formInline.time;
@@ -543,6 +577,15 @@ export default {
 	    },
 	    openImg(){
 	    	window.open('http://10.2.98.65/ZFP-XDS/Main?DomainId=1.2.156.112636.1.1.1.3.1&PatientId='+this.patientId, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    },
+	    openBMJ(){
+	    	let main = '';
+	    	if (window.location.host == '192.168.132.13') {
+	    		main = process.env.HOST
+	    	}else{
+	    		main = 'http://192.168.8.74:8080'
+	    	}
+	    	window.open(main+'/search/ZH_CN?q='+this.formInline.disease, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
 	    }
     }
 }
@@ -551,6 +594,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .setRecord{
+	.el-form-item {
+	    margin-bottom: 0;
+	}
 	.el-button.el-button--text{
 		font-size: 18px;
 		.el-icon-delete,.delete{
@@ -580,7 +626,23 @@ export default {
 			padding: 2px 5px;
 			vertical-align: middle;
 		}
-		
+	}
+	.history{
+		font-size: 14px;
+		margin-bottom: 10px;
+		span{
+			color: red;
+		}
+	}
+	.el-tabs.el-tabs--left{
+		height: 420px;
+		.el-tabs__content{
+			.scroll-y{
+				max-height: 420px;
+	    		overflow-y: auto;
+			}
+			
+		}
 	}
 }
 

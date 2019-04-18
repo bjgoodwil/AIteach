@@ -72,6 +72,4 @@ export const recordApi = {
             data: data
         });
     },
-    //保存职业，时间，mrKey
-    //获取职业，时间，mrKey
 }

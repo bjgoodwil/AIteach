@@ -25,17 +25,25 @@ export const diseaseApi = {
         });
     },
     //新增疾病
-    addDisease(data) {
+    // addDisease(data) {
+    //     return axios({
+    //         url: '/teachai/med/disease/addDisease.json',
+    //         method: 'post',
+    //         data: data
+    //     });
+    // },
+    // //修改疾病
+    // updateDisease(data) {
+    //     return axios({
+    //         url: '/teachai/med/disease/updateDisease.json',
+    //         method: 'post',
+    //         data: data
+    //     });
+    // },
+    //新增和修改疾病
+    editDisease(data) {
         return axios({
-            url: '/teachai/med/disease/addDisease.json',
-            method: 'post',
-            data: data
-        });
-    },
-    //修改疾病
-    updateDisease(data) {
-        return axios({
-            url: '/teachai/med/disease/updateDisease.json',
+            url: '/teachai/med/disease/editDisease.json',
             method: 'post',
             data: data
         });
@@ -48,10 +56,10 @@ export const diseaseApi = {
             data: data
         });
     },
-    //获取疾病下所有问题
-    relationShips(data) {
+    //获取疾病下所有内容
+    diseaseWithQuestion(data) {
         return axios({
-            url: '/teachai/med/disease/listDiseaseQuestionRelationShips.json',
+            url: '/teachai/med/disease/listDiseaseWithQuestion.json',
             method: 'post',
             data: data
         });

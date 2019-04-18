@@ -64,30 +64,8 @@
 				      :total="100">
 				</el-pagination> -->
 		    </el-tab-pane>
-		    <el-tab-pane label="问题描述" name="problem">
-				<!-- <el-collapse accordion>
-					<div v-for="item in myQuestion" class="m-b-20" :key="item.id">
-						<el-collapse-item>
-							<template slot="title">
-						      <p style="color: rgb(245, 108, 108);font-size: 16px;"><i class="header-icon el-icon-menu"></i> {{item.name}} </p>
-						    </template>
-							
-							<div v-for="list in item.children" :key="list.id">
-								<el-alert
-								    :title="list.name"
-								    :closable="false"
-								    class="m-t-20"
-								    >
-								</el-alert>
-								
-								<p v-for="(i,e) in list.parms" :key="i.questionId" class="m-t-20">{{e+1}}.{{i.questionName}}</p>
-								
+		    <!-- <el-tab-pane label="问题描述" name="problem">
 
-							</div>
-						
-						</el-collapse-item>
-					</div>
-				</el-collapse> -->
 				<el-table :data="checkQuestion" class="m-t-20">
 		    		<el-table-column
 				      type="index"
@@ -100,7 +78,7 @@
 			        </el-table-column>
 			    </el-table>
 				
-		    </el-tab-pane>
+		    </el-tab-pane> -->
 
 		</el-tabs>
 		
@@ -131,25 +109,25 @@ export default {
 
 			this.tableData = response.data.data.diseaseRecord;
 		})
-    	diseaseApi.relationShips({diseaseId:this.$route.query.diseaseId}).then(response=>{
-	    		this.myQuestion = response.data.data.trees;
-	    		if (this.myQuestion) {
-		    		for (var i = 0; i < this.myQuestion.length; i++) {
+    	// diseaseApi.relationShips({diseaseId:this.$route.query.diseaseId}).then(response=>{
+    	// 	this.myQuestion = response.data.data.trees;
+    	// 	if (this.myQuestion) {
+	    // 		for (var i = 0; i < this.myQuestion.length; i++) {
 
-		    			for (var j = 0; j < this.myQuestion[i].children.length; j++) {
-		    				//this.allQuestionId.push(this.allQuestion[i].children[j].parms)
-		    				if (this.myQuestion[i].children[j].parms) {
+	    // 			for (var j = 0; j < this.myQuestion[i].children.length; j++) {
+	    // 				//this.allQuestionId.push(this.allQuestion[i].children[j].parms)
+	    // 				if (this.myQuestion[i].children[j].parms) {
 
-			    				for (var k = 0; k < this.myQuestion[i].children[j].parms.length; k++) {
+		   //  				for (var k = 0; k < this.myQuestion[i].children[j].parms.length; k++) {
 
-			    					this.checkQuestion.push(this.myQuestion[i].children[j].parms[k])
-			    				}
-			    			}
-			    			
-			    		}
-		    		}
-		    	}
-	        });
+		   //  					this.checkQuestion.push(this.myQuestion[i].children[j].parms[k])
+		   //  				}
+		   //  			}
+		    			
+		   //  		}
+	    // 		}
+	    // 	}
+     //    });
     },
     methods:{
     	/**

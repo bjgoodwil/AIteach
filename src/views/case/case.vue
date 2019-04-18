@@ -46,7 +46,7 @@
 
 										<div slot="content">
 											
-										  	<a style="cursor: pointer;" @click="toCaseInfo(i)">详情</a>&nbsp; 
+										  	<a style="cursor: pointer;" @click="toCaseInfo(i)">病例</a>&nbsp; 
 										  	<a style="cursor: pointer;" @click="toAddCase(i)">编辑</a>&nbsp; 
 										  	<a style="cursor: pointer;" v-if="i.count == 0" @click="deleteDis(e,i,listDisease)">删除</a>
 										
@@ -54,7 +54,7 @@
 									</el-tooltip>
 									<span class="diseaseNum">{{i.count}}例</span>
 								</li>
-								
+								<p v-if="listDisease.length == 0" class="textCenter m-t-10">暂无数据</p>
 						</ul>
 						
 						
@@ -141,7 +141,12 @@ export default {
 	    },
 	    //
 	    addCase(){
-	    	this.$router.push({name:'addCase'})
+	    	this.$router.push({
+	    		name:'addCase',
+	    		query:{
+	    			diseaseId:0
+	    		}
+	    	})
 	    },
 	    /**
 		 * 删除疾病
@@ -151,12 +156,14 @@ export default {
 		 * @return {[type]}      [description]
 		 */
 	    deleteDis(index,row,rows){
+
 	    	this.$confirm('确定删除该病例吗?', '提示', {
 	          confirmButtonText: '确定',
 	          cancelButtonText: '取消',
 	          type: 'warning'
 	        }).then(() => {
-	        	diseaseApi.deleteDisease({diseaseId:row.disease.id}).then(response=>{
+
+	        	diseaseApi.deleteDisease({diseaseId:row.id}).then(response=>{
 	        		rows.splice(index, 1);
 			        this.$message({
 			            type: 'success',
@@ -185,6 +192,7 @@ export default {
 	    	this.$router.push({ 
 	    		name: 'addCase',
 	    		query:{
+	    			diseaseId:caseName.id,
 	    			activeName:this.activeName,
 	    			activeClass:this.activeClass
 	    		},
