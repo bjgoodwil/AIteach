@@ -25,19 +25,18 @@
                       @select="handleSelect"
                       class="el-menu-vertical-demo"
                       >
-                      <!-- <el-menu-item index="/mapTable">
-                        <i class="el-icon-document"></i>
-                        <span slot="title">映射表</span>
-                      </el-menu-item> -->
-                      <el-menu-item index="/problem">
-                        <i class="el-icon-document"></i>
-                        <span slot="title">提问库</span>
-                      </el-menu-item>
                       <el-menu-item index="/case">
                         <i class="el-icon-menu"></i>
                         <span slot="title">疾病分类</span>
                       </el-menu-item>
-                      
+                      <el-menu-item index="/mapTable">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">问题分类表</span>
+                      </el-menu-item>
+                      <el-menu-item index="/problem">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">标准提问库</span>
+                      </el-menu-item>
                       <el-menu-item index="/list">
                         <i class="el-icon-tickets"></i>
                         <span slot="title">虚拟病例</span>

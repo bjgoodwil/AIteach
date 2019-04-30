@@ -20,7 +20,7 @@ let instance = axios.create({
 instance.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
     config.headers['Accept'] = '*/*';
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 
     // if(config.method=='post'){  //设置固定入参
     //     config.data = {

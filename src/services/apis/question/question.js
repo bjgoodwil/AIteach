@@ -8,39 +8,31 @@ export const question = {
             data: data
         });
     },
-    //获取所有问题
-    questionListAll(data) {
+    //添加子问题
+    addSubQuestion(data) {
         return axios({
-            url: '/teachai/med/question/questionListAll.json',
+            url: '/teachai/med/question/addSubQuestion.json',
             method: 'post',
             data: data
         });
     },
-    //问题列表
-    questionList(data) {
+    //添加父问题（标准库问题）
+    addFatherQuestion(data) {
         return axios({
-            url: '/teachai/med/question/questionList.json',
-            method: 'post',
-            data: data
-        });
-    },
-    //添加问题
-    addQuestion(data) {
-        return axios({
-            url: '/teachai/med/question/addQuestion.json',
+            url: '/teachai/med/question/addFatherQuestion.json',
             method: 'post',
             data: data
         });
     },
     //修改问题
-    updateQuestion(data) {
+    updateSubQuestion(data) {
         return axios({
-            url: '/teachai/med/question/updateQuestion.json',
+            url: '/teachai/med/question/updateSubQuestion.json',
             method: 'post',
             data: data
         });
     },
-    //删除问题
+    //删除父问题（标准问题库）
     deleteQuestion(data) {
         return axios({
             url: '/teachai/med/question/deleteQuestion.json',
@@ -48,12 +40,29 @@ export const question = {
             data: data
         });
     },
-    //获取映射路径
-    getModelList(data) {
+    //获取问题类型
+    standandType(data) {
         return axios({
-            url: '/teachai/med/question/getModelList.json',
+            url: '/teachai/med/question/listAllStandandTypeName.json',
             method: 'post',
             data: data
         });
     },
+    //获取相关子问题
+    allSubQuestion(data) {
+        return axios({
+            url: '/teachai/med/question/listAllSubQuestion.json',
+            method: 'post',
+            data: data
+        });
+    },
+    //获取所有主问题
+    listAllQuestion(data) {
+        return axios({
+            url: '/teachai/med/question/listAllQuestion.json',
+            method: 'post',
+            data: data
+        });
+    },
+    
 }

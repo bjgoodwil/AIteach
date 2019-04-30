@@ -72,4 +72,12 @@ export const recordApi = {
             data: data
         });
     },
+    //导入病例Excel
+    uploadSampleModel(data) {
+        return axios({
+            url: '/teachai/med/disease/uploadSampleModelFile.json',
+            method: 'post',
+            data: data
+        });
+    },
 }

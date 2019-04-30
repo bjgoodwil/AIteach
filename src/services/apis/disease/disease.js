@@ -64,4 +64,12 @@ export const diseaseApi = {
             data: data
         });
     },
+    //添加疾病下问题
+    addSingleQuestion(data) {
+        return axios({
+            url: '/teachai/med/disease/addSingleQuestion.json',
+            method: 'post',
+            data: data
+        });
+    },
 }
