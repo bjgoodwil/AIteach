@@ -11,9 +11,6 @@
 			<el-form-item label="年龄：">
 			    {{formInline.age}} {{formInline.ageunit}}
 			</el-form-item>
-			<!-- <el-form-item label="职业：">
-			    {{formInline.profession}}
-			</el-form-item> --> &nbsp;&nbsp;
 			<el-button type="primary" round size="small" @click="open">查看病历详情</el-button>
 			<el-button type="primary" round size="small" @click="openImg">查看影像</el-button>
 			<el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button><br>
@@ -48,7 +45,7 @@
 		<el-popover
 		  ref="popover"
 		  placement="right"
-		  width="400"
+		  width="280"
 		  trigger="click">
 		    <el-select v-model="sceneName" placeholder="请选择场景" @change="change" size="small" style="width: 200px">
 		      	<el-option label="查房" value="查房" ></el-option>
@@ -136,14 +133,14 @@
 							</el-tab-pane>
 						</el-tabs>
 				    </el-tab-pane>
-				    <el-tab-pane label="诊断" name="诊断" v-if="activeScene ==0">
+				    <el-tab-pane label="诊断" name="诊断">
 				    	<el-tabs tab-position="left" v-model="activeClass">
 				    		<el-tab-pane label="诊断" name="诊断">
 				    			<div class="scroll-y">
 								<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].support">
 									<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
 										<span class="pos-a" style="right: 60px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-										<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan.support,index)">删除</a>
+										<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].support,index)">删除</a>
 									</p>
 									<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
 									<el-table :data="item.supportQuestions" :show-header="false">
@@ -152,10 +149,8 @@
 									      label="序号"
 									      width="50">
 									    </el-table-column>
-								        <el-table-column prop="questionName">
-								        	
+								        <el-table-column prop="questionName">	
 								        </el-table-column>
-				
 								        <el-table-column label="得分" width="120">
 								        	<template slot-scope="scope">
 								        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
@@ -163,7 +158,6 @@
 								        </el-table-column>
 								        <el-table-column width="100px" label="操作">
 								        	<template slot-scope="scope">
-								        		
 										        <el-button
 										          title="删除"
 										          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
@@ -172,15 +166,15 @@
 								        </el-table-column>
 								    </el-table>
 								</div>
+								<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
 								</div>
 							</el-tab-pane>
 							<el-tab-pane label="鉴别诊断" name="鉴别诊断">
 								<div class="scroll-y">
-
 								<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport">
 									<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
 										<span class="pos-a" style="right: 60px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-										<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan.unsupport,index)">删除</a>
+										<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport,index)">删除</a>
 									</p>
 									<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
 									<el-table :data="item.supportQuestions" :show-header="false">
@@ -190,9 +184,7 @@
 									      width="50">
 									    </el-table-column>
 								        <el-table-column prop="questionName">
-								        	
 								        </el-table-column>
-				
 								        <el-table-column label="得分" width="120">
 								        	<template slot-scope="scope">
 								        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分" style="width: 62px"></el-input>
@@ -200,7 +192,6 @@
 								        </el-table-column>
 								        <el-table-column width="100px" label="操作">
 								        	<template slot-scope="scope">
-								        		
 										        <el-button
 										          title="删除"
 										          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
@@ -216,9 +207,7 @@
 									      width="50">
 									    </el-table-column>
 								        <el-table-column prop="questionName">
-								        	
 								        </el-table-column>
-				
 								        <el-table-column label="得分" width="120">
 								        	<template slot-scope="scope">
 								        		<el-input type="number" v-model="scope.row.score" placeholder="得分" style="width: 60px"></el-input>
@@ -226,7 +215,6 @@
 								        </el-table-column>
 								        <el-table-column width="100px" label="操作">
 								        	<template slot-scope="scope">
-								        		
 										        <el-button
 										          title="删除"
 										          type="text" @click.native.prevent="deleteRow(item.unSupportQuestions,scope.$index)">
@@ -235,11 +223,12 @@
 								        </el-table-column>
 								    </el-table>
 								</div>
+								<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
 								</div>
 							</el-tab-pane>
 						</el-tabs>
 				    </el-tab-pane>
-				    <el-tab-pane label="处置" name="处置" v-if="activeScene ==0">
+				    <el-tab-pane label="处置" name="处置">
 						<el-tabs tab-position="left" v-model="activeClass">
 				    		<el-tab-pane v-for="(item,index) in chuzhi[activeScene][allQuestion.trees[activeScene].name]" :key="item.diagnosisName" :label="item.diagnosisName+'('+item.supportQuestions.length+')'" :name="item.diagnosisName">
 				    			<div class="scroll-y">
@@ -254,7 +243,6 @@
 											<el-input size="small" v-model="scope.row.questionName" placeholder="处置名称"></el-input>
 							        	</template>
 							        </el-table-column>
-			
 							        <el-table-column label="得分" width="120">
 							        	<template slot-scope="scope">
 							        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分" style="width: 62px"></el-input>
@@ -262,7 +250,6 @@
 							        </el-table-column>
 							        <el-table-column width="100px" label="操作">
 							        	<template slot-scope="scope">
-							        		
 									        <el-button
 									          title="删除"
 									          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
@@ -272,13 +259,11 @@
 							    </el-table>
 								</div>
 							</el-tab-pane>
-						
 						</el-tabs>
 				    </el-tab-pane> 
 				</el-tabs>
 			</el-tab-pane>
 		</el-tabs>
-
 		<!-- 添加依据弹出框 -->
 		<el-dialog
 		  title="添加依据"
@@ -298,9 +283,18 @@
 							    class="m-t-20">
 							</el-alert>
 							<el-checkbox-group v-model="checkReason" @change="handleCheckChange">
-								<el-checkbox v-for="i in list.parms" :label="i" :key="i.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(i.questionId) > -1"><span>[{{item.name}}]</span> {{i.questionName}}
-							    </el-checkbox>
+								<div v-for="i in list.parms">
+									<el-checkbox :label="i" :key="i.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(i.questionId) > -1"><span>[{{item.name}}]</span> {{i.questionName}}
+							    	</el-checkbox>
+							    	<div v-for="sub in i.subQuestionList" class="m-l-10">
+							    		<el-checkbox :label="sub" :key="sub.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(sub.questionId) > -1"><span>[{{item.name}}]</span> {{sub.questionName}} (子)
+							    		</el-checkbox>
+							    	</div>
+								</div>
+								<!-- <el-checkbox v-for="i in list.parms" :label="i" :key="i.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(i.questionId) > -1"><span>[{{item.name}}]</span> {{i.questionName}} (<span v-for="(sub,index) in i.subQuestionList">{{sub.questionName}}，</span>)
+							    </el-checkbox> -->
 							</el-checkbox-group>
+							
 						</div>	
 					</el-collapse-item>
 				</div>
@@ -331,7 +325,6 @@
 						<el-input v-model="questionForm.questionAnswer" placeholder="请输入答案" size="small"></el-input> 
 				  	</el-form-item>
 			    </div>
-			  	
 			  	<el-form-item label="难度" class="floatLeft" style="width: 240px;" >
 					<el-select v-model="questionForm.difficultyDegree" placeholder="难度"size="small">
 				      	<el-option label="0" value="0" ></el-option>
@@ -367,10 +360,9 @@ export default {
 
 	    return {
 	    	loading:false,
-	    	params:{},  //入参
 	    	dialogVisibleTree: false,
 	    	dialogVisibleQuestion:false,
-	    	activeScene:'0',
+	    	activeScene:0,
 	    	activeName:'',
 	    	activeClass:'',
 	    	currentZhenduan: '',//当前诊断
@@ -394,12 +386,12 @@ export default {
 	    	},
 	    	questionForm:{
 	    		classifyId: "",
-				difficultyDegree: "0",
+				difficultyDegree: 0,
 				questionAnswer: "",
 				questionId: "",
 				questionName: "",
 				questionPath: "",
-				questionScore: "0",
+				questionScore: 0,
 				subQuestionList: [],
 				//添加诊断，处置
 				diagnosisName:'',
@@ -409,6 +401,7 @@ export default {
 	        },
 	        chuzhi:[],
 	        patientId:'',
+	        visitId:'',
 	        sceneName:'查房',//场景名
 	        gist:[],  //依据
 	    }
@@ -462,8 +455,8 @@ export default {
   		//设置默认数据
   		setDefaultData(data){
   			this.loading = false;
-			this.params = data;
-			this.patientId = data.patientId
+			this.patientId = data.patientId;
+			this.visitId = data.visitId;
 			this.formInline.gender = data.gender;
 			this.formInline.age = data.age;
 			this.formInline.ageunit = data.ageunit;
@@ -476,19 +469,52 @@ export default {
 			this.allQuestion = data;
 			this.zhenduan = data.zhenduan;
 			this.chuzhi = data.chuzhi;
-			this.gist = this.params.trees[this.activeScene].children;
+			this.gist = this.allQuestion.trees[this.activeScene].children;
   		},
   		//添加和删除场景
      	addScene(){
      		this.loading = true;
      		recordApi.questionRelationShips({
 				diseaseId:this.$route.query.diseaseId,
-				patientId:this.$route.query.patientId,
-				visitId:this.$route.query.visitId,
+				patientId:this.patientId,
+				visitId:this.visitId,
 				sceneName:this.sceneName
 			}).then(response=>{
 				this.loading = false;
-				this.params.trees.push(response.data.data.trees[0])
+				let sc = response.data.data.trees[0];
+				let scName = sc.name;
+				scName = scName+"_"+(this.allQuestion.trees.length+1);
+				this.allQuestion.trees.push(sc);
+				this.allQuestion.trees[this.allQuestion.trees.length-1].name = scName;
+				this.allQuestion.zhenduan.push({
+					[scName]:{
+						support:[],
+						unsupport:[]
+					}
+				});
+				this.allQuestion.chuzhi.push({
+					[scName]:[{
+						diagnosisName: "检验",
+						diagnosisScore: 0,
+						diagnosisType: "检验",
+						supportQuestions: []
+					},{
+						diagnosisName: "检查",
+						diagnosisScore: 0,
+						diagnosisType: "检查",
+						supportQuestions: []
+					},{
+						diagnosisName: "手术",
+						diagnosisScore: 0,
+						diagnosisType: "手术",
+						supportQuestions: []
+					},{
+						diagnosisName: "药品",
+						diagnosisScore: 0,
+						diagnosisType: "药品",
+						supportQuestions: []
+					}]
+				})
 			})
 			document.getElementsByClassName('el-popover')[0].style.display = "none"
      	},
@@ -504,7 +530,18 @@ export default {
 		          cancelButtonText: '取消',
 		          type: 'warning'
 		        }).then(() => {
-		        	this.params.trees.splice(index,1)
+		        	recordApi.deleteSampleScene({
+						sampleSceneNameAndId:this.allQuestion.trees[index].name
+					}).then(response=>{
+						this.$message({
+				            type: 'success',
+				            message: '删除成功!'
+				        });
+				        this.activeScene = "0";
+				        this.allQuestion.trees.splice(index,1);
+				        this.allQuestion.zhenduan.splice(index,1);
+				        this.allQuestion.chuzhi.splice(index,1);
+					})
 		        })
      		}
      	},
@@ -540,7 +577,7 @@ export default {
      		}
      	},
      	addQuestion(){
-     		let a = this.params.trees[this.activeScene];
+     		let a = this.allQuestion.trees[this.activeScene];
      		if (this.activeName == '诊断') {
      			if (this.activeClass == '诊断') {
      				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support.push({
@@ -585,6 +622,7 @@ export default {
      	showReasonLog(type,num,n){
      		this.currentZhenduan = type;
      		this.currentZhenduanNum = num;
+     		this.gist = this.allQuestion.trees[this.activeScene].children;
      		this.dialogVisibleTree = true;
      		if (n) {
      			this.isNo = 'no';
@@ -666,22 +704,22 @@ export default {
      	//保存
      	save(type){
      		this.loading = true;
-     		if (this.params.diagnosis == '') {
-     			this.params.diagnosis = this.formInline.disease
+     		if (this.allQuestion.diagnosis == '') {
+     			this.allQuestion.diagnosis = this.formInline.disease
      		}
-     		this.params.symptoms = this.formInline.symptoms;
-     		this.params.chiefComplaint = this.formInline.chiefComplaint;
-     		this.params.suggestDuration = this.formInline.time;
-     		this.params.difficultyDegree = this.formInline.grade;
-     		this.params.status = type;
-     		for (var i = 0; i < this.params.trees.length; i++) {
-     			this.params.trees[i].name = '入院_1';
-     			this.chuzhi[0]=JSON.parse(JSON.stringify(this.chuzhi[0]).replace(/入院/g,"入院_1"))
-     			this.zhenduan[0]=JSON.parse(JSON.stringify(this.zhenduan[0]).replace(/入院/g,"入院_1"))
-	    		for (var j = 0; j < this.params.trees[i].children.length; j++) {
-	    			for (var k = 0; k < this.params.trees[i].children[j].children.length; k++) {
-		    			for (var l = 0; l < this.params.trees[i].children[j].children[k].parms.length; l++) {
-			    			this.params.trees[i].children[j].children[k].parms[l].questionNum = l+1
+     		this.allQuestion.symptoms = this.formInline.symptoms;
+     		this.allQuestion.chiefComplaint = this.formInline.chiefComplaint;
+     		this.allQuestion.suggestDuration = this.formInline.time;
+     		this.allQuestion.difficultyDegree = this.formInline.grade;
+     		this.allQuestion.status = type;
+     		for (var i = 0; i < this.allQuestion.trees.length; i++) {
+     			// this.allQuestion.trees[i].name = '入院_1';
+     			// this.chuzhi[0]=JSON.parse(JSON.stringify(this.chuzhi[0]).replace(/入院/g,"入院_1"))
+     			// this.zhenduan[0]=JSON.parse(JSON.stringify(this.zhenduan[0]).replace(/入院/g,"入院_1"))
+	    		for (var j = 0; j < this.allQuestion.trees[i].children.length; j++) {
+	    			for (var k = 0; k < this.allQuestion.trees[i].children[j].children.length; k++) {
+		    			for (var l = 0; l < this.allQuestion.trees[i].children[j].children[k].parms.length; l++) {
+			    			this.allQuestion.trees[i].children[j].children[k].parms[l].questionNum = l+1
 			    		}
 		    		}
 	    		}
@@ -689,7 +727,7 @@ export default {
         	if (this.$route.query.type == 'edit') {
      			recordApi.updateRecord({
 					sampleId:this.$route.query.sampleId,
-					relationJson:JSON.stringify(this.params)
+					relationJson:JSON.stringify(this.allQuestion)
 				}).then(response=>{
 					this.loading = false;
 					this.$message({
@@ -698,14 +736,14 @@ export default {
 			        });
 				})
      		}else{
-     			this.$set(this.params, "sampleParms",{
+     			this.$set(this.allQuestion, "sampleParms",{
 	     			mrKey:this.formInline.mrKey || '',
 				    profession:this.formInline.profession || '',
 				    hospitalizedTime:this.formInline.hospitalizedTime || '',
 	     		})
      			recordApi.addDiseaseRecord({
 					diseaseId:this.$route.query.diseaseId || this.$route.parms.diseaseId,
-					relationJson:JSON.stringify(this.params)
+					relationJson:JSON.stringify(this.allQuestion)
 				}).then(response=>{
 					this.loading = false;
 					this.$router.push({name:'list'})
@@ -728,7 +766,7 @@ export default {
 	    },
 	    openBMJ(){
 	    	let main = '';
-	    	if (window.location.host == process.env.HOST) {
+	    	if (window.location.host == '192.168.132.13:8804') {
 	    		main = 'http://10.2.3.96:8080'
 	    	}else{
 	    		main = 'http://192.168.8.74:8080'

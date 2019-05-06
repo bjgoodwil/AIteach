@@ -357,7 +357,7 @@ export default {
 	    },
 	    openBMJ(){
 	    	let main = '';
-	    	if (window.location.host == process.env.HOST) {
+	    	if (window.location.host == '192.168.132.13:8804') {
 	    		main = 'http://10.2.3.96:8080'
 	    	}else{
 	    		main = 'http://192.168.8.74:8080'

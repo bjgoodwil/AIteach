@@ -80,4 +80,12 @@ export const recordApi = {
             data: data
         });
     },
+    //导入病例Excel
+    deleteSampleScene(data) {
+        return axios({
+            url: '/teachai/med/disease/deleteSampleScene.json',
+            method: 'post',
+            data: data
+        });
+    },
 }

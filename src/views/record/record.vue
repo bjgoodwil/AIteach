@@ -64,7 +64,7 @@
 	        		<span v-else-if="scope.row.status == 0"> 未发布 </span>
 	        	</template>
 	        </el-table-column>
-	        <el-table-column prop="createDate" label="发布时间" width="200">
+	        <el-table-column prop="createDate" label="发布时间" width="160">
 	        </el-table-column>
 	        <el-table-column label="操作" width="120">
 		      <template slot-scope="scope">
