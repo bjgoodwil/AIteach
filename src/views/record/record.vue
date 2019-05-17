@@ -1,5 +1,5 @@
 <template>
-    <div class="record">
+    <div class="record" v-loading="allLoading">
 		<el-tabs v-model="activeName">
 		    <el-tab-pane label="病例列表" name="病例列表">
 		    	<el-form ref="form" :inline="true" :model="form" label-width="40px" size="small" class="clearfix m-b-10">
@@ -13,7 +13,6 @@
 					</el-form-item>
 					<el-form-item label="疾病" class="floatLeft">
 						<el-select v-model="form.caseName" clearable placeholder="请选择" size="small" @change="selectDisease">
-
 						    <el-option
 						      v-for="item in optionsDis1"
 						      :key="item.id"
@@ -146,7 +145,7 @@
 					    </el-option>
 					</el-select>
 				</el-form-item>
-			  	<el-form-item label="职业" class="floatLeft">
+			  	<!-- <el-form-item label="职业" class="floatLeft">
 			        <el-input v-model="importForm.profession" placeholder="职业" size="small"></el-input>
 			    </el-form-item>
 			    <el-form-item label="入院时间" class="floatLeft">
@@ -154,7 +153,7 @@
 			    </el-form-item>
 			    <el-form-item label="mrKey" class="floatLeft">
 			        <el-input v-model="importForm.mrKey" placeholder="mrKey" size="small"></el-input>
-			    </el-form-item>
+			    </el-form-item> -->
 			    <el-upload
 			      style="width: 300px"
 				  class="upload-demo floatLeft m-l-30 m-t-20"
@@ -181,6 +180,7 @@ export default {
 	data () {
 		
 	    return {
+	    	allLoading:false,
 	    	loading:true,
 	    	disabled:false,
 	    	activeName:'病例列表',
@@ -194,7 +194,7 @@ export default {
         	dialogFormVisible:false,
         	dialogFormVisibleExcel:false,
         	diseaseForm:{
-        		diseaseType:'',
+        		diseaseType:[],
         		disease:'',
         		diseaseId:'',
         	},
@@ -296,7 +296,7 @@ export default {
 	    },
 	    //dialog关闭的回调
 	    dialogClose(){
-	    	this.diseaseForm.diseaseType = '';
+	    	this.diseaseForm.diseaseType = [];
 	    	this.diseaseForm.disease = '';
 	    	this.importForm.diseaseType = '';
 	    	this.importForm.disease = '';
@@ -327,27 +327,6 @@ export default {
 	    	this.importForm.disease = val.diseaseName;
 	    	this.importForm.diseaseId = val.id;
 	    },
-	    handleExcelSuccess(res, file) {
-	    	this.importData = res.data;
-	    	this.$message({
-	            type: 'success',
-	            message: '病例上传成功!'
-	        });
-	    },
-	    toSetRecord(){
-	    	this.$router.push({
-	    		name:'setRecord',
-	    		query:{
-	    			type:'import',
-	    			disease:this.importForm.disease,
-	    			diseaseId:this.importForm.diseaseId,
-	    			mrKey:this.importForm.mrKey,
-	    			profession:this.importForm.profession,
-	    			hospitalizedTime:this.importForm.hospitalizedTime,
-	    		},
-	    		params:this.importData
-	    	})
-	    },
 	    beforeExcelUpload(file) {
 	    	var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)				
 			const extension = testmsg === 'xls'
@@ -361,6 +340,63 @@ export default {
 	          this.$message.error('文件大小不能超过 2MB!');
 	        }
 	        return extension || extension2 && isLt2M;
+	    },
+	    handleExcelSuccess(res, file) {
+	    	this.importData = res.data;
+	    	this.$message({
+	            type: 'success',
+	            message: '病例上传成功!'
+	        });
+	    },
+	    toSetRecord(){
+
+	    	// this.$router.push({
+	    	// 	name:'setRecord',
+	    	// 	query:{
+	    	// 		type:'import',
+	    	// 		disease:this.importForm.disease,
+	    	// 		diseaseId:this.importForm.diseaseId,
+	    	// 		mrKey:this.importForm.mrKey,
+	    	// 		profession:this.importForm.profession,
+	    	// 		hospitalizedTime:this.importForm.hospitalizedTime,
+	    	// 	},
+	    	// 	params:this.importData
+	    	// })
+	    	if (this.importData.patientId) {
+	    		this.allLoading = true;
+	    		this.dialogFormVisibleExcel = false;
+	    		this.$set(this.importData, "sampleParms",{
+	     			mrKey:this.importForm.mrKey || '',
+				    profession:this.importForm.profession || '',
+				    hospitalizedTime:this.importForm.hospitalizedTime || '',
+	     		})
+	 			recordApi.addDiseaseRecord({
+					diseaseId:this.importForm.diseaseId,
+					relationJson:JSON.stringify(this.importData)
+				}).then(response=>{
+					this.loading = false;
+					this.$router.push({name:'list'})
+					this.$message({
+			            type: 'success',
+			            message: '病例已保存成功!'
+			        });
+			        this.$router.push({
+			    		name:'setRecord',
+			    		query:{
+			    			disease:this.importForm.disease,
+			    			type:'edit',
+			    			sampleId:response.data.data,
+			    			diseaseId:this.importForm.diseaseId
+			    		},
+			    	})
+				})
+	    	}else{
+	    		this.$message({
+		            type: 'warning',
+		            message: '请上传病例'
+		        });
+	    	}
+	    	
 	    },
 	    /**
 		 * 删除病例

@@ -88,4 +88,12 @@ export const recordApi = {
             data: data
         });
     },
+    //获取所有查房记录
+    getChafang(data) {
+        return axios({
+            url: '/teachai/med/disease/getShangjiyishichafang.json',
+            method: 'post',
+            data: data
+        });
+    },
 }

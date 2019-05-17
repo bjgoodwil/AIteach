@@ -1,6 +1,6 @@
 <template>
     <div class="mapTable">
-		
+		<p style="height: 32px;"><i class="el-icon-location-outline"></i> 问题分类表 </p>
     	<el-tabs v-model="activeName" tab-position="left" @tab-click="tabClick1">
 		    <el-tab-pane v-for="(item,index) in questionList" :key="item.id" :label="item.standandTypeName" :name="item.id">
 		    	<div class="clearfix">

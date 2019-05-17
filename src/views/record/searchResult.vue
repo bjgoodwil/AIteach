@@ -71,7 +71,6 @@ export default {
 		//this.param.disease = this.$route.query.disease
 		this.getData(this.param);
 		
-		//this.result = this.$route.query.keywords;
 	},
 	beforeRouteEnter(to, from, next) {
 	   next(vm=>{          //  这里的vm指的就是vue实例，可以用来当做this使用
@@ -103,31 +102,74 @@ export default {
 	    },
 	    //to结构化病历
 	    setRecord(row){
-	    	recordApi.sampleAreRepeat({
-				diseaseId:this.$route.query.diseaseId,
-	    		patientId:row.patientId,
-	    		visitId:row.visitNum
-			}).then(response=>{
-				if (response.data.data) {
-					this.$message({
-			            type: 'warning',
-			            message: '该病例已存在!'
-			        });
-				}else{
-					this.$router.push({
-			    		name:'setRecord',
-			    		query:{
-			    			disease:this.$route.query.disease,
-			    			diseaseId:this.$route.query.diseaseId,
-			    			patientId:row.patientId,
-			    			visitId:row.visitNum,
-			    			mrKey:row.mrKey,
-			    			profession:row.profession,
-			    			hospitalizedTime:row.hospitalizedTime,
+	  //   	recordApi.sampleAreRepeat({
+			// 	diseaseId:this.$route.query.diseaseId,
+	  //   		patientId:row.patientId,
+	  //   		visitId:row.visitNum
+			// }).then(response=>{
+			// 	if (response.data.data) {
+			// 		this.$message({
+			//             type: 'warning',
+			//             message: '该病例已存在!'
+			//         });
+			// 	}else{
+					this.loading = true;
+					recordApi.questionRelationShips({
+						diseaseId:this.$route.query.diseaseId,
+						patientId:row.patientId,
+						visitId:row.visitNum,
+						sceneName:'入院'
+					}).then(response=>{
+						let params = response.data.data;
+						if (response.data.errCode == "0") {
+			    			this.$set(params, "sampleParms",{
+				     			mrKey:row.mrKey || '',
+							    profession:row.profession || '',
+							    hospitalizedTime:row.hospitalizedTime || '',
+				     		})
+				     		// params.sampleParms.mrKey = row.mrKey || '';
+				     		// params.sampleParms.profession = row.profession || '';
+				     		// params.sampleParms.hospitalizedTime = row.hospitalizedTime || '';
+			     			recordApi.addDiseaseRecord({
+								diseaseId:this.$route.query.diseaseId,
+								relationJson:JSON.stringify(params)
+							}).then(response=>{
+								this.loading = false;
+								this.$message({
+						            type: 'success',
+						            message: '病例已保存!'
+						        });
+								this.$router.push({
+						    		name:'setRecord',
+						    		query:{
+						    			disease:row.diagnosis,
+						    			type:'edit',
+						    			sampleId:response.data.data,
+						    			diseaseId:this.$route.query.diseaseId
+						    		}
+						    	})
+							})
+			    		}else{
+			    			this.$message({
+						        message: response.data.errMsg,
+						        type: 'warning'
+					        });
 			    		}
-			    	})
-				}
-			})
+					})
+					// this.$router.push({
+			  //   		name:'setRecord',
+			  //   		query:{
+			  //   			disease:this.$route.query.disease,
+			  //   			diseaseId:this.$route.query.diseaseId,
+			  //   			patientId:row.patientId,
+			  //   			visitId:row.visitNum,
+			  //   			mrKey:row.mrKey,
+			  //   			profession:row.profession,
+			  //   			hospitalizedTime:row.hospitalizedTime,
+			  //   		}
+			  //   	})
+			  //	}
+			//})
 	    	
 	    },
 	    open(row){

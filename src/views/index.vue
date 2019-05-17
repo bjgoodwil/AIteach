@@ -29,23 +29,23 @@
                         <i class="el-icon-menu"></i>
                         <span slot="title">疾病分类</span>
                       </el-menu-item>
-                      <el-menu-item index="/mapTable">
-                        <i class="el-icon-document"></i>
-                        <span slot="title">问题分类表</span>
+                      <el-menu-item index="/list">
+                        <i class="el-icon-tickets"></i>
+                        <span slot="title">虚拟病例</span>
                       </el-menu-item>
                       <el-menu-item index="/problem">
                         <i class="el-icon-document"></i>
                         <span slot="title">标准提问库</span>
                       </el-menu-item>
-                      <el-menu-item index="/list">
-                        <i class="el-icon-tickets"></i>
-                        <span slot="title">虚拟病例</span>
+                      <el-menu-item index="/mapTable">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">问题分类表</span>
                       </el-menu-item>
-                      <!-- <el-menu-item index="5">
+                      <!-- <el-menu-item index="/students">
                         <i class="el-icon-menu"></i>
-                        <span slot="title">统计</span>
-                      </el-menu-item>
-                      <el-menu-item index="6">
+                        <span slot="title">用户信息</span>
+                      </el-menu-item> -->
+                      <!-- <el-menu-item index="6">
                         <i class="el-icon-document"></i>
                         <span slot="title">操作日志</span>
                       </el-menu-item> -->

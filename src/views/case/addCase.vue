@@ -4,36 +4,33 @@
 		    <el-breadcrumb-item :to="{ path: '/case' }">疾病库</el-breadcrumb-item>
 		    <el-breadcrumb-item v-if="$route.query.activeName">编辑疾病</el-breadcrumb-item>
 		    <el-breadcrumb-item v-else>新建疾病</el-breadcrumb-item>
-		    
 		</el-breadcrumb>
 		
 		<el-form ref="form" :model="form" label-width="80px" class="m-t-20">
 			<div class="clearfix">
-				
 				<el-form-item label="专业" class="floatLeft">
-				
 				    <el-cascader
 					    :options="options"
 					    :props="defaultProps"
 					    v-model="form.selectedOptions"
 					    @change="handleChange"
-					    :disabled="disabled" size="small"
-					    >
+					    :disabled="disabled" size="small">
 					</el-cascader>
 				</el-form-item>
 				<el-form-item label="疾病" class="floatLeft">
 				    <el-input v-model="form.caseName" placeholder="请输入疾病症状" size="small"></el-input>
 				</el-form-item>
+				<el-button type="primary" round size="small" @click="openYWD" class="m-l-20">查看病历</el-button>
+				<el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button>
 			</div>
-			
 			<el-form-item label="教学目的">
-			    <el-input v-model="form.teachingAims" autosize type="textarea" placeholder="请输入教学目的" style="width: 495px;"></el-input> 
+			    <el-input v-model="form.teachingAims" autosize type="textarea" placeholder="请输入教学目的" style="width: 715px;"></el-input> 
 			    
 			</el-form-item>
 		</el-form>
 
 		<p class="m-b-10 m-t-10">
-			</el-input> <el-button type="primary" round size="small" @click="openYWD">查看病历</el-button> <el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button> <el-button type="primary" round size="small" @click="exportToExcel">导出问题</el-button>
+			  <!-- <el-button type="primary" round size="small" @click="exportToExcel">导出问题</el-button> -->
 		</p>
 		
 		<el-tabs type="border-card" v-model="activeScene" @tab-click="tabClick">
@@ -161,6 +158,7 @@ export default {
             dialogVisibleTree:false,
             optionQuestion:[],
             questionForm:{    //添加问题表单
+            	diseaseTypeId:'', //专业id
             	selectQuestion:'',
             	questionParm:'',
             	//自定义问题
@@ -249,18 +247,30 @@ export default {
      		}
      	},
      	showQuestionList(){
-     		this.dialogVisibleTree = true;
-     		let a = this.optionQuestion[this.activeScene];
-     		for (var i = 0; i < a.children.length; i++) {
-        		if (this.activeName == a.children[i].id) {
-        			for (var j = 0; j < a.children[i].children.length; j++) {
-        				if (this.activeClass == a.children[i].children[j].id){
-        					this.thisQuestion = a.children[i].children[j].parms
-        				}
-        			}
-        		}
-        	}
-        	
+     		if(this.form.selectedOptions.length == 0){
+     			this.$message({
+			        message: '请先选择专业',
+			        type: 'warning'
+		        });
+     		}else if (this.form.caseName == '') {
+     			this.$message({
+			        message: '请输入疾病名称',
+			        type: 'warning'
+		        });
+     		}else{
+     			this.dialogVisibleTree = true;
+     			this.questionForm.diseaseTypeId = this.form.selectedOptions[1]
+	     		let a = this.optionQuestion[this.activeScene];
+	     		for (var i = 0; i < a.children.length; i++) {
+	        		if (this.activeName == a.children[i].id) {
+	        			for (var j = 0; j < a.children[i].children.length; j++) {
+	        				if (this.activeClass == a.children[i].children[j].id){
+	        					this.thisQuestion = a.children[i].children[j].parms
+	        				}
+	        			}
+	        		}
+	        	}
+     		}
      	},
      	dialogClose(){
      		for(var i in this.questionForm) {
@@ -269,8 +279,8 @@ export default {
 			this.standandTypeName = ''
 	    },
      	addQuestion(){
-
      		let param = {
+     			//diseaseTypeId:this.questionForm.diseaseTypeId,
      			diseaseId:this.$route.query.diseaseId,
      			classifyId:this.activeClass,
      			standandQuestionId:'',
@@ -442,10 +452,9 @@ export default {
 	}
 }
 .el-tabs.el-tabs--left{
-	height: 400px;
 	.el-tabs__content{
 		.scroll-y{
-			max-height: 400px;
+			max-height: 600px;
     		overflow-y: auto;
 		}
 		

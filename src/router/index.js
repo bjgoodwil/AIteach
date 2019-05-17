@@ -14,6 +14,8 @@ import Problem from './problem/problem'
 import Case from './case/case'
 // 虚拟病历
 import Record from './record/record'
+//学生信息
+import Students from './students/students'
 
 const router = new Router({
 	routes: [
@@ -36,7 +38,8 @@ const router = new Router({
 				...Problem,
 				...Case,
 				...Record,
-				...MapTable
+				...MapTable,
+				...Students
 			]
 			
 		}

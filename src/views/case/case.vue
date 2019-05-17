@@ -28,13 +28,13 @@
 		<el-button type="primary" round class="addBtn floatRight pos-r" size="small" @click="addCase"><i class="el-icon-plus"></i> 添加疾病</el-button>
     	<el-tabs v-model="activeName" @tab-click="tabClick1">
     		<el-tab-pane v-for="(item,index) in data" :key="item.id" :label="item.typeName" :name="item.id.toString()">
-    			<p class="symptomBox clearfix">
+    			<!-- <p class="symptomBox clearfix">
 					<label for="" class="floatLeft">症状：</label>
 					<ul class="symptomList clearfix">
 					
 						<li class="floatLeft" v-for="(item,index) in symptomList" :key="item.id" :class="{ symptomActive: index == symptomIndex}" @click="selectSymptom(index)">{{item.name}}</li>
 					</ul>
-    			</p>
+    			</p> -->
 				<el-tabs tab-position="left" v-model="activeClass" @tab-click="tabClick2">
 					<el-tab-pane v-for="(it,eq) in item.list" :key="it.id" :label="it.typeName" :name="it.id.toString()">
 						<ul class="specialtyList" v-loading="fullscreenLoading">

@@ -1,6 +1,6 @@
 <template>
     <div class="problem" v-loading="loading">
-		<p style="height: 32px;"><i class="el-icon-location-outline"></i> 提问库 </p>
+		<p style="height: 32px;"><i class="el-icon-location-outline"></i> 标准提问库 </p>
 		
 		<el-tabs type="border-card" v-model="activeScene" @tab-click="tabClick">
 			<el-tab-pane :key="scene.id" :label="scene.name" v-for="scene in classes">
@@ -19,6 +19,9 @@
 									      width="50">
 									    </el-table-column>
 								        <el-table-column prop="questionName">
+								        	
+								        </el-table-column>
+								        <el-table-column prop="questionPath">
 								        	
 								        </el-table-column>
 								        <el-table-column width="100">
@@ -47,8 +50,17 @@
 		  :close-on-click-modal="false"
 		  @close="dialogClose">
 		  	<el-form label-width="80px" :model="questionForm">
+		  		<el-form-item label="专业">
+				    <el-cascader
+				        style="width: 280px"
+					    :options="options"
+					    :props="defaultProps"
+					    v-model="questionForm.selectedOptions"
+					    @change="handleChange"
+					    size="small">
+					</el-cascader>
+				</el-form-item>
 			  	<el-form-item label="问题分类">
-				    
 				    <el-select v-model="questionForm.standandTypeId" filterable clearable
 					@change="changeStandandType" placeholder="请选择问题分类" size="small" style="width: 280px">
 					    <el-option
@@ -83,7 +95,8 @@
 </template>
 <script>
 //提问库接口
-import {question} from '@/services/apis/question/question'
+import {question} from '@/services/apis/question/question';
+import {diseaseApi} from '@/services/apis/disease/disease';
 //医问道映射接口
 import {ywd} from '@/services/apis/ywd'
 export default {
@@ -105,6 +118,8 @@ export default {
 	        	standandTypeId:'',  //问题类型
 	        	questionName:'',  //主问题名字
 	        	questionPath: '', //主问题路径
+	        	selectedOptions: [],//专业
+	        	diseaseTypesId:'', //专业id
 	        	questionNum:'', //问题序号
 	        },
 
@@ -112,9 +127,8 @@ export default {
 	        dataTree: [],
 	        //联级相关
 	        defaultProps: {
-	        	value:'name',
-	        	label:'name',
-	        	children:'children'
+	        	value:'id',
+	        	label:'name'
 	        }, //联级配置
 	  		options:[],
 	  		searchQuestion:""
@@ -125,6 +139,18 @@ export default {
 			this.questionType = response.data.data;
     	})
         this.getQuestionList();
+        //获取疾病所有分类
+    	diseaseApi.diseaseTypesAll().then(response=>{
+    		this.options = response.data.data.trees;
+    		this.options.push({
+    			classifyNum: 505,
+				diseaseNum: 0,
+				id: "505",
+				medicalRecordNum: 0,
+				name: "全部",
+				parentId: "0",
+    		})
+    	})
     },
     
   	methods: {
@@ -154,14 +180,12 @@ export default {
 	    tabClick2(tag){
 	    	//this.getQuestionList(tag.name);
 	    },
-
 	    dialogClose(){
 	    	this.questionForm.questionName = '';
 	    },
 	    //显示添加和编辑问题
 	    showQuestionForm(type,row){
 	    	this.dialogVisibleTree = true;
-	    	console.log(row)
 	    	if (type == 'edit') {
 	    		this.addOrEdit = 'edit';
 	    		this.$set( this.questionForm, 'id', row.id)
@@ -173,7 +197,7 @@ export default {
 	    		this.addOrEdit = 'add';
 	    		this.$delete(this.questionForm,'id');
 	    		for (var index in this.questionForm){
-	    			if (index == 'subQuestionList') {
+	    			if (index == 'selectedOptions') {
 	    				this.questionForm[index] = []
 	    			}else{
 	    				this.questionForm[index] = '';
@@ -182,6 +206,10 @@ export default {
 				}
 	    	}
 	    },
+	    //所选专业
+	    handleChange(value){
+	        this.questionForm.diseaseTypesId = value[1] || value[0];
+        },
 	    //选择问题类型
 	    changeStandandType(val){
 	    	//console.log(this.questionForm.standandTypeId)
@@ -191,6 +219,7 @@ export default {
 	    	this.loading = true;
 	    	this.questionForm.classifyId = this.activeClass;
 	    	question.addFatherQuestion(this.questionForm).then(response=>{
+	    		
 	    		if (response.data.errCode == "0") {
 	    			this.$message({
 			            type: 'success',
@@ -199,7 +228,6 @@ export default {
 			        question.listAllQuestion().then(response=>{
 			            this.classes = response.data.data.trees;
 			            this.classes2 = JSON.parse(JSON.stringify(this.classes));
-			            
 			            this.loading = false;
 			        });
 	    			
@@ -253,18 +281,6 @@ export default {
 	                  
 	        });
 	    },
-	    addSubQuestion(){
-	    	this.questionForm.subQuestionList.push({
-	    		questionName: "",
-				relativePath: "",
-				filterParm: "",
-				questionNumber: this.questionForm.subQuestionList.length+1
-	    	})
-	    },
-	    deleteSubQuestion(index){
-	    	this.questionForm.subQuestionList.splice(index, 1);
-	    },
-	   
     },
     watch : {
 	   'activeName':(val) => { //监听切换状态-计划单
@@ -301,10 +317,9 @@ export default {
 	}
 }
 .el-tabs.el-tabs--left{
-	height: 420px;
 	.el-tabs__content{
 		.scroll-y{
-			max-height: 420px;
+			max-height: 600px;
     		overflow-y: auto;
 		}
 		
