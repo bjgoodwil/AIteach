@@ -4,7 +4,7 @@
         <el-container class="mainFrame" >
             <el-header>
                 <h1 style="font-size: 20px;line-height: 60px;" class="floatLeft title">
-                人工智能临床医学教学辅助数据库管理平台</h1>
+                北京大学第三医院人工智能临床医学教学辅助数据库管理平台</h1>
                 <el-dropdown trigger="click" class="floatRight">
                   <span class="el-dropdown-link">
                     admin<i class="el-icon-arrow-down el-icon--right"></i>
@@ -26,19 +26,19 @@
                       class="el-menu-vertical-demo"
                       >
                       <el-menu-item index="/case">
-                        <i class="el-icon-menu"></i>
+                        <img src="../assets/icon01.png" alt="" class="m-r-10">
                         <span slot="title">疾病分类</span>
                       </el-menu-item>
                       <el-menu-item index="/list">
-                        <i class="el-icon-tickets"></i>
+                        <img src="../assets/icon03.png" alt="" class="m-r-10">
                         <span slot="title">虚拟病例</span>
                       </el-menu-item>
                       <el-menu-item index="/problem">
-                        <i class="el-icon-document"></i>
+                        <img src="../assets/icon02.png" alt="" class="m-r-10">
                         <span slot="title">标准提问库</span>
                       </el-menu-item>
                       <el-menu-item index="/mapTable">
-                        <i class="el-icon-document"></i>
+                        <img src="../assets/icon04.png" alt="" class="m-r-10">
                         <span slot="title">问题分类表</span>
                       </el-menu-item>
                       <!-- <el-menu-item index="/students">
@@ -112,7 +112,8 @@ export default {
         }
         .title{
             font-weight: 400;
-            background: url(../assets/logo.png) no-repeat center left;
+            background: url(../assets/bysylogo.png) no-repeat center left;
+
             padding-left: 40px;
         }
     }

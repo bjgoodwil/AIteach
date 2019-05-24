@@ -123,13 +123,10 @@ export default {
 						let params = response.data.data;
 						if (response.data.errCode == "0") {
 			    			this.$set(params, "sampleParms",{
-				     			mrKey:row.mrKey || '',
-							    profession:row.profession || '',
-							    hospitalizedTime:row.hospitalizedTime || '',
+				     			mrKey:params.mrkey || '',
+							    profession:params.profession || '',
+							    hospitalizedTime:params.sceneStartTime || '',
 				     		})
-				     		// params.sampleParms.mrKey = row.mrKey || '';
-				     		// params.sampleParms.profession = row.profession || '';
-				     		// params.sampleParms.hospitalizedTime = row.hospitalizedTime || '';
 			     			recordApi.addDiseaseRecord({
 								diseaseId:this.$route.query.diseaseId,
 								relationJson:JSON.stringify(params)

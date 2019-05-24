@@ -7,6 +7,9 @@ export default [
 	{
 		path: 'mapTable',
 		name: 'mapTable',
-		component: MapTable
+		component: MapTable,
+		// beforeEnter(to,from,next){
+  //           alert("您的权限不能访问该页面")
+  //       }
 	}
 ]

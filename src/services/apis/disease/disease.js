@@ -24,22 +24,6 @@ export const diseaseApi = {
             data: data
         });
     },
-    //新增疾病
-    // addDisease(data) {
-    //     return axios({
-    //         url: '/teachai/med/disease/addDisease.json',
-    //         method: 'post',
-    //         data: data
-    //     });
-    // },
-    // //修改疾病
-    // updateDisease(data) {
-    //     return axios({
-    //         url: '/teachai/med/disease/updateDisease.json',
-    //         method: 'post',
-    //         data: data
-    //     });
-    // },
     //新增和修改疾病
     editDisease(data) {
         return axios({
@@ -68,6 +52,14 @@ export const diseaseApi = {
     addSingleQuestion(data) {
         return axios({
             url: '/teachai/med/disease/addSingleQuestion.json',
+            method: 'post',
+            data: data
+        });
+    },
+    //首页统计
+    firstPageStatistics(data) {
+        return axios({
+            url: '/teachai/med/statistics/firstPageStatistics.json',
             method: 'post',
             data: data
         });

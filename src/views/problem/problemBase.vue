@@ -12,19 +12,22 @@
 							<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name" :name="it.id">
 								<div class="scroll-y">
 								
-									<el-table :data="it.parms" :show-header="false">
+									<el-table :data="it.parms">
 							    		<el-table-column
 									      type="index"
 									      label="序号"
 									      width="50">
 									    </el-table-column>
-								        <el-table-column prop="questionName">
+								        <el-table-column label="问题" prop="questionName">
 								        	
 								        </el-table-column>
-								        <el-table-column prop="questionPath">
+								        <el-table-column label="映射路径" prop="questionPath">
 								        	
 								        </el-table-column>
-								        <el-table-column width="100">
+								        <el-table-column label="所属科室" prop="departmentName" width="100">
+								        	
+								        </el-table-column>
+								        <el-table-column label="操作" width="100">
 								        	<template slot-scope="scope">
 									        	<el-button
 										          title="删除"
@@ -119,7 +122,7 @@ export default {
 	        	questionName:'',  //主问题名字
 	        	questionPath: '', //主问题路径
 	        	selectedOptions: [],//专业
-	        	diseaseTypesId:'', //专业id
+	        	departmentId:'', //专业id
 	        	questionNum:'', //问题序号
 	        },
 
@@ -142,22 +145,20 @@ export default {
         //获取疾病所有分类
     	diseaseApi.diseaseTypesAll().then(response=>{
     		this.options = response.data.data.trees;
-    		this.options.push({
-    			classifyNum: 505,
-				diseaseNum: 0,
-				id: "505",
-				medicalRecordNum: 0,
+    		this.options.unshift({
+				id: "0",
 				name: "全部",
-				parentId: "0",
     		})
-    	})
+    		this.questionForm.selectedOptions[0] = this.options[0].id;
+    		console.log(this.questionForm.selectedOptions)
+    	});
     },
     
   	methods: {
 
 	    //获取问题列表
 	    getQuestionList(){
-	    	question.listAllQuestion().then(response=>{
+	    	question.listAllQuestion({departmentId:"all"}).then(response=>{
 	            this.classes = response.data.data.trees;
 	            this.classes2 = JSON.parse(JSON.stringify(this.classes));
 	            
@@ -208,7 +209,8 @@ export default {
 	    },
 	    //所选专业
 	    handleChange(value){
-	        this.questionForm.diseaseTypesId = value[1] || value[0];
+	        this.questionForm.departmentId = value[1] || value[0];
+	        console.log(this.questionForm.selectedOptions)
         },
 	    //选择问题类型
 	    changeStandandType(val){
@@ -216,29 +218,35 @@ export default {
 	    },
 	    //新增问题
 	    addCase(){
-	    	this.loading = true;
-	    	this.questionForm.classifyId = this.activeClass;
-	    	question.addFatherQuestion(this.questionForm).then(response=>{
-	    		
-	    		if (response.data.errCode == "0") {
-	    			this.$message({
-			            type: 'success',
-			            message: '添加成功!'
-			        });
-			        question.listAllQuestion().then(response=>{
-			            this.classes = response.data.data.trees;
-			            this.classes2 = JSON.parse(JSON.stringify(this.classes));
-			            this.loading = false;
-			        });
-	    			
-	    		}else{
-	    			this.$confirm(response.data.errMsg, '提示', {
-			          type: 'warning',
-			          showConfirmButton: false,
-			        })
-	    		}
-	            this.dialogVisibleTree = false;
-	        })
+	    	if (this.questionForm.departmentId != "") {
+	    		this.loading = true;
+	    		this.questionForm.classifyId = this.activeClass;
+	    		question.addFatherQuestion(this.questionForm).then(response=>{
+	    			this.dialogVisibleTree = false;
+		    		if (response.data.errCode == "0") {
+		    			this.$message({
+				            type: 'success',
+				            message: '添加成功!'
+				        });
+				        question.listAllQuestion({departmentId:"all"}).then(response=>{
+				            this.classes = response.data.data.trees;
+				            this.classes2 = JSON.parse(JSON.stringify(this.classes));
+				            this.loading = false;
+				        });
+		    		}else{
+		    			this.$confirm(response.data.errMsg, '提示', {
+				          type: 'warning',
+				          showConfirmButton: false,
+				        })
+		    		}
+		        }) 
+	    	}else{
+	    		this.$message({
+		            type: 'warning',
+		            message: "请选择所属专业",
+		        })
+	    	}
+	    	
 	    },
 	    editCase(){
 	    	this.loading = true;

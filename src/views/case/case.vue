@@ -2,29 +2,30 @@
     <div class="case">
 		
     	<el-row type="flex" class="row-bg m-b-20">
+    	  <el-col :span="8"><div class="grid-content">
+			<img class="floatLeft logo" src="../../assets/case/c.png" alt="">
+		  	<div class="floatLeft">
+				<p>涵盖专业</p>
+				<p>{{statistics.涵盖专业}}个</p>
+		  	</div>
+		  </div></el-col>
 		  <el-col :span="8"><div class="grid-content">
 			<img class="floatLeft logo" src="../../assets/case/a.png" alt="">
 		  	<div class="floatLeft">
 				<p>疾病类别</p>
-				<p>60个</p>
+				<p>{{statistics.疾病类别}}个</p>
 		  	</div>
 		  </div></el-col>
 		  <el-col :span="8"><div class="grid-content">
 		  	<img class="floatLeft logo" src="../../assets/case/b.png" alt="">
 		  	<div class="floatLeft">
 				<p>虚拟病例</p>
-				<p>400例</p>
+				<p>{{statistics.虚拟病历}}例</p>
 		  	</div>
 				
 		  </div></el-col>
-		  <!-- <el-col :span="8"><div class="grid-content">
-			<img class="floatLeft logo" src="../../assets/logo.png" alt="">
-		  	<div class="floatLeft">
-				<p>平台用户</p>
-				<p>2000个</p>
-		  	</div>
-		  </div></el-col>
- -->		</el-row>
+		  
+		</el-row>
 		<el-button type="primary" round class="addBtn floatRight pos-r" size="small" @click="addCase"><i class="el-icon-plus"></i> 添加疾病</el-button>
     	<el-tabs v-model="activeName" @tab-click="tabClick1">
     		<el-tab-pane v-for="(item,index) in data" :key="item.id" :label="item.typeName" :name="item.id.toString()">
@@ -76,6 +77,7 @@ export default {
 
 	    return {
 	    	fullscreenLoading: false,
+	    	statistics:{}, //统计
 	    	data: {},
 	        activeName:'',  //当前一级科室分类
 	        activeClass:'', //当前二级科室分类
@@ -87,20 +89,15 @@ export default {
 	    }
 	},
 	mounted() {
-        // this.activeName = this.data.data.specialty_list[0].specialty_name;
-        // this.activeClass = [];
-        // for (var i = 0; i < this.data.data.specialty_list.length; i++) {
 
-        	
-        // 		this.activeClass.push(this.data.data.specialty_list[i].sub_specialty_list[0].sub_specialty_name)
-        		
-        	
-        // }
         diseaseApi.listDiseaseType({fatherTypeId:0}).then(response=>{
-
             this.data = response.data.data.diseaseTypeList;
             this.activeName = this.data[0].id.toString();
             this.getDiseaseType(this.data[0].id,0)
+        });
+        diseaseApi.firstPageStatistics().then(response=>{
+            this.statistics = response.data.data;
+            console.log(this.statistics)
         });
     },
   	methods: {
@@ -220,18 +217,13 @@ export default {
 }
 .el-row .el-col.el-col-8{
 	margin-right: 1%;
-	.logo{
-		width: 70px;
-	}
 	p{
 		font-size: 18px;
-		margin-top: 6px;
+		margin-top: 4px;
 		margin-left: 20px;
 	}
 }
 .specialtyList{
-
-
     width: 100%;
 	.caseItem{
 		list-style: none;

@@ -158,7 +158,7 @@ export default {
             dialogVisibleTree:false,
             optionQuestion:[],
             questionForm:{    //添加问题表单
-            	diseaseTypeId:'', //专业id
+            	departmentId:'', //专业id
             	selectQuestion:'',
             	questionParm:'',
             	//自定义问题
@@ -194,7 +194,6 @@ export default {
     	diseaseApi.diseaseWithQuestion({diseaseId:this.$route.query.diseaseId}).then(response=>{
     		this.dataForm = response.data.data;
     		if (this.$route.query.diseaseId == 0) {
-    			//this.dataForm.disease.diseaseTypeId = 
     		}else{
     			this.form.selectedOptions = [];
 		        this.form.selectedOptions[0] = this.$route.query.activeName;
@@ -208,15 +207,12 @@ export default {
             this.activeClass = this.allQuestion[0].children[0].children[0].id;
             this.loading = false;
     	})
-    	//获取所有问题
-        question.listAllQuestion().then(response=>{
-        	this.optionQuestion = response.data.data.trees
-    	})
+    	
 
     },
     methods:{
         handleChange(value){
-	        this.dataForm.disease.diseaseTypeId = value[1];
+	        this.dataForm.disease.departmentId = value[1];
         },
         changeQuestion(value){
         	if (this.standandTypeName == '') {this.questionForm.questionParm == ''}
@@ -259,17 +255,20 @@ export default {
 		        });
      		}else{
      			this.dialogVisibleTree = true;
-     			this.questionForm.diseaseTypeId = this.form.selectedOptions[1]
-	     		let a = this.optionQuestion[this.activeScene];
-	     		for (var i = 0; i < a.children.length; i++) {
-	        		if (this.activeName == a.children[i].id) {
-	        			for (var j = 0; j < a.children[i].children.length; j++) {
-	        				if (this.activeClass == a.children[i].children[j].id){
-	        					this.thisQuestion = a.children[i].children[j].parms
-	        				}
-	        			}
-	        		}
-	        	}
+     			//获取专业下所有问题
+		        question.listAllQuestion({departmentId:this.$route.query.activeClass||this.activeClass}).then(response=>{
+		        	this.optionQuestion = response.data.data.trees;
+		     		let a = this.optionQuestion[this.activeScene];
+		     		for (var i = 0; i < a.children.length; i++) {
+		        		if (this.activeName == a.children[i].id) {
+		        			for (var j = 0; j < a.children[i].children.length; j++) {
+		        				if (this.activeClass == a.children[i].children[j].id){
+		        					this.thisQuestion = a.children[i].children[j].parms
+		        				}
+		        			}
+		        		}
+		        	}
+		    	})
      		}
      	},
      	dialogClose(){
@@ -280,7 +279,6 @@ export default {
 	    },
      	addQuestion(){
      		let param = {
-     			//diseaseTypeId:this.questionForm.diseaseTypeId,
      			diseaseId:this.$route.query.diseaseId,
      			classifyId:this.activeClass,
      			standandQuestionId:'',

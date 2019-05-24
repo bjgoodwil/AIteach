@@ -45,13 +45,16 @@
 		      label="序号"
 		      width="50">
 		    </el-table-column>
-	        <!-- <el-table-column prop="specialty" label="科室">
-	        </el-table-column> -->
-	        <el-table-column prop="diagnosis" label="疾病">
+	        <el-table-column prop="diseaseName" label="所属疾病">
+	        </el-table-column>
+	        <el-table-column prop="diagnosis" label="出院诊断">
 	        </el-table-column>
 	        <el-table-column prop="gender" label="性别" width="60">
 	        </el-table-column>
-	        <el-table-column prop="age" label="年龄" width="60">
+	        <el-table-column label="年龄" width="60">
+	        	<template slot-scope="scope">
+	        		{{scope.row.age}} {{scope.row.ageUnit}}
+	        	</template>
 	        </el-table-column>
 	        <el-table-column prop="chiefComplaint" label="病历概述">
 	        </el-table-column>
@@ -131,7 +134,7 @@
 				        size="small"
 					    :options="options"
 					    :props="defaultProps"
-					    v-model="importForm.selectedOptions"
+					    v-model="importForm.diseaseType"
 					    @change="handleChangeImport">
 					</el-cascader>
 				</el-form-item>
@@ -155,6 +158,7 @@
 			        <el-input v-model="importForm.mrKey" placeholder="mrKey" size="small"></el-input>
 			    </el-form-item> -->
 			    <el-upload
+			      ref="upload"
 			      style="width: 300px"
 				  class="upload-demo floatLeft m-l-30 m-t-20"
 				  :action="uploadUrl"
@@ -202,7 +206,7 @@ export default {
         		mrKey:'',
         		profession:'',
         		hospitalizedTime:'',
-        		diseaseType:'',
+        		diseaseType:[],
         		disease:'',
         		diseaseId:'',
         	},
@@ -298,8 +302,9 @@ export default {
 	    dialogClose(){
 	    	this.diseaseForm.diseaseType = [];
 	    	this.diseaseForm.disease = '';
-	    	this.importForm.diseaseType = '';
+	    	this.importForm.diseaseType = [];
 	    	this.importForm.disease = '';
+	    	this.$refs.upload.clearFiles();
 	    },
 	    //添加病例选择专业
 	    handleChangeSearch(val){
@@ -362,13 +367,13 @@ export default {
 	    	// 	},
 	    	// 	params:this.importData
 	    	// })
-	    	if (this.importData.patientId) {
+	    	if (this.importData.patientId && (this.importForm.disease) != '') {
 	    		this.allLoading = true;
 	    		this.dialogFormVisibleExcel = false;
 	    		this.$set(this.importData, "sampleParms",{
-	     			mrKey:this.importForm.mrKey || '',
-				    profession:this.importForm.profession || '',
-				    hospitalizedTime:this.importForm.hospitalizedTime || '',
+	     			mrKey:this.importData.mrkey || '',
+				    profession:this.importData.profession || '',
+				    hospitalizedTime:this.importData.hospitalizedTime || '',
 	     		})
 	 			recordApi.addDiseaseRecord({
 					diseaseId:this.importForm.diseaseId,
@@ -383,7 +388,7 @@ export default {
 			        this.$router.push({
 			    		name:'setRecord',
 			    		query:{
-			    			disease:this.importForm.disease,
+			    			disease:this.importData.diagnosis,
 			    			type:'edit',
 			    			sampleId:response.data.data,
 			    			diseaseId:this.importForm.diseaseId
@@ -393,7 +398,7 @@ export default {
 	    	}else{
 	    		this.$message({
 		            type: 'warning',
-		            message: '请上传病例'
+		            message: '请选择疾病并且上传病例'
 		        });
 	    	}
 	    	

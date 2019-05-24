@@ -418,7 +418,7 @@
 							</el-alert>
 							<el-checkbox-group v-model="checkReason" @change="handleCheckChange">
 								<div v-for="i in list.parms">
-									<el-checkbox :label="i" :key="i.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(i.questionId) > -1"><span>[{{item.name}}]</span> {{i.questionName}}（{{i.questionAnswer}}）
+									<el-checkbox :label="i" :key="i.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(i.questionId) > -1"><span>[{{item.name}}]</span> {{i.questionName}}<span v-show="!(activeScene != 0 && item.name == '报告')">（{{i.questionAnswer}}）</span>
 							    	</el-checkbox>
 							    	<div v-for="sub in i.subQuestionList" class="m-l-10">
 							    		<el-checkbox :label="sub" :key="sub.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(sub.questionId) > -1"><span>[{{item.name}}]</span> {{sub.questionName}} ({{sub.questionAnswer}})(子)
@@ -568,16 +568,16 @@ export default {
 				sampleId:this.$route.query.sampleId
 			}).then(response=>{
 				this.setDefaultData(response.data.data);
-				this.formInline.mrKey = response.data.data.sampleParms.mrKey;
-				this.formInline.profession = response.data.data.sampleParms.profession;
-				this.formInline.hospitalizedTime = response.data.data.sampleParms.hospitalizedTime;
+				let sampleParm = response.data.data.sampleParms; 
+				this.formInline.mrKey = sampleParm.mrKey;
+				this.formInline.profession = sampleParm.profession;
+				this.formInline.hospitalizedTime = sampleParm.hospitalizedTime;
 			})
 		}else{
-			this.formInline.mrKey = this.$route.query.mrKey ||'';
-			this.formInline.profession = this.$route.query.profession ||'';
-			this.formInline.hospitalizedTime = this.$route.query.hospitalizedTime ||'';
+			// this.formInline.mrKey = this.$route.query.mrKey ||'';
+			// this.formInline.profession = this.$route.query.profession ||'';
+			// this.formInline.hospitalizedTime = this.$route.query.hospitalizedTime ||'';
 			if (this.$route.query.type == 'import') {
-
 				this.setDefaultData(this.$route.params);
 			}else{
 				recordApi.questionRelationShips({
@@ -900,9 +900,7 @@ export default {
      	//保存
      	save(type){
      		this.loading = true;
-     		if (this.allQuestion.diagnosis == '') {
-     			this.allQuestion.diagnosis = this.formInline.disease
-     		}
+     		this.allQuestion.diagnosis = this.formInline.disease
      		this.allQuestion.symptoms = this.formInline.symptoms;
      		this.allQuestion.chiefComplaint = this.formInline.chiefComplaint;
      		this.allQuestion.suggestDuration = this.formInline.time;
