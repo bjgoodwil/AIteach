@@ -99,6 +99,9 @@ export default {
             this.statistics = response.data.data;
             console.log(this.statistics)
         });
+        diseaseApi.hasQuestionDisease().then(response=>{
+            console.log(response.data.data)
+        });
     },
   	methods: {
   		//获取科室分类列表

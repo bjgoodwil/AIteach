@@ -16,6 +16,14 @@ export const recordApi = {
             data: data
         });
     },
+    //根据可是id查病例
+    listRecordByTypeId(data) {
+        return axios({
+            url: '/teachai/med/disease/listDiseaseRecordByTypeId.json',
+            method: 'post',
+            data: data
+        });
+    },
     //修改病例状态
     updateRecordStatus(data) {
         return axios({
@@ -80,7 +88,7 @@ export const recordApi = {
             data: data
         });
     },
-    //导入病例Excel
+    //删除场景
     deleteSampleScene(data) {
         return axios({
             url: '/teachai/med/disease/deleteSampleScene.json',
@@ -92,6 +100,22 @@ export const recordApi = {
     getChafang(data) {
         return axios({
             url: '/teachai/med/disease/getShangjiyishichafang.json',
+            method: 'post',
+            data: data
+        });
+    },
+    //上传检查图片
+    uploadSampleImage(data) {
+        return axios({
+            url: '/teachai/med/disease/uploadSampleJianchaImage.json',
+            method: 'post',
+            data: data
+        });
+    },
+    //删除检查图片
+    deleteSampleImage(data) {
+        return axios({
+            url: '/teachai/med/disease/deleteSampleJianchaImage.json',
             method: 'post',
             data: data
         });

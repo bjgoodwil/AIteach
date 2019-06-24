@@ -14,6 +14,7 @@
   "dependencies": {
     "array-includes": "^3.0.3",
     "axios": "^0.18.0",
+    "babel-polyfill": "^6.26.0",
     "cross-env": "^5.1.5",
     "define-properties": "^1.1.3",
     "element-ui": "^2.6.1",

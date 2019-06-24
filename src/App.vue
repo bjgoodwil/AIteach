@@ -6,8 +6,23 @@
 </template>
 
 <script>
+import {ywd} from '@/services/apis/ywd';
 export default {
-  name: 'App'
+    name: 'App',
+    data () {
+
+        return {
+            
+        }
+    },
+    mounted() {
+        // let param = {
+        //     token:true,
+        // }
+        // ywd.getToken(param).then(response=>{
+        //     localStorage.setItem('token',response.data.result);
+        // })
+    },
 }
 </script>
 

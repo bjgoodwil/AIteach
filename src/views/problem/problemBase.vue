@@ -89,7 +89,7 @@
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleTree = false">取 消</el-button>
-			    <el-button v-if="addOrEdit=='add'" type="primary" @click="addCase">确 定</el-button>
+			    <el-button v-if="addOrEdit=='add'" type="primary" @click="addCase" :disabled="btnDisabled">确 定</el-button>
 			    <el-button v-if="addOrEdit=='edit'" type="primary" @click="editCase">确 定</el-button>
 			</span>
 			
@@ -107,6 +107,7 @@ export default {
 	data () {
 
 	    return {
+	    	btnDisabled:false,
 	    	loading: true,
 	    	addOrEdit: '', //判断新增还是编辑
 	    	currentId:'',  //当前编辑的问题id
@@ -219,10 +220,12 @@ export default {
 	    //新增问题
 	    addCase(){
 	    	if (this.questionForm.departmentId != "") {
+	    		this.btnDisabled = true;
 	    		this.loading = true;
 	    		this.questionForm.classifyId = this.activeClass;
 	    		question.addFatherQuestion(this.questionForm).then(response=>{
 	    			this.dialogVisibleTree = false;
+	    			this.btnDisabled = false;
 		    		if (response.data.errCode == "0") {
 		    			this.$message({
 				            type: 'success',
@@ -327,7 +330,7 @@ export default {
 .el-tabs.el-tabs--left{
 	.el-tabs__content{
 		.scroll-y{
-			max-height: 600px;
+			max-height: 700px;
     		overflow-y: auto;
 		}
 		

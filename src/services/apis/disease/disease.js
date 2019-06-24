@@ -64,4 +64,12 @@ export const diseaseApi = {
             data: data
         });
     },
+    //有多少个疾病配置了问题
+    hasQuestionDisease(data) {
+        return axios({
+            url: '/teachai/med/disease/hasQuestionDiseaseStatistics.json',
+            method: 'post',
+            data: data
+        });
+    },
 }

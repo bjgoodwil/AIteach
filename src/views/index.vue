@@ -41,20 +41,18 @@
                         <img src="../assets/icon04.png" alt="" class="m-r-10">
                         <span slot="title">问题分类表</span>
                       </el-menu-item>
-                      <!-- <el-menu-item index="/students">
-                        <i class="el-icon-menu"></i>
+                      <el-menu-item index="/students">
+                        <img src="../assets/icon04.png" alt="" class="m-r-10">
                         <span slot="title">用户信息</span>
-                      </el-menu-item> -->
+                      </el-menu-item>
                       <!-- <el-menu-item index="6">
                         <i class="el-icon-document"></i>
                         <span slot="title">操作日志</span>
                       </el-menu-item> -->
-                    
                     </el-menu>
                 </el-aside>
                 <el-main>
                     <router-view/>
-
                 </el-main>
             </el-container>
         </el-container>
@@ -70,6 +68,9 @@ export default {
             
         }
     },
+    mounted() {
+  
+    },
     methods:{
         handleSelect(key, keyPath) {
            
@@ -81,6 +82,7 @@ export default {
             return path;
             
         },
+
     }
 }
 </script>

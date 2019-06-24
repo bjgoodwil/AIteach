@@ -21,8 +21,8 @@ export default {
 
 		//三院地址：http://192.168.132.13:8804
 		//本地地址：http://192.168.8.20
-		this.src = process.env.HOST+"search/bysy/advanced.html?from=AI&disease="+this.$route.query.disease+"&diseaseId="+this.$route.query.diseaseId+"&host="+this.$route.query.host
-
+		this.src = process.env.HOST+"search/bysy/advanced.html?from=AI&disease="+this.$route.query.disease+"&diseaseId="+this.$route.query.diseaseId+"&host="+this.$route.query.host;
+		console.log(this.src)
 	},
   	methods: {
       	test(){

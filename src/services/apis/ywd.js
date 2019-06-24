@@ -16,4 +16,12 @@ export const ywd = {
             data: data
         });
     },
+    //获取Token
+    getToken(data) {
+        return axios({
+            url: '/search/bysy/med/login.json',
+            method: 'post',
+            data: data
+        });
+    },
 }

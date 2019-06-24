@@ -150,6 +150,8 @@
 									<p v-if="it.name == '既往史'" class="history"><span>既往史：</span>{{allQuestion.jiwangshisrc}}</p>
 									<p v-if="it.name == '个人史'" class="history"><span>个人史：</span>{{allQuestion.gerenshisrc}}</p>
 									<p v-if="it.name == '家族史'" class="history"><span>家族史：</span>{{allQuestion.jiazushisrc}}</p>
+									<p v-if="it.name == '喂养史'" class="history"><span>喂养史：</span>{{allQuestion.weiyangshisrc}}</p>
+									<p v-if="it.name == '新生儿状况'" class="history"><span>新生儿状况：</span>{{allQuestion.xinshengerzhuangkuang}}</p>
 									<table style="width: 100%;">
 										<thead>
 											<th style="width: 8%">序号</th>
@@ -168,12 +170,13 @@
 											<div class="questionAnswer" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></div>
 											<div style="width: 8%"><el-input v-model="i.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
 											<div style="width: 8%">
-												<el-select v-model="i.difficultyDegree" placeholder="难度"size="small">
+												<el-select v-model="i.difficultyDegree" placeholder="难度"size="small" v-if="item.name !== '报告'">
 											      	<el-option label="0" value="0" ></el-option>
 											      	<el-option label="1" value="1" ></el-option>
 											      	<el-option label="2" value="2" ></el-option>
 											      	<el-option label="3" value="3" ></el-option>
 											    </el-select>
+											    <div style="width: 100%" v-else>--</div>
 											</div>
 											<div style="width: 8%">
 												<el-button
@@ -218,7 +221,15 @@
 					    			<div class="scroll-y">
 									<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].support">
 										<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
-											<span class="pos-a" style="right: 60px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+											<span class="pos-a" style="right: 60px">难度：
+												<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
+											      	<el-option label="0" value="0" ></el-option>
+											      	<el-option label="1" value="1" ></el-option>
+											      	<el-option label="2" value="2" ></el-option>
+											      	<el-option label="3" value="3" ></el-option>
+											    </el-select>
+											</span>
+											<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 											<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].support,index)">删除</a>
 										</p>
 										<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
@@ -252,7 +263,15 @@
 									<div class="scroll-y">
 									<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport">
 										<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
-											<span class="pos-a" style="right: 60px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+											<span class="pos-a" style="right: 60px">难度：
+												<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
+											      	<el-option label="0" value="0" ></el-option>
+											      	<el-option label="1" value="1" ></el-option>
+											      	<el-option label="2" value="2" ></el-option>
+											      	<el-option label="3" value="3" ></el-option>
+											    </el-select>
+											</span>
+											<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 											<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport,index)">删除</a>
 										</p>
 										<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
@@ -352,18 +371,24 @@
 											    <el-table-column label="检查结论" prop="检查结论">
 											    </el-table-column>
 									        </el-table>
-									        <!-- <el-upload
+									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
+									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
+									        
+									        <el-upload
+									          v-else
+											  :id="props.row.id+'_img'"	
 											  class="upload-demo"
+											  multiple
+  											  :limit="1"
+  											  :on-exceed="handleExceed"
 											  action=""
-											  :http-request="upLoadImg"
-											  :on-preview="handlePictureCardPreview"
+											  :http-request="(file)=>upLoadImg(file,props.row.id)"
 											  :on-success="handleImgSuccess"
 	  										  :before-upload="beforeImgUpload"
-											  list-type="picture-card"
 											  :file-list="fileList">
-											  <i class="el-icon-plus"></i>
-											  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2m</div>
-											</el-upload> -->
+											  <el-button size="small" type="primary">上传影像</el-button>
+											  <div slot="tip" class="el-upload__tip">只能上传jpg或zip文件</div>
+											</el-upload>
 									      </template>
 									    </el-table-column>
 							    		<el-table-column
@@ -376,9 +401,27 @@
 												<el-input size="small" v-model="scope.row.questionName" placeholder="处置名称"></el-input>
 								        	</template>
 								        </el-table-column>
-								        <el-table-column label="得分" width="120">
+								        <el-table-column label="时间" width="224">
 								        	<template slot-scope="scope">
-								        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分" style="width: 62px"></el-input>
+								        		<el-input size="small" type="number" placeholder="时间" v-model="scope.row.intervalDay">
+								        			<template slot="prepend">入院第</template>
+								        			<template slot="append">天</template>
+												</el-input>
+								        	</template>
+								        </el-table-column>
+								        <el-table-column label="得分" width="100">
+								        	<template slot-scope="scope">
+								        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分"></el-input>
+								        	</template>
+								        </el-table-column>
+								        <el-table-column label="难度" width="100">
+								        	<template slot-scope="scope">
+								        		<el-select v-model="scope.row.difficultyDegree" placeholder="难度" size="small">
+											      	<el-option label="0" value="0" ></el-option>
+											      	<el-option label="1" value="1" ></el-option>
+											      	<el-option label="2" value="2" ></el-option>
+											      	<el-option label="3" value="3" ></el-option>
+											    </el-select>
 								        	</template>
 								        </el-table-column>
 								        <el-table-column width="100px" label="操作">
@@ -459,7 +502,10 @@
 						<el-input v-model="questionForm.questionAnswer" placeholder="请输入答案" size="small"></el-input> 
 				  	</el-form-item>
 			    </div>
-			  	<el-form-item label="难度" class="floatLeft" style="width: 240px;" >
+			    <el-form-item label="分数" class="floatLeft" style="width: 240px;">
+					<el-input v-model="questionForm.questionScore" type="number" placeholder="分数" size="small"></el-input> 
+			  	</el-form-item>
+			  	<el-form-item label="难度" class="floatRight" style="width: 240px;" v-if="showDifficultyDegree">
 					<el-select v-model="questionForm.difficultyDegree" placeholder="难度"size="small">
 				      	<el-option label="0" value="0" ></el-option>
 				      	<el-option label="1" value="1" ></el-option>
@@ -467,9 +513,7 @@
 				      	<el-option label="3" value="3" ></el-option>
 				    </el-select>
 			  	</el-form-item>
-			  	<el-form-item label="分数" class="floatRight" style="width: 240px;">
-					<el-input v-model="questionForm.questionScore" type="number" placeholder="分数" size="small"></el-input> 
-			  	</el-form-item>
+			  	
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleQuestion = false">取 消</el-button>
@@ -481,6 +525,7 @@
 		  title="查房记录"
 		  :visible.sync="dialogVisibleCheckrecord"
 		  width="600px">
+		  <p v-if="checkrecordList.length==0" class="textCenter m-t-10">暂无数据</p>
 		  <ul class="checkrecordList">
 			<li v-for="(item,idnex) in checkrecordList" class="m-t-10 pos-r" @click="selectCheckRecord(item)">
 				<!-- <i class="el-icon-success pos-a" style="right: 0;top:-8px;color: #409eff;font-size: 18px"></i> -->
@@ -514,6 +559,7 @@ export default {
 	    	dialogVisibleQuestion:false,
 	    	dialogVisibleCheckrecord:false,
 	    	showAddButton:true,
+	    	showDifficultyDegree: true,  //显示难度
 	    	activeScene:0,
 	    	activeName:'',
 	    	activeClass:'',
@@ -538,7 +584,7 @@ export default {
 	    	},
 	    	questionForm:{
 	    		classifyId: "",
-				difficultyDegree: 0,
+				difficultyDegree: 1,
 				questionAnswer: "",
 				questionId: "",
 				questionName: "",
@@ -549,15 +595,14 @@ export default {
 				diagnosisName:'',
 	    	},//添加问题表单
 	        allQuestion:[], //问诊，查体，院前检查的问题
-	        zhenduan:{  //诊断数据
-	        },
+	        zhenduan:[],  //诊断数据
 	        chuzhi:[],
 	        patientId:'',
 	        visitId:'',
 	        sceneName:'查房',//场景名
 	        checkrecordList:[],//查房记录
 	        gist:[],  //依据
-	        fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}]
+	        fileList: []
 	    }
 	},
 	mounted() {
@@ -572,11 +617,10 @@ export default {
 				this.formInline.mrKey = sampleParm.mrKey;
 				this.formInline.profession = sampleParm.profession;
 				this.formInline.hospitalizedTime = sampleParm.hospitalizedTime;
+				this.activeName = response.data.data.trees[0].children[0].id;
+				this.activeClass = response.data.data.trees[0].children[0].children[0].id;
 			})
 		}else{
-			// this.formInline.mrKey = this.$route.query.mrKey ||'';
-			// this.formInline.profession = this.$route.query.profession ||'';
-			// this.formInline.hospitalizedTime = this.$route.query.hospitalizedTime ||'';
 			if (this.$route.query.type == 'import') {
 				this.setDefaultData(this.$route.params);
 			}else{
@@ -606,6 +650,14 @@ export default {
 
 	},
   	methods: {
+  		//根据Sample查询数据
+  		getListSampleDetailBysample(){
+  			recordApi.listSampleDetailBysample({
+				sampleId:this.$route.query.sampleId
+			}).then(response=>{
+				this.setDefaultData(response.data.data);
+			})
+  		},
   		//设置默认数据
   		setDefaultData(data){
   			this.loading = false;
@@ -618,8 +670,6 @@ export default {
 			this.formInline.symptoms = data.symptoms;
 			this.formInline.time = data.suggestDuration;
      		this.formInline.grade = data.difficultyDegree;
-			this.activeName = data.trees[0].children[0].id;
-			this.activeClass = data.trees[0].children[0].children[0].id;
 			this.allQuestion = data;
 			this.zhenduan = data.zhenduan;
 			this.chuzhi = data.chuzhi;
@@ -715,6 +765,7 @@ export default {
      	},
      	//点击一级分类
      	tabClick1(tag){
+     		this.showDifficultyDegree = tag.label=='报告'?false:true;
      		//if (this.activeScene == 0) {
 	     		if (tag.index == '3') {
 	     			this.activeClass = '诊断';
@@ -747,7 +798,8 @@ export default {
      					diagnosisName: formParam.diagnosisName,
 						diagnosisScore: formParam.questionScore,
 						diagnosisType: "support",
-						supportQuestions: []
+						supportQuestions: [],
+						difficultyDegree:formParam.difficultyDegree
      				})
      			}else{
      				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport.push({
@@ -755,7 +807,8 @@ export default {
 						diagnosisScore: formParam.questionScore,
 						diagnosisType: "unsupport",
 						supportQuestions: [],
-						unSupportQuestions: []
+						unSupportQuestions: [],
+						difficultyDegree:formParam.difficultyDegree
      				})
      			}
      		}else if (this.activeName == '处置') {
@@ -764,7 +817,11 @@ export default {
      					this.chuzhi[this.activeScene][this.allQuestion.trees[this.activeScene].name][i].supportQuestions.push({
      						questionName: formParam.diagnosisName,
 							score: formParam.questionScore,
-							questionAnswer:'[]'
+							questionAnswer:'[]',
+							difficultyDegree:formParam.difficultyDegree,
+							hasDicomImage: "no",
+							hasImage: "no",
+							intervalDay:1,
      					})
      				}
      			}
@@ -864,38 +921,67 @@ export default {
 	                  
 	        });
      	},
-     	upLoadImg(file){
-		    const formData = new FormData()
-		    formData.append('file',file.file)
-		    //formData.append('id',id)
-		    // this.axios.post(`/admin/file`,formData).then(res => res.data).then(data => {
-		    //     console.log(data)
-		    //     if(data.code === 200){
-		    //         this.imgurl = data.data[0]
-		    //     }
-		    // })
+     	handleExceed(files, fileList) {
+	        this.$message.warning(`当前限制选择 1 个文件`);
+	    },
+     	upLoadImg(file,id){
+     		this.loading = true;
+     		let imgType = ''
+		    var testmsg=file.file.name.substring(file.file.name.lastIndexOf('.')+1);
+
+	        if (testmsg == 'zip') {
+	        	imgType = 'dicom'
+	        }else if(testmsg == 'jpg'){
+	        	imgType = 'image'
+	        }else{
+	        	this.$message.error('只能上传 jpg和zip 文件!');
+	        	return false;
+	        }
+		    recordApi.uploadSampleImage({files:file.file,handleId:id,imagetype:imgType,jianchaUpload:true}).then(response=>{
+				this.$message({
+		            type: 'success',
+		            message: '上传成功!'
+		        });
+		        this.loading = false;
+		        this.getListSampleDetailBysample();
+			})
      	},
      	handleImgSuccess(res, file) {
 	    	this.$message({
 	            type: 'success',
-	            message: '图片上传成功!'
+	            message: '上传成功!'
 	        });
 	    },
 	    beforeImgUpload(file) {
 	    	var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)				
-			const extension = testmsg === 'png'
+			const extension = testmsg === 'zip'
 			const extension2 = testmsg === 'jpg'
-	        const isLt2M = file.size / 1024 / 1024 < 2;
+	        //const isLt2M = file.size / 1024 / 1024 < 2;
 	        if (!extension && !extension2) {
-	          this.$message.error('只能上传 png和jpg 文件!');
+	          this.$message.error('只能上传 jpg和zip 文件!');
 	        }
-	        if (!isLt2M) {
-	          this.$message.error('文件大小不能超过 2MB!');
-	        }
-	        return extension || extension2 && isLt2M;
+	        // if (!isLt2M) {
+	        //   this.$message.error('文件大小不能超过 2MB!');
+	        // }
+	        return extension || extension2;
 	    },
-	    handlePictureCardPreview(file){
-
+	    deleteImage(id,hasDicomImage,hasImage){
+	    	this.$confirm('确定删除该项目?', '提示', {
+	          confirmButtonText: '确定',
+	          cancelButtonText: '取消',
+	          type: 'warning'
+	        }).then(() => {
+	        	hasDicomImage = 'no',hasImage = 'no';
+		    	recordApi.deleteSampleImage({handleId:id,imagetype:''}).then(response=>{
+					this.$message({
+			            type: 'success',
+			            message: '删除成功!'
+			        });
+			        this.getListSampleDetailBysample();
+				})
+	        }).catch(() => {
+	                  
+	        });
 	    },
      	//保存
      	save(type){
@@ -925,6 +1011,8 @@ export default {
 			            type: 'success',
 			            message: '保存成功!'
 			        });
+			        this.getListSampleDetailBysample();
+			        
 				})
      		}else{
      			this.$set(this.allQuestion, "sampleParms",{
@@ -963,6 +1051,13 @@ export default {
 	    		main = 'http://192.168.8.74:8080'
 	    	}
 	    	window.open(main+'/search/ZH_CN?q='+this.formInline.disease, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    },
+	    checkImage(id,hasDicomImage,hasImage){
+	    	if (hasDicomImage == 'yes') {
+	    		window.open(process.env.HOST+'/teachai/yingxiang/ImageShare.htm?reportid='+id, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    	}else if (hasImage == 'yes') {
+	    		window.open(process.env.HOST+'/teachai/yingxiang/dicom/image/'+id+'.jpg', '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    	}else{return false}
 	    }
     }
 }

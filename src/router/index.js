@@ -18,6 +18,7 @@ import Record from './record/record'
 import Students from './students/students'
 
 const router = new Router({
+	//mode: 'history',
 	routes: [
 		{
 			path: '/login',

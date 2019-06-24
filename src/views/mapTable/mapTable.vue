@@ -1,5 +1,5 @@
 <template>
-    <div class="mapTable">
+    <div class="mapTable" v-loading="fullscreenLoading">
 		<p style="height: 32px;"><i class="el-icon-location-outline"></i> 问题分类表 </p>
     	<el-tabs v-model="activeName" tab-position="left" @tab-click="tabClick1">
 		    <el-tab-pane v-for="(item,index) in questionList" :key="item.id" :label="item.standandTypeName" :name="item.id">
@@ -80,7 +80,7 @@ export default {
 	},
 	data () {
 	    return {
-	    	fullscreenLoading:false,
+	    	fullscreenLoading:true,
 	    	activeName:'',
 	    	tableData: [],
 	        questionList:[],
@@ -109,7 +109,7 @@ export default {
 	},
   	methods: {
 
-	    //获取疾病列表
+	    //获取问题列表
 	    getAllSubQuestion(id){
 	    	
 	    	question.allSubQuestion({standandTypeId:id}).then(response=>{

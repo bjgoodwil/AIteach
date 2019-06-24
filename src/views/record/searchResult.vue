@@ -68,6 +68,7 @@ export default {
 	    }
 	},
 	mounted() {
+		console.log(this.$route.query.keywords)
 		//this.param.disease = this.$route.query.disease
 		this.getData(this.param);
 		

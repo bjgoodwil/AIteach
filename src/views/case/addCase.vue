@@ -120,7 +120,7 @@
 			
 			<span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleTree = false">取 消</el-button>
-			    <el-button type="primary" @click="addQuestion">确 定</el-button>
+			    <el-button type="primary" @click="addQuestion" :disabled="btnDisabled">确 定</el-button>
 			</span>
 			
 		</el-dialog>	
@@ -138,6 +138,7 @@ export default {
     data () {
 
         return {
+        	btnDisabled:false,
         	loading: true,
         	disabled:false,//设置专业是否可编辑
         	activeScene:'', //当前场景
@@ -278,6 +279,7 @@ export default {
 			this.standandTypeName = ''
 	    },
      	addQuestion(){
+     		this.btnDisabled = true;
      		let param = {
      			diseaseId:this.$route.query.diseaseId,
      			classifyId:this.activeClass,
@@ -319,6 +321,7 @@ export default {
 		            this.loading = false;
 		    	})
 		    	this.dialogVisibleTree = false;
+		    	this.btnDisabled = false;
 	    	})
      	},
      	//删除问题

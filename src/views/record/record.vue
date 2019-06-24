@@ -5,6 +5,7 @@
 		    	<el-form ref="form" :inline="true" :model="form" label-width="40px" size="small" class="clearfix m-b-10">
 					<el-form-item label="专业" class="floatLeft">
 					    <el-cascader
+					        clearable
 						    :options="options"
 						    :props="defaultProps"
 						    v-model="form.selectedOptions"
@@ -35,7 +36,7 @@
 			      <el-radio-button label="1">已发布</el-radio-button>
 			      <el-radio-button label="0">未发布</el-radio-button>
 			    </el-radio-group>
-			    <el-button type="primary" round size="small" class="floatRight m-l-10" @click="showDialogExcel"> 导入病例</el-button>
+			    <el-button type="primary" round size="small" class="floatRight m-l-10" @click="showDialogExcel"><i class="el-icon-upload2"></i> 导入病例</el-button>
 			    <el-button type="primary" round size="small" @click="showDialogForm" class="floatRight"><i class="el-icon-plus"></i> 添加病例</el-button>
 		    </el-tab-pane>
 		</el-tabs>
@@ -98,12 +99,12 @@
 		      layout="total, prev, pager, next"
 		      :total="100">
 		</el-pagination> -->
-		<el-dialog title="选择专业疾病" :visible.sync="dialogFormVisible" @close="dialogClose" width="600px">
-			<el-form :model="diseaseForm" label-width="80px">
+		<el-dialog title="选择专业疾病" :visible.sync="dialogFormVisible" @close="dialogClose" width="400px">
+			<el-form :model="diseaseForm" label-width="60px">
 			  	<el-form-item label="专业">
 			        <el-cascader
 			            size="small"
-			        	style="width: 480px"
+			        	style="width: 300px"
 					    :options="options"
 					    :props="defaultProps"
 					    v-model="diseaseForm.diseaseType"
@@ -112,7 +113,7 @@
 					</el-cascader>
 			    </el-form-item>
 			    <el-form-item label="疾病">
-			        <el-select v-model="diseaseForm.disease" placeholder="请选择" size="small" style="width: 480px" @change="handleChangeGetId">
+			        <el-select v-model="diseaseForm.disease" placeholder="请选择" size="small" style="width: 300px" @change="handleChangeGetId">
 					    <el-option
 					      v-for="item in optionsDis2"
 					      :key="item.id"
@@ -266,17 +267,30 @@ export default {
 	    },
 	    //选择专业
 	    handleChange(val){	
+	    	this.loading = true;
 	    	this.form.caseName = '';
-	    	diseaseApi.listDisease({typeId:val[1]}).then(response=>{
-	            this.optionsDis1 = response.data.data.diseasevolist;
-	        })
+	        if (val.length == 0) {
+	        	this.getListRecord({diseaseId:'',status:'',gender:''});
+	        }else{
+	        	diseaseApi.listDisease({typeId:val[1]}).then(response=>{
+		            this.optionsDis1 = response.data.data.diseasevolist;
+		        })
+	        	recordApi.listRecordByTypeId({typeId:val[1]}).then(response=>{
+					this.tableData = response.data.data.diseaseRecord;
+					this.loading = false;
+				})
+	        }
 	    },
 	    //选择疾病
 	    selectDisease(val){
 	    	this.loading = true;
 	    	this.form.diseaseId = val;
-	    	if (val == '') this.form.selectedOptions = [];
-	    	
+	    	if (val == ''){
+	    		recordApi.listRecordByTypeId({typeId:this.form.selectedOptions}).then(response=>{
+					this.tableData = response.data.data.diseaseRecord;
+					this.loading = false;
+				})
+	    	}
 	    	this.getListRecord({diseaseId:val,status:this.form.status,gender:this.form.gender});
 	    },
 	    //选择状态
@@ -304,7 +318,7 @@ export default {
 	    	this.diseaseForm.disease = '';
 	    	this.importForm.diseaseType = [];
 	    	this.importForm.disease = '';
-	    	this.$refs.upload.clearFiles();
+	    	if (this.$refs.upload) {this.$refs.upload.clearFiles()}
 	    },
 	    //添加病例选择专业
 	    handleChangeSearch(val){
@@ -430,6 +444,8 @@ export default {
 	    
 	    //to搜索结果列表页
 	    toSearch(){
+	    	let main = '';
+	    	main = process.env.NODE_ENV == 'production'?process.env.HOST:window.location.host;
 	    	if (this.diseaseForm.disease == '') {
 	    		this.$message({
 		          message: '请选择疾病',
@@ -438,7 +454,7 @@ export default {
 	    	}else{
 	    		this.$router.push({name:'search',
 		    		query:{
-		    			host:window.location.host,
+		    			host:main,
 		    			disease:this.diseaseForm.disease,
 		    			diseaseId:this.diseaseForm.diseaseId
 		    		}
