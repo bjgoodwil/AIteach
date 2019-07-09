@@ -3,7 +3,7 @@ export const studentsApi = {
     //学生列表
     list(data) {
         return axios({
-            url: '/med/user/listStudentDetail.json',
+            url: '/teachai/med/user/listStudentDetail.json',
             method: 'post',
             data: data
         });
@@ -11,7 +11,7 @@ export const studentsApi = {
     //新增和编辑学生
     addOrEdit(data) {
         return axios({
-            url: '/med/user/editStudentDetail.json',
+            url: '/teachai/med/user/editStudentDetail.json',
             method: 'post',
             data: data
         });
@@ -19,7 +19,7 @@ export const studentsApi = {
     //修改学生密码
     updatePassword(data) {
         return axios({
-            url: '/med/user/updatePassword.json',
+            url: '/teachai/med/user/updatePassword.json',
             method: 'post',
             data: data
         });
@@ -27,7 +27,7 @@ export const studentsApi = {
     //删除学生
     delete(data) {
         return axios({
-            url: '/med/user/deleteStudentDetail.json',
+            url: '/teachai/med/user/deleteStudentDetail.json',
             method: 'post',
             data: data
         });
