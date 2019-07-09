@@ -59,12 +59,12 @@
 	        </el-table-column>
 	        <el-table-column prop="chiefComplaint" label="病历概述">
 	        </el-table-column>
-	        <el-table-column prop="symptoms" label="症状">
-	        </el-table-column>
+	        <!-- <el-table-column prop="symptoms" label="症状">
+	        </el-table-column> -->
 	        <el-table-column prop="status" label="状态" width="80">
 	        	<template slot-scope="scope">
-	        		<span v-if="scope.row.status == 1">已发布</span>
-	        		<span v-else-if="scope.row.status == 0"> 未发布 </span>
+	        		<el-tag v-if="scope.row.status == 1" type="success">已发布</el-tag>
+	        		<el-tag v-else-if="scope.row.status == 0">未发布</el-tag>
 	        	</template>
 	        </el-table-column>
 	        <el-table-column prop="createDate" label="发布时间" width="160">
@@ -79,7 +79,7 @@
 		          type="text"
 		          v-if="scope.row.status == 0" @click="changeStatus('1', scope.row)"><i class="el-icon-upload"></i></el-button>
 		        <el-button
-		          title="下架"
+		          title="下线"
 		          type="text"
 		          v-if="scope.row.status == 1" @click="changeStatus('0', scope.row)"><i class="el-icon-download"></i></el-button>
 		        <el-button
@@ -247,8 +247,8 @@ export default {
 	    //改变病例状态
 	    changeStatus(type,row){
 	    	let text = ''
-	    	if (type == 1) text = '发布'; else text = '下架';
-	    	console.log(text)
+	    	if (type == 1) text = '发布'; else text = '下线';
+
 	    	this.$confirm('确定'+text+'病例吗?', '提示', {
 	          confirmButtonText: '确定',
 	          cancelButtonText: '取消',

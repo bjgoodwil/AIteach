@@ -16,7 +16,7 @@ export const recordApi = {
             data: data
         });
     },
-    //根据可是id查病例
+    //根据科室id查病例
     listRecordByTypeId(data) {
         return axios({
             url: '/teachai/med/disease/listDiseaseRecordByTypeId.json',

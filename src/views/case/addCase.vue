@@ -257,7 +257,7 @@ export default {
      		}else{
      			this.dialogVisibleTree = true;
      			//获取专业下所有问题
-		        question.listAllQuestion({departmentId:this.$route.query.activeClass||this.activeClass}).then(response=>{
+		        question.listAllQuestion({departmentId:this.$route.query.activeClass||this.dataForm.disease.departmentId}).then(response=>{
 		        	this.optionQuestion = response.data.data.trees;
 		     		let a = this.optionQuestion[this.activeScene];
 		     		for (var i = 0; i < a.children.length; i++) {

@@ -61,7 +61,6 @@ export default {
 	    	param:{
 	    		keywords:JSON.stringify({"name":this.$route.query.keywords,"page":0,"size":10}),
 	    		disease:'',
-
 	    	},//参数
 	        result:'',
 
@@ -70,7 +69,10 @@ export default {
 	mounted() {
 		console.log(this.$route.query.keywords)
 		//this.param.disease = this.$route.query.disease
-		this.getData(this.param);
+		ywd.getToken({token:'token'}).then(response=>{
+			localStorage.setItem("token", response.data.result);
+			this.getData(this.param);
+        })
 		
 	},
 	beforeRouteEnter(to, from, next) {

@@ -18,6 +18,15 @@ let instance = axios.create({
 });
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
+    let exp = 1000*60*60*2; // 2小时的秒数
+    let overtime = localStorage.getItem("overtime");
+    if(overtime && (new Date().getTime() - overtime) > exp) {
+        // 如果(当前时间 - 存储的元素在创建时候设置的时间) > 过期时间 
+        window.location.href = window.location.host+"/login"
+        localStorage.clear();
+    }else{
+        localStorage.setItem("overtime", new Date().getTime());
+    }
     //console.log(config)
     let token=localStorage.getItem('token') || ''
     // 在发送请求之前做些什么

@@ -13,11 +13,12 @@
               </el-form-item>
               <el-form-item class="pos-a" style="left:220px;">
                 <img src="../../assets/login/mima.png" alt="" class="pos-a" style="left: 40px;">
-                <input class="pos-a" v-model="formInline.password" placeholder="密码" style="left: 80px;">
+                <input type="password" class="pos-a" v-model="formInline.password" placeholder="密码" style="left: 80px;">
               </el-form-item>
               <el-form-item class="pos-a" style="left:440px;">
                 <img src="../../assets/login/yanzm.png" alt="" class="pos-a" style="left: 80px;">
-                <input class="pos-a" v-model="formInline.code" placeholder="验证码" style="left: 120px;">
+                <img :src="codeUrl" alt="" class="pos-a" style="left: 210px;">
+                <input class="pos-a" v-model="formInline.captchaCode" placeholder="验证码" style="left: 120px;" @click="getCode">
               </el-form-item>
               <el-form-item class="pos-a" style="left:780px;">
                 <el-button class="m-l-20" type="primary" @click="onSubmit">登 陆</el-button>
@@ -30,25 +31,65 @@
 </template>
 
 <script>
+import {loginApi} from '@/services/apis/login/login';
 export default {
     name: 'login',
     data () {
         return {
             msg: '人工智能临床医学教学辅助数据库',
+            codeUrl:'', //图形验证码
             formInline: {
                 userName: '',
                 password: '',
-                code:''
+                captchaCode:''
             }
         }
     },
     mounted() {
-
+        this.getCode();
     },
     methods: {
         onSubmit() {
-            this.$router.push({name:'case'})
-
+            if (this.formInline.userName == '' || this.formInline.password == '') {
+                this.$message({
+                    message: '请输入账号和密码',
+                    type: 'warning'
+                });
+            }else if (this.formInline.captchaCode == '') {
+                this.$message({
+                    message: '请输入验证码',
+                    type: 'warning'
+                });
+            }else{
+                let param = {
+                    userName: this.formInline.userName,
+                    password: this.formInline.password,
+                    captchaCode: this.formInline.captchaCode.toUpperCase()
+                }
+                loginApi.login(param).then(response=>{
+                    if (response.data.errCode == '0') {
+                        this.$message({
+                            message: "登陆成功",
+                            type: 'success'
+                        });
+                        localStorage.setItem("uerId", response.data.data.userId);
+                        localStorage.setItem("uerInfo", JSON.stringify(response.data.data));
+                        this.$router.push({path:this.$route.query.redirect || '/'})
+                    }else{
+                        this.$message({
+                            message: response.data.errMsg + '('+response.data.data+')',
+                            type: 'error'
+                        });
+                    }
+                    
+                })
+            }
+            
+        },
+        getCode(){
+            loginApi.getCode().then(response=>{
+                this.codeUrl = "data:image/png;base64,"+response.data.data.codePic;
+            })
         }
     }
 }
@@ -96,13 +137,13 @@ export default {
 
 }
 .el-form-item{
-
     .el-form-item__content{
         input{
             height: 34px;
             padding-left: 10px; 
             background:none;
             border: none;
+            color: #fff;
             border-bottom: 1px solid #ccc;
         }
         

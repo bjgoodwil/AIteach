@@ -5,13 +5,13 @@
             <el-header>
                 <h1 style="font-size: 20px;line-height: 60px;" class="floatLeft title">
                 北京大学第三医院人工智能临床医学教学辅助数据库管理平台</h1>
-                <el-dropdown trigger="click" class="floatRight">
+                <el-dropdown class="floatRight" @command="handleCommand">
                   <span class="el-dropdown-link">
-                    admin<i class="el-icon-arrow-down el-icon--right"></i>
+                    {{name}} ({{roleName}})<i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>个人中心</el-dropdown-item>
-                    <el-dropdown-item>退出</el-dropdown-item>
+                    <el-dropdown-item command="my">个人中心</el-dropdown-item>
+                    <el-dropdown-item command="loginOut">退出</el-dropdown-item>
             
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -25,11 +25,11 @@
                       @select="handleSelect"
                       class="el-menu-vertical-demo"
                       >
-                      <el-menu-item index="/case">
-                        <img src="../assets/icon01.png" alt="" class="m-r-10">
-                        <span slot="title">疾病分类</span>
+                      <el-menu-item v-for="item in menuItem" :key="item.url" :index="item.url" v-if="item.role.indexOf(roleName) > -1">
+                        <img :src="item.icon" alt="" class="m-r-10">
+                        <span slot="title">{{item.name}}</span>
                       </el-menu-item>
-                      <el-menu-item index="/list">
+                      <!-- <el-menu-item index="/list">
                         <img src="../assets/icon03.png" alt="" class="m-r-10">
                         <span slot="title">虚拟病例</span>
                       </el-menu-item>
@@ -43,8 +43,12 @@
                       </el-menu-item>
                       <el-menu-item index="/students">
                         <img src="../assets/icon04.png" alt="" class="m-r-10">
-                        <span slot="title">用户信息</span>
+                        <span slot="title">学生管理</span>
                       </el-menu-item>
+                      <el-menu-item index="/teacher">
+                        <img src="../assets/icon04.png" alt="" class="m-r-10">
+                        <span slot="title">教师管理</span>
+                      </el-menu-item> -->
                       <!-- <el-menu-item index="6">
                         <i class="el-icon-document"></i>
                         <span slot="title">操作日志</span>
@@ -65,24 +69,66 @@ export default {
     data () {
 
         return {
-            
+            name:'',
+            roleName:'管理员', //角色
+            menuItem:[{
+                name:'疾病分类',
+                url:'/case',
+                icon:require('../assets/icon01.png'),
+                role:['教师','管理员'],
+            },{
+                name:'虚拟病例',
+                url:'/list',
+                icon:require('../assets/icon03.png'),
+                role:['教师','管理员'],
+            },{
+                name:'标准提问库',
+                url:'/problem',
+                icon:require('../assets/icon02.png'),
+                role:['管理员'],
+            },{
+                name:'问题分类表',
+                url:'/mapTable',
+                icon:require('../assets/icon02.png'),
+                role:['管理员'],
+            },{
+                name:'学生管理',
+                url:'/students',
+                icon:require('../assets/icon04.png'),
+                role:['教师','管理员'],
+            },{
+                name:'教师管理',
+                url:'/teacher',
+                icon:require('../assets/icon04.png'),
+                role:['管理员'],
+            }]
         }
     },
     mounted() {
-  
+        this.name = JSON.parse(localStorage.getItem("uerInfo")).name;
+        this.roleName = JSON.parse(localStorage.getItem("uerInfo")).role.roleName;
     },
     methods:{
         handleSelect(key, keyPath) {
-           
             this.$router.push({path:key})
         },
         //设置菜单栏选中状态
         setMenuActive(path) {
-            
             return path;
-            
         },
-
+        handleCommand(command) {
+            if (command == 'loginOut') {
+                localStorage.removeItem("uerId");
+                localStorage.removeItem("uerInfo");
+                this.$router.push({
+                    name:'login'
+                })
+            }else if(command == 'my'){
+                this.$router.push({
+                    name:'my'
+                })
+            }else{}
+        },
     }
 }
 </script>

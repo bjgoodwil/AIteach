@@ -1,10 +1,10 @@
 <template>
-    <div class="students">
+    <div class="teacher">
     	
     	<div class="clearfix">
-    		<p class="floatLeft"><i class="el-icon-location-outline"></i> 学生列表 </p>
+    		<p class="floatLeft"><i class="el-icon-location-outline"></i> 教师列表 </p>
     		<!-- <el-button type="primary" round class="floatRight m-l-10" size="small"><i class="el-icon-upload2"></i> 批量导入</el-button> -->
-    		<el-upload
+    		<!-- <el-upload
 		      ref="upload"
 			  class="upload-demo floatRight m-l-10"
 			  :action="uploadUrl"
@@ -12,8 +12,8 @@
 			  :before-upload="beforeExcelUpload"
 			  :on-success="handleExcelSuccess">
 			  <el-button slot="trigger" round size="small" type="primary"><i class="el-icon-upload2"></i> 批量导入</el-button>
-			</el-upload>
-    		<el-button type="primary" round class="floatRight" size="small" @click="showStudentForm('add')"><i class="el-icon-plus"></i> 添加学生</el-button>
+			</el-upload> -->
+    		<el-button type="primary" round class="floatRight" size="small" @click="showTeacherForm('add')"><i class="el-icon-plus"></i> 添加用户</el-button>
 
     	</div>
     	<el-table :data="tableData" class="m-t-20" v-loading="loading">
@@ -22,25 +22,16 @@
 		      label="序号"
 		      width="50">
 		    </el-table-column>
-		    <!-- <el-table-column prop="id" label="Id" width="160">
-		    </el-table-column> -->
-		    <el-table-column prop="userName" label="姓名" width="100">
+		    <el-table-column prop="teacherName" label="账号" width="120">
+	        </el-table-column>
+		    <el-table-column prop="name" label="姓名" width="100">
 		    </el-table-column>
-	        <el-table-column prop="sex" label="性别" width="80"> 
+	        <el-table-column prop="sex" label="性别" width="100"> 
 	        </el-table-column>
-			<el-table-column prop="name" label="账号">
-	        </el-table-column>
-	        <!-- <el-table-column prop="password" label="密码">
-	        </el-table-column> -->
-	        <el-table-column prop="hospital" label="医院">
-	        </el-table-column>
-			<el-table-column prop="grade" label="班级">
-	        </el-table-column>
-	        <el-table-column label="所属科室">
+	        <el-table-column label="管理科室">
 	        	<template slot-scope="scope">
 	        		<!-- {{scope.row.permissionId}} -->
-	        		<el-cascader 
-	        			   
+	        		<el-cascader      
 	        			disabled
 				        style="width: 100%"
 				        size="small"
@@ -49,7 +40,6 @@
 					    :value="JSON.parse(scope.row.permissionId)"
 					    clearable>
 					</el-cascader>
-
 				</template>
 	        </el-table-column>
 	        <el-table-column label="操作" width="100">
@@ -59,14 +49,14 @@
 		          type="text" @click="edit(scope.row,'edit')"><i class="el-icon-edit"></i></el-button>
 		        <el-button
 		      	  title="删除"
-		          type="text" @click="deleteStudent(scope.row)"><i class="el-icon-delete"></i></el-button>
+		          type="text" @click="deleteTeacher(scope.row)"><i class="el-icon-delete"></i></el-button>
 		      </template>
 		    </el-table-column>
 		</el-table>
 
 		<!-- 添加用户弹出框 -->
 		<el-dialog
-		  title="编辑学生信息"
+		  title="编辑教师信息"
 		  :visible.sync="dialogVisibleStudents"
 		  width="400px"
 		  @close="dialogClose"
@@ -74,35 +64,30 @@
 		  >
 		    <el-tabs v-model="activeName">
 			    <el-tab-pane label="基本信息" name="first" @tab-click="handleClick">
-					<el-form label-width="60px" :model="studentsForm">
+					<el-form label-width="80px" :model="teachersForm">
 				  		<el-form-item label="姓名">
-							<el-input v-model="studentsForm.name" placeholder="请输入姓名" size="small"></el-input> 
+							<el-input v-model="teachersForm.name" placeholder="请输入姓名" size="small"></el-input> 
 						</el-form-item>
 						<el-form-item label="性别">
-						    <el-radio-group v-model="studentsForm.sex">
+						    <el-radio-group v-model="teachersForm.sex">
 						      <el-radio label="男">男</el-radio>
 						      <el-radio label="女">女</el-radio>
 						    </el-radio-group>
 						</el-form-item>
 						<el-form-item label="账号">
-						    <el-input v-model="studentsForm.account" placeholder="请输入账号" size="small"></el-input> 
+						    <el-input v-model="teachersForm.teacherName" placeholder="请输入账号" size="small"></el-input> 
 						</el-form-item>
 						<el-form-item label="密码" v-if="addOrEdit == 'add'">
-						    <el-input type="password" v-model="studentsForm.password" placeholder="请输入密码" size="small"></el-input> 
+						    <el-input type="password" v-model="teachersForm.teacherPassword" placeholder="请输入密码" size="small"></el-input> 
 						</el-form-item>
-						<el-form-item label="医院">
-						    <el-input v-model="studentsForm.hospital" placeholder="请输入医院" size="small"></el-input> 
-						</el-form-item>
-						<el-form-item label="班级">
-						    <el-input v-model="studentsForm.grade" placeholder="请输入班级" size="small"></el-input> 
-						</el-form-item>
-						<el-form-item label="科室">
+						<el-form-item label="管理科室">
 						    <el-cascader
-						        style="width: 300px"
+
+						        style="width: 280px"
 						        size="small"
 							    :options="permissions"
 							    :props="props"
-							    :value="studentsForm.permissionId"
+							    :value="teachersForm.permissionId"
 							    @change="handleChange"
 							    clearable>
 							</el-cascader>
@@ -113,7 +98,7 @@
 			    <el-tab-pane label="重置密码" name="second" v-if="addOrEdit == 'edit'">
 					<el-form label-width="60px" :model="passwordForm">
 				  		<el-form-item label="密码">
-							<el-input type="password" v-model="passwordForm.password" placeholder="请输入密码" size="small"></el-input> 
+							<el-input type="password" v-model="passwordForm.teacherPassword" placeholder="请输入密码" size="small"></el-input> 
 						</el-form-item>
 					</el-form>
 			    </el-tab-pane>
@@ -121,7 +106,7 @@
 		    <span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleStudents = false">取 消</el-button>
 			    <el-button type="primary" @click="editPassword" v-if="activeName == 'second'">确 定</el-button :loading="btnLoading">
-			    <el-button type="primary" @click="addStudent" v-else :loading="btnLoading">确 定</el-button>
+			    <el-button type="primary" @click="addTeacher" v-else :loading="btnLoading">确 定</el-button>
 			</span>
 		</el-dialog>
     </div>
@@ -130,32 +115,31 @@
 import {studentsApi} from '@/services/apis/students/students'
 import {teachersApi} from '@/services/apis/teachers/teachers'
 export default {
-	name: 'students',
+	name: 'teacher',
 	data () {
 	    return {
 	    	loading:true,
 	    	btnLoading: false,
 	    	tableData:[],
-	    	dialogVisibleStudents:false,
-	    	studentsForm:{
-	    		id:'',
-	    		name:'',
-	    		sex:'男',
-	    		account:'',
-	    		password:'', 
-	    		hospital:'',//医院
-	    		grade:'',//班级
-	    		permissionId:[]//权限
-	    	},
-	    	passwordForm:{ //修改密码
-	    		password:'',
-	    	},
 	    	props: { 
+	    		multiple: true,
 	    		value:"diseaseType",
 	    		label:"permissionName",
 	    		children:"teacherPermissionVOChilds"
 	    	},
 	    	permissions: [], //权限列表
+	    	dialogVisibleStudents:false,
+	    	teachersForm:{
+	    		id:'',
+	    		name:'',
+	    		sex:'男',
+	    		teacherName:'',
+	    		teacherPassword:'', 
+	    		permissionId:[]//权限
+	    	},
+	    	passwordForm:{ //修改密码
+	    		teacherPassword:'',
+	    	},
 	    	addOrEdit:'',  //新增还是编辑
 	    	currentData:'', //当前操作对象
 	    	uploadUrl:'',
@@ -167,32 +151,27 @@ export default {
 		this.getData();
 		teachersApi.selectPer().then(response=>{
 			this.permissions = response.data.data.permissions;
+	
 		})
 	},
   	methods: {
       	getData(){
-      		studentsApi.list().then(response=>{
+			teachersApi.list().then(response=>{
 				this.tableData = response.data.data;
 				this.loading = false;
 			})
       	},
-      	showStudentForm(type){
+      	showTeacherForm(type){
       		this.dialogVisibleStudents = true;
       		this.addOrEdit = type;
       	},
       	setData(data){
       		let param = {
-      			userId:data.id,
-      			accountName: data.account,
-      			userName: data.name,
+      			//userId:data.id,
+      			name: data.name,
+      			teacherName: data.userName,
       			sex: data.sex,
-      			phone: data.account,
-      			password: data.password,
-      			hospitalName: data.hospital,
-      			grade: data.grade,
-      			identificationNumber:'',
-      			identity:'',
-      			permissionId:JSON.stringify(data.permissionId)|| ""
+      			teacherPassword: data.password,
       		}
       		return param;
       	},
@@ -201,11 +180,12 @@ export default {
 	    },
 	    //选择管理科室
 	    handleChange(val){	
-	    	this.studentsForm.permissionId = val;
+	    	this.teachersForm.permissionId = val;
 	    },
-      	addStudent(){
+      	addTeacher(){
       		this.btnLoading = true;
-      		studentsApi.addOrEdit(this.setData(this.studentsForm)).then(response=>{
+      		this.teachersForm.permissionId = JSON.stringify(this.teachersForm.permissionId) || ""
+      		teachersApi.addOrEdit(this.teachersForm).then(response=>{
       			this.getData();
       			this.$message({
 		            type: 'success',
@@ -216,13 +196,13 @@ export default {
       	},
       	editPassword(){
       		this.btnLoading = true;
-      		if (this.passwordForm.password == '') {
+      		if (this.passwordForm.teacherPassword == '') {
       			this.$message({
 		            type: 'warning',
 		            message: '请输入密码!'
 		        });
       		}else{
-      			studentsApi.updatePassword({password:this.passwordForm.password,userId:this.currentData.id}).then(response=>{
+      			teachersApi.updatePassword({password:this.passwordForm.teacherPassword,userId:this.currentData.id,type:"2"}).then(response=>{
 	      			this.getData();
 	      			this.$message({
 			            type: 'success',
@@ -236,27 +216,24 @@ export default {
       		this.dialogVisibleStudents = true;
       		this.currentData = row;
       		this.addOrEdit = type;
-      		this.studentsForm={
+      		this.teachersForm={
 	  			id:this.currentData.id,
-	    		name:this.currentData.userName,
+	    		name:this.currentData.name,
 	    		sex:this.currentData.sex,
-	    		account:this.currentData.name,
-	    		password:'', 
-	    		hospital:this.currentData.hospital,//医院
-	    		grade:this.currentData.grade,//班级
-	    		permissionId:JSON.parse(this.currentData.permissionId)//权限
+	    		teacherName:this.currentData.teacherName,
+	    		teacherPassword:'', 
+	    		permissionId:JSON.parse(this.currentData.permissionId)
 	    	}
-	    	console.log(this.studentsForm)
       	},
-      	deleteStudent(row){
+      	deleteTeacher(row){
       		this.currentData = row;
       		this.$confirm('确定删除该账号?', '提示', {
 	          confirmButtonText: '确定',
 	          cancelButtonText: '取消',
 	          type: 'warning'
 	        }).then(() => {
-	        	studentsApi.delete({
-					userId:this.currentData.id
+	        	teachersApi.delete({
+					id:this.currentData.id
 				}).then(response=>{
 					this.$message({
 			            type: 'success',
@@ -268,13 +245,11 @@ export default {
       	},
       	dialogClose(){
       		this.btnLoading = false;
-      		this.studentsForm={
+      		this.teachersForm={
 	    		name:'',
 	    		sex:'男',
-	    		account:'',
-	    		password:'', 
-	    		hospital:'',//医院
-	    		grade:'',//班级
+	    		teacherName:'',
+	    		teacherPassword:'', 
 	    		permissionId:[]//权限
 	    	},
 	    	this.passwordForm.password = '';

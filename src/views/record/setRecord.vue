@@ -134,7 +134,7 @@
 								        	<template slot-scope="scope">
 										        <el-button
 										          title="删除"
-										          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
+										          type="text" @click.native.prevent="deleteRow(it.parms,scope.$index)">
 										          <i class="el-icon-delete"></i></el-button>
 								        	</template>
 								        </el-table-column> -->
@@ -403,8 +403,8 @@
 								        </el-table-column>
 								        <el-table-column label="时间" width="224">
 								        	<template slot-scope="scope">
-								        		<el-input size="small" type="number" placeholder="时间" v-model="scope.row.intervalDay">
-								        			<template slot="prepend">入院第</template>
+								        		<el-input size="small" placeholder="时间" v-model="scope.row.intervalDay">
+								        			<template slot="prepend">入院</template>
 								        			<template slot="append">天</template>
 												</el-input>
 								        	</template>
@@ -647,7 +647,6 @@ export default {
             event.preventDefault();
             event.stopPropagation();
         }
-
 	},
   	methods: {
   		//根据Sample查询数据
@@ -1138,5 +1137,4 @@ export default {
 		background-color: #f0f5fa;
 	}
 }
-
 </style>
