@@ -3,7 +3,7 @@ export const teachersApi = {
     //教师列表
     list(data) {
         return axios({
-            url: '/med/user/selectTeacher.json',
+            url: '/teachai/med/user/selectTeacher.json',
             method: 'post',
             data: data
         });
@@ -11,7 +11,7 @@ export const teachersApi = {
     //新增和编辑教师
     addOrEdit(data) {
         return axios({
-            url: '/med/user/reg.json',
+            url: '/teachai/med/user/reg.json',
             method: 'post',
             data: data
         });
@@ -19,7 +19,7 @@ export const teachersApi = {
     //修改教师密码
     updatePassword(data) {
         return axios({
-            url: '/med/user/updatePasswordForTeacher.json',
+            url: '/teachai/med/user/updatePasswordForTeacher.json',
             method: 'post',
             data: data
         });
@@ -27,7 +27,7 @@ export const teachersApi = {
     //删除教师
     delete(data) {
         return axios({
-            url: '/med/user/delTeacher.json',
+            url: '/teachai/med/user/delTeacher.json',
             method: 'post',
             data: data
         });
@@ -35,7 +35,7 @@ export const teachersApi = {
     //权限类查询类列表
     selectPer(data) {
         return axios({
-            url: '/med/user/selectPer.json',
+            url: '/teachai/med/user/selectPer.json',
             method: 'post',
             data: data
         });
