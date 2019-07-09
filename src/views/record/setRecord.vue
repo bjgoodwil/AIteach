@@ -379,7 +379,7 @@
 											  :id="props.row.id+'_img'"	
 											  class="upload-demo"
 											  multiple
-  											  :limit="10"
+  											  :limit="1"
   											  :on-exceed="handleExceed"
 											  action=""
 											  :http-request="(file)=>upLoadImg(file,props.row.id)"
