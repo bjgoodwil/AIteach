@@ -1,7 +1,8 @@
 'use strict'
-
+import router from '../router'
 import axios from 'axios'
 import qs from 'qs'
+
 //import Cookies from 'js-cookie'
 import {MessageBox} from 'element-ui';
 
@@ -22,7 +23,8 @@ instance.interceptors.request.use(function (config) {
     let overtime = localStorage.getItem("overtime");
     if(overtime && (new Date().getTime() - overtime) > exp) {
         // 如果(当前时间 - 存储的元素在创建时候设置的时间) > 过期时间 
-        window.location.href = window.location.host+"/login"
+        //window.location.href = window.location.host+"/login"
+        router.push({path: "/login"})
         localStorage.clear();
     }else{
         localStorage.setItem("overtime", new Date().getTime());

@@ -174,13 +174,30 @@ export default {
 	        standandTypeList:[],
 	        standandTypeName:'',
 	        searchQuestion:'',
-
+	        permissionId:'', //权限
+	        formatPermissionId:[], //格式化权限，便于处理
         }
     },
     mounted(){
+    	if (JSON.parse(localStorage.getItem("uerInfo")).permissionId != '') {
+			this.permissionId = JSON.parse(JSON.parse(localStorage.getItem("uerInfo")).permissionId);
+			for (var i = 0; i < this.permissionId.length; i++) {
+				this.formatPermissionId.push(this.permissionId[i][1])
+			}
+		}
     	//获取疾病所有分类
     	diseaseApi.diseaseTypesAll().then(response=>{
     		this.options = response.data.data.trees;
+    		if (this.permissionId != '') {
+    			for (var i = 0; i < this.options.length; i++) {
+	    			for (var j = 0; j < this.options[i].children.length; j++) {
+	    				if(this.formatPermissionId.indexOf(this.options[i].children[j].id) <0){
+	    					this.$set(this.options[i].children[j],'disabled',true)
+	    				}
+	    			}
+	    		}
+
+    		}else {}
     	})
     	//判断是添加还是编辑
     	if (this.$route.query.activeName) {

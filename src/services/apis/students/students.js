@@ -32,4 +32,12 @@ export const studentsApi = {
             data: data
         });
     },
+    //下载模板
+    getStudentTemplate(data) {
+        return axios({
+            url: '/teachai/med/user/getStudentTemplate.json',
+            method: 'post',
+            data: data
+        });
+    }
 }

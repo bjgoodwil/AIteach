@@ -68,11 +68,12 @@ export default {
 	},
 	mounted() {
 		console.log(this.$route.query.keywords)
-		//this.param.disease = this.$route.query.disease
-		ywd.getToken({token:'token'}).then(response=>{
-			localStorage.setItem("token", response.data.result);
-			this.getData(this.param);
-        })
+		this.param.disease = this.$route.query.disease
+		// ywd.getToken({token:'token'}).then(response=>{
+		// 	localStorage.setItem("token", response.data.result);
+		// 	this.getData(this.param);
+  //       })
+  		this.getData(this.param);
 		
 	},
 	beforeRouteEnter(to, from, next) {
@@ -142,7 +143,7 @@ export default {
 								this.$router.push({
 						    		name:'setRecord',
 						    		query:{
-						    			disease:row.diagnosis,
+						    			disease:this.$route.query.disease,
 						    			type:'edit',
 						    			sampleId:response.data.data,
 						    			diseaseId:this.$route.query.diseaseId

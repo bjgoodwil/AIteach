@@ -24,6 +24,14 @@ export const recordApi = {
             data: data
         });
     },
+    //修改病例可见状态
+    updateSampleScope(data) {
+        return axios({
+            url: '/teachai/med/disease/updateSampleScope.json',
+            method: 'post',
+            data: data
+        });
+    },
     //修改病例状态
     updateRecordStatus(data) {
         return axios({
@@ -51,7 +59,7 @@ export const recordApi = {
     //获取结构化病例
     questionRelationShips(data) {
         return axios({
-            url: '/teachai/med/disease/listDiseaseQuestionRelationShipsAndAnswer.json',
+            url: '/teachai/med/disease/listDiseaseQuestionRelationShipsAndAnswerV2.json',
             method: 'post',
             data: data
         });

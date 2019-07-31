@@ -13,9 +13,20 @@
 			  :on-success="handleExcelSuccess">
 			  <el-button slot="trigger" round size="small" type="primary"><i class="el-icon-upload2"></i> 批量导入</el-button>
 			</el-upload>
+			<el-button type="primary" round class="floatRight m-l-10" size="small" @click="downloadTemplate"><i class="el-icon-download"></i> 下载模板</el-button>
     		<el-button type="primary" round class="floatRight" size="small" @click="showStudentForm('add')"><i class="el-icon-plus"></i> 添加学生</el-button>
 
     	</div>
+    	<el-cascader
+    		size="small"
+    		class="m-r-20"
+    		placeholder="请选择科室筛选"
+		    :options="permissions"
+		    :props="{ checkStrictly: true,value:'diseaseType',label:'permissionName',children:'teacherPermissionVOChilds' }"
+		    clearable
+		    @change="handleChangeClass">
+	    </el-cascader>
+	    <el-input v-model="params.searchKey" placeholder="请输入姓名或手机号" size="small" @input="handleChangeSearchKey" clearable style="width: 220px" ></el-input>
     	<el-table :data="tableData" class="m-t-20" v-loading="loading">
     		<el-table-column
 		      type="index"
@@ -63,7 +74,16 @@
 		      </template>
 		    </el-table-column>
 		</el-table>
-
+		<!-- 分页 -->
+	    <el-pagination
+          class="textRight"
+	      @size-change="handleSizeChange"
+	      @current-change="handleCurrentChange"
+	      :current-page.sync="params.page"
+	      :page-size="params.count"
+	      layout="total, prev, pager, next"
+	      :total="pageTotla">
+		</el-pagination>
 		<!-- 添加用户弹出框 -->
 		<el-dialog
 		  title="编辑学生信息"
@@ -85,7 +105,7 @@
 						    </el-radio-group>
 						</el-form-item>
 						<el-form-item label="账号">
-						    <el-input v-model="studentsForm.account" placeholder="请输入账号" size="small"></el-input> 
+						    <el-input v-model="studentsForm.account" placeholder="请输入手机号" size="small"></el-input> 
 						</el-form-item>
 						<el-form-item label="密码" v-if="addOrEdit == 'add'">
 						    <el-input type="password" v-model="studentsForm.password" placeholder="请输入密码" size="small"></el-input> 
@@ -129,6 +149,8 @@
 <script>
 import {studentsApi} from '@/services/apis/students/students'
 import {teachersApi} from '@/services/apis/teachers/teachers'
+//import Blob from '@/vendor/Blob'
+import Export2Excel from '@/vendor/Export2Excel.js'
 export default {
 	name: 'students',
 	data () {
@@ -159,7 +181,17 @@ export default {
 	    	addOrEdit:'',  //新增还是编辑
 	    	currentData:'', //当前操作对象
 	    	uploadUrl:'',
-	    	activeName: 'first'
+	    	activeName: 'first',
+	    	params:{
+	    		permissionId:'',
+	    		searchKey:'', //姓名和手机号
+	    		count:10, //每页数量
+	        	page:1 //当前页码
+	    	},
+	    	pageTotla:null,  //总条数
+	    	studentTemplate: [
+		        {'account':'13112311233', 'password':'zhangsan', 'name':'张三', 'phone':'13112311233', 'cord':'111111194412011111', 'type':'学生', 'class':'一年二班', 'sex':'男', 'classify':'内科_呼吸内科'},
+		    ]
 	    }
 	},
 	mounted() {
@@ -171,8 +203,10 @@ export default {
 	},
   	methods: {
       	getData(){
-      		studentsApi.list().then(response=>{
-				this.tableData = response.data.data;
+      		this.loading = true;
+      		studentsApi.list(this.params).then(response=>{
+				this.tableData = response.data.data.user;
+				this.pageTotla = response.data.data.pageTotla;
 				this.loading = false;
 			})
       	},
@@ -202,6 +236,32 @@ export default {
 	    //选择管理科室
 	    handleChange(val){	
 	    	this.studentsForm.permissionId = val;
+	    },
+	    handleChangeClass(val){
+	    	
+	    	if (val.length == 1) {
+	    		this.params.permissionId = val[0]
+	    	}else if (val.length == 2) {
+	    		this.params.permissionId = val[1]
+	    	}else{
+	    		this.params.permissionId = ''
+	    	}
+	    	this.params.page = 1;
+	    	this.getData();
+	    },
+	    handleChangeSearchKey(val){
+	    	this.params.searchKey = val;
+	    	this.getData();
+	    },
+	    // 分页相关
+	    handleSizeChange(val) {
+	        console.log(`每页 ${val} 条`);
+	    },
+	    handleCurrentChange(val) {
+	        //console.log(`当前页: ${val}`);
+	        this.loading = true;
+	        this.params.page = val;
+	        this.getData();
 	    },
       	addStudent(){
       		this.btnLoading = true;
@@ -301,6 +361,22 @@ export default {
 	        });
 	        this.getData();
 	    },
+	    //下载学生模板
+	    downloadTemplate(){
+	    	require.ensure([], () => {
+		        const { export_json_to_excel } = require('@/vendor/Export2Excel');
+		        const tHeader = ['登陆账号', '初始密码', '姓名', '手机号码', '证件号码', '类别', '班级', '性别', '科室' ];
+		        // 上面设置Excel的表格第一行的标题
+		        const filterVal = ['account', 'password', 'name', 'phone', 'cord', 'type', 'class', 'sex', 'classify'];
+		        // 上面的index、nickName、name是tableData里对象的属性
+		        const list = this.studentTemplate;  //把data里的tableData存到list
+		        const data = this.formatJson(filterVal, list);
+		        export_json_to_excel(tHeader, data, 'students');
+		    })
+	    },
+	    formatJson(filterVal, jsonData) {
+	      return jsonData.map(v => filterVal.map(j => v[j]))
+	    }
     }
 }
 </script>

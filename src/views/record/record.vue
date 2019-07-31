@@ -26,15 +26,16 @@
 				</el-form>
 		    	<label for="" style="font-size: 14px;">性别 </label>
 				<el-radio-group v-model="form.gender"  size="small" class="m-l-10" @change="selectGender">
-			      <el-radio-button label="">全部</el-radio-button>
+			      <el-radio-button label="">全 部</el-radio-button>
 			      <el-radio-button label="男">男</el-radio-button>
 			      <el-radio-button label="女">女</el-radio-button>
 			    </el-radio-group>
-			    <label for="" class="m-l-20" style="font-size: 14px;">状态 </label>
+			    <label for="" class="m-l-30" style="font-size: 14px;">状态 </label>
 			    <el-radio-group v-model="form.status" size="small" class="m-l-10" @change="selectStatus">
 			      <el-radio-button label="">全部</el-radio-button>
+			      <el-radio-button label="2">已审核</el-radio-button>
 			      <el-radio-button label="1">已发布</el-radio-button>
-			      <el-radio-button label="0">未发布</el-radio-button>
+			      <el-radio-button label="0">待审核</el-radio-button>
 			    </el-radio-group>
 			    <el-button type="primary" round size="small" class="floatRight m-l-10" @click="showDialogExcel"><i class="el-icon-upload2"></i> 导入病例</el-button>
 			    <el-button type="primary" round size="small" @click="showDialogForm" class="floatRight"><i class="el-icon-plus"></i> 添加病例</el-button>
@@ -50,7 +51,7 @@
 	        </el-table-column>
 	        <el-table-column prop="diagnosis" label="出院诊断">
 	        </el-table-column>
-	        <el-table-column prop="gender" label="性别" width="60">
+	        <el-table-column prop="gender" label="性别" width="50">
 	        </el-table-column>
 	        <el-table-column label="年龄" width="60">
 	        	<template slot-scope="scope">
@@ -59,29 +60,48 @@
 	        </el-table-column>
 	        <el-table-column prop="chiefComplaint" label="病历概述">
 	        </el-table-column>
-	        <!-- <el-table-column prop="symptoms" label="症状">
-	        </el-table-column> -->
+	        <el-table-column prop="createDate" label="发布时间" width="150">
+	        </el-table-column>
 	        <el-table-column prop="status" label="状态" width="80">
 	        	<template slot-scope="scope">
 	        		<el-tag v-if="scope.row.status == 1" type="success">已发布</el-tag>
-	        		<el-tag v-else-if="scope.row.status == 0">未发布</el-tag>
+	        		<el-tag v-else-if="scope.row.status == 0">待审核</el-tag>
+	        		<el-tag v-else-if="scope.row.status == 2" type="warning">已审核</el-tag>	
 	        	</template>
 	        </el-table-column>
-	        <el-table-column prop="createDate" label="发布时间" width="160">
+	        <el-table-column label="开放权限" width="120">
+	        	<template slot-scope="scope">
+	        		<el-select v-model="scope.row.scope" size="small" @change="(val)=>selectScope(val,scope.row.id)">
+					    <el-option label="全部科室" value="0"></el-option>
+					    <el-option label="本科室" value="-1"></el-option>
+					</el-select>
+				</template>
 	        </el-table-column>
-	        <el-table-column label="操作" width="120">
+	        <el-table-column label="操作" width="150">
 		      <template slot-scope="scope">
 		      	<el-button
-		      	  title="查看"
-		          type="text" @click="setRecord(scope.row)"><i class="el-icon-search"></i></el-button>
-		        <el-button
-		          title="发布"
-		          type="text"
-		          v-if="scope.row.status == 0" @click="changeStatus('1', scope.row)"><i class="el-icon-upload"></i></el-button>
+		      	  title="查看或修改"
+		          type="text" @click="setRecord(scope.row)"><i class="el-icon-view"></i></el-button>
+		        <span v-if="scope.row.status == 2" class="m-l-10 m-r-10">
+					<el-button
+			          title="发布"
+			          type="text"
+			           @click="changeStatus('1', scope.row)"><i class="el-icon-s-promotion"></i></el-button>
+			        <el-button
+			      	  title="待审核"
+				      type="text"
+			           @click="changeStatus('0', scope.row)"><i class="el-icon-document-delete"></i></el-button>
+		        </span>
+		        
 		        <el-button
 		          title="下线"
 		          type="text"
-		          v-if="scope.row.status == 1" @click="changeStatus('0', scope.row)"><i class="el-icon-download"></i></el-button>
+		          v-else-if="scope.row.status == 1" @click="changeStatus('2', scope.row)"><i class="el-icon-download"></i></el-button>
+		        <el-button
+		      	  title="通过审核"
+		      	  type="text"
+		          v-else-if="scope.row.status == 0" @click="changeStatus('2', scope.row)"><i class="el-icon-check"></i></el-button>
+		        
 		        <el-button
 		          title="删除"
 		          type="text"
@@ -90,15 +110,15 @@
 		    </el-table-column>
 	    </el-table>
 	    <!-- 分页 -->
-	    <!-- <el-pagination
+	    <el-pagination
 	          class="textRight"
 		      @size-change="handleSizeChange"
 		      @current-change="handleCurrentChange"
-		      :current-page.sync="currentPage"
-		      :page-size="10"
+		      :current-page.sync="form.page"
+		      :page-size="form.count"
 		      layout="total, prev, pager, next"
-		      :total="100">
-		</el-pagination> -->
+		      :total="pageTotla">
+		</el-pagination>
 		<el-dialog title="选择专业疾病" :visible.sync="dialogFormVisible" @close="dialogClose" width="400px">
 			<el-form :model="diseaseForm" label-width="60px">
 			  	<el-form-item label="专业">
@@ -149,15 +169,6 @@
 					    </el-option>
 					</el-select>
 				</el-form-item>
-			  	<!-- <el-form-item label="职业" class="floatLeft">
-			        <el-input v-model="importForm.profession" placeholder="职业" size="small"></el-input>
-			    </el-form-item>
-			    <el-form-item label="入院时间" class="floatLeft">
-			        <el-input v-model="importForm.hospitalizedTime" placeholder="入院时间" size="small"></el-input>
-			    </el-form-item>
-			    <el-form-item label="mrKey" class="floatLeft">
-			        <el-input v-model="importForm.mrKey" placeholder="mrKey" size="small"></el-input>
-			    </el-form-item> -->
 			    <el-upload
 			      ref="upload"
 			      style="width: 300px"
@@ -190,11 +201,15 @@ export default {
 	    	disabled:false,
 	    	activeName:'病例列表',
 	    	form:{
+	    		teacherUserId:'',
         		selectedOptions: [],//所选专业
 	        	caseName: '',//添加的疾病症状名称
+	        	typeId:'', //科室id
 	        	diseaseId:'',
 	        	gender:'',//性别
-	        	status:'' //
+	        	status:'', //
+	        	count:10, //每页数量
+	        	page:1 //当前页码
         	},
         	dialogFormVisible:false,
         	dialogFormVisibleExcel:false,
@@ -220,36 +235,66 @@ export default {
 	        	label:'name'
 	        },
 	        tableData: [],
-	        currentPage:1,  //当前页码
+	        pageTotla:null,  //总条数
 	        uploadUrl:'',
-	        importData:{} //导入数据
+	        importData:{}, //导入数据
+	        permissionId:'', //权限
+	        formatPermissionId:[], //格式化权限，便于处理
 	    }
 	},
 	mounted(){
+		this.form.teacherUserId = JSON.parse(localStorage.getItem("uerInfo")).userId;
+
+		if (JSON.parse(localStorage.getItem("uerInfo")).permissionId != '') {
+			this.permissionId = JSON.parse(JSON.parse(localStorage.getItem("uerInfo")).permissionId);
+			for (var i = 0; i < this.permissionId.length; i++) {
+				this.formatPermissionId.push(this.permissionId[i][1])
+			}
+		}
+    	//获取疾病所有分类
+    	diseaseApi.diseaseTypesAll().then(response=>{
+    		this.options = response.data.data.trees;
+    		if (this.permissionId != '') {
+    			for (var i = 0; i < this.options.length; i++) {
+	    			for (var j = 0; j < this.options[i].children.length; j++) {
+	    				if(this.formatPermissionId.indexOf(this.options[i].children[j].id) <0){
+	    					this.$set(this.options[i].children[j],'disabled',true)
+	    				}
+	    			}
+	    		}
+
+    		}else {}
+    	})
 		this.uploadUrl = process.env.BASE_API+'/teachai/med/disease/uploadSampleModelFile.json'
-		this.getListRecord({diseaseId:'',status:'',gender:''});
+		this.getListRecord(this.form);
     	//判断是添加还是编辑
     	if (this.$route.params.diseaseName) {
     		this.disabled = true;
     	}else{this.disabled = false;}
-    	//获取疾病所有分类
-    	diseaseApi.diseaseTypesAll().then(response=>{
-    		this.options = response.data.data.trees;
-    	})
     },
   	methods: {
   		getListRecord(params){
   			recordApi.listRecord(params).then(response=>{
 				this.tableData = response.data.data.diseaseRecord;
+				this.pageTotla = response.data.data.pageTotla;
 				this.loading = false;
 			})
   		},
 	    //改变病例状态
 	    changeStatus(type,row){
 	    	let text = ''
-	    	if (type == 1) text = '发布'; else text = '下线';
-
-	    	this.$confirm('确定'+text+'病例吗?', '提示', {
+	    	switch (type) {
+			  case '1':
+			    text = "已发布";
+			    break;
+			  case '0':
+			    text = "待审核";
+			    break;
+			  case '2':
+			    text = "已审核";
+			    break;
+			}
+	    	this.$confirm('确定将该病例设置为 '+text+' 吗?', '提示', {
 	          confirmButtonText: '确定',
 	          cancelButtonText: '取消',
 	          type: 'warning'
@@ -270,38 +315,56 @@ export default {
 	    	this.loading = true;
 	    	this.form.caseName = '';
 	        if (val.length == 0) {
-	        	this.getListRecord({diseaseId:'',status:'',gender:''});
+	        	this.form.typeId = '';
+	        	this.form.diseaseId = '';
 	        }else{
 	        	diseaseApi.listDisease({typeId:val[1]}).then(response=>{
 		            this.optionsDis1 = response.data.data.diseasevolist;
 		        })
-	        	recordApi.listRecordByTypeId({typeId:val[1]}).then(response=>{
-					this.tableData = response.data.data.diseaseRecord;
-					this.loading = false;
-				})
+		        this.form.typeId = val[1];
+	   //      	recordApi.listRecordByTypeId({typeId:val[1]}).then(response=>{
+				// 	this.tableData = response.data.data.diseaseRecord;
+				// 	this.loading = false;
+				// })
 	        }
+	        this.form.page = 1;
+	        this.getListRecord(this.form);
 	    },
 	    //选择疾病
 	    selectDisease(val){
 	    	this.loading = true;
 	    	this.form.diseaseId = val;
-	    	if (val == ''){
-	    		recordApi.listRecordByTypeId({typeId:this.form.selectedOptions}).then(response=>{
-					this.tableData = response.data.data.diseaseRecord;
-					this.loading = false;
-				})
-	    	}
-	    	this.getListRecord({diseaseId:val,status:this.form.status,gender:this.form.gender});
+	   //  	if (val == ''){
+	   //  		recordApi.listRecordByTypeId({typeId:this.form.selectedOptions}).then(response=>{
+				// 	this.tableData = response.data.data.diseaseRecord;
+				// 	this.loading = false;
+				// })
+	   //  	}
+	    	this.form.page = 1;
+	    	this.form.diseaseId = val;
+	    	this.getListRecord(this.form);
 	    },
 	    //选择状态
 	    selectStatus(val){
 	    	this.loading = true;
-	    	this.getListRecord({diseaseId:this.form.diseaseId,status:val,gender:this.form.gender});
+	    	this.form.status = val;
+	    	this.form.page = 1;
+	    	this.getListRecord(this.form);
 	    },
 	    //选择性别
 	    selectGender(val){
 	    	this.loading = true;
-	    	this.getListRecord({diseaseId:this.form.diseaseId,status:this.form.status,gender:val});
+	    	this.form.gender = val;
+	    	this.form.page = 1;
+	    	this.getListRecord(this.form);
+	    },
+	    selectScope(val,id){
+	    	recordApi.updateSampleScope({sampleId:id,scope:val}).then(response=>{
+		        this.$message({
+		            type: 'success',
+		            message: '设置成功'
+		        });
+			})
 	    },
 	    //dialog打开的回调
 	    showDialogForm(){
@@ -368,19 +431,6 @@ export default {
 	        });
 	    },
 	    toSetRecord(){
-
-	    	// this.$router.push({
-	    	// 	name:'setRecord',
-	    	// 	query:{
-	    	// 		type:'import',
-	    	// 		disease:this.importForm.disease,
-	    	// 		diseaseId:this.importForm.diseaseId,
-	    	// 		mrKey:this.importForm.mrKey,
-	    	// 		profession:this.importForm.profession,
-	    	// 		hospitalizedTime:this.importForm.hospitalizedTime,
-	    	// 	},
-	    	// 	params:this.importData
-	    	// })
 	    	if (this.importData.patientId && (this.importForm.disease) != '') {
 	    		this.allLoading = true;
 	    		this.dialogFormVisibleExcel = false;
@@ -467,14 +517,17 @@ export default {
 	        console.log(`每页 ${val} 条`);
 	    },
 	    handleCurrentChange(val) {
-	        console.log(`当前页: ${val}`);
+	        //console.log(`当前页: ${val}`);
+	        this.loading = true;
+	        this.form.page = val;
+	        this.getListRecord(this.form);
 	    },
 	    //to结构化病历
 	    setRecord(row){
 	    	this.$router.push({
 	    		name:'setRecord',
 	    		query:{
-	    			disease:row.diagnosis,
+	    			disease:row.diseaseName,
 	    			type:'edit',
 	    			sampleId:row.id,
 	    			diseaseId:row.diseaseId

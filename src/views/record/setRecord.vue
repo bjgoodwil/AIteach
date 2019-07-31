@@ -81,8 +81,6 @@
 											    </el-table-column>
 											    <el-table-column label="定性结果" prop="定性结果">
 											    </el-table-column>
-											    <el-table-column label="标志位" prop="标志位">
-											    </el-table-column>
 											    <el-table-column label="参考范围" prop="参考范围">
 											    </el-table-column>
 									        </el-table>
@@ -340,17 +338,36 @@
 											      label="序号"
 											      width="50">
 											    </el-table-column>
-											    <el-table-column label="检验细项" prop="检验细项">
+											    <el-table-column label="检验细项">
+											    	<template slot-scope="scope">
+														<el-input size="small" v-model="scope.row.检验细项" placeholder="检验细项"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="定量结果" prop="定量结果">
+											    <el-table-column label="定量结果">
+											    	<template slot-scope="scope">
+														<el-input size="small" v-model="scope.row.定量结果" placeholder="定量结果"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="定性结果" prop="定性结果">
+											    <el-table-column label="定性结果">
+											    	<template slot-scope="scope">
+														<el-input size="small" v-model="scope.row.定性结果" placeholder="定性结果"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="标志位" prop="标志位">
+											    <el-table-column label="参考范围">
+											    	<template slot-scope="scope">
+														<el-input size="small" v-model="scope.row.参考范围" placeholder="参考范围"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="参考范围" prop="参考范围">
+											    <el-table-column label="操作" width="50px">
+											    	<template slot-scope="scope">
+														<el-button
+												          title="删除"
+												          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
+												          <i class="el-icon-delete"></i></el-button>
+										        	</template>
 											    </el-table-column>
 									        </el-table>
+									        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检验')">添加项目</el-button>
 									      </template>
 									    </el-table-column>
 									    <el-table-column type="expand" v-if="item.diagnosisName == '检查'" >
@@ -362,15 +379,36 @@
 											      label="序号"
 											      width="50">
 											    </el-table-column>
-											    <el-table-column label="检查类型" prop="检查类型">
+											    <el-table-column label="检查类型">
+											    	<template slot-scope="scope">
+														<el-input size="small" v-model="scope.row.检查类型" placeholder="检查类型"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="检查项目名称" prop="检查项目名称">
+											    <el-table-column label="检查项目名称">
+											    	<template slot-scope="scope">
+														<el-input size="small" v-model="scope.row.检查项目名称" placeholder="检查项目名称"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="检查所见" prop="检查所见">
+											    <el-table-column label="检查所见">
+											    	<template slot-scope="scope">
+														<el-input type="textarea" autosize size="small" v-model="scope.row.检查所见" placeholder="检查所见"></el-input>
+										        	</template>
 											    </el-table-column>
-											    <el-table-column label="检查结论" prop="检查结论">
+											    <el-table-column label="检查结论">
+											    	<template slot-scope="scope">
+														<el-input type="textarea" autosize size="small" v-model="scope.row.检查结论" placeholder="检查结论"></el-input>
+										        	</template>
+											    </el-table-column>
+											    <el-table-column label="操作" width="50px">
+											    	<template slot-scope="scope">
+														<el-button
+												          title="删除"
+												          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
+												          <i class="el-icon-delete"></i></el-button>
+										        	</template>
 											    </el-table-column>
 									        </el-table>
+									        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检查')">添加项目</el-button>
 									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
 									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
 									        
@@ -711,18 +749,26 @@ export default {
 				sceneSrc:data
 			}).then(response=>{
 				this.loading = false;
-				let sc = response.data.data.trees[0];
-				let scName = sc.name;
-				scName = scName+"_"+(this.allQuestion.trees.length+1);
-				this.allQuestion.trees.push(sc);
-				this.allQuestion.trees[this.allQuestion.trees.length-1].name = scName;
-				this.allQuestion.zhenduan.push({
-					[scName]:response.data.data.zhenduan[0][this.sceneName]
-				});
+				if (response.data.errCode == '0') {
+					let sc = response.data.data.trees[0];
+					let scName = sc.name;
+					scName = scName+"_"+(this.allQuestion.trees.length+1);
+					this.allQuestion.trees.push(sc);
+					this.allQuestion.trees[this.allQuestion.trees.length-1].name = scName;
+					this.allQuestion.zhenduan.push({
+						[scName]:response.data.data.zhenduan[0][this.sceneName]
+					});
 
-				this.allQuestion.chuzhi.push({
-					[scName]:response.data.data.chuzhi[0][this.sceneName]
-				})
+					this.allQuestion.chuzhi.push({
+						[scName]:response.data.data.chuzhi[0][this.sceneName]
+					})
+				}else{
+					this.$message({
+			            type: 'warning',
+			            message: response.data.errMsg
+			        });
+				}
+				
 			})
      	},
      	removeScene(index){
@@ -904,7 +950,7 @@ export default {
      	handleCheckChange(val){
      		this.checkReason = val
      	},
-     	//删除依据
+     	//删除项目
      	deleteRow(rows,index){
      		this.$confirm('确定删除该项目?', '提示', {
 	          confirmButtonText: '确定',
@@ -919,6 +965,25 @@ export default {
 	        }).catch(() => {
 	                  
 	        });
+     	},
+     	//添加检查检验
+     	addCheck(rows,type){
+     		if (type == '检验') {
+     			rows.push({
+	     			检验细项:"",
+	     			定量结果:"",
+	     			定性结果:"",
+	     			参考范围:""
+	     		})
+     		}else if (type == '检查') {
+     			rows.push({
+	     			检查类型:"",
+	     			检查项目名称:"",
+	     			检查所见:"",
+	     			检查结论:""
+	     		})
+     		}
+     		
      	},
      	handleExceed(files, fileList) {
 	        this.$message.warning(`当前限制选择 1 个文件`);

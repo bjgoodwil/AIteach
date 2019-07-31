@@ -203,7 +203,6 @@ export default {
 		        });
       		}else{
       			teachersApi.updatePassword({password:this.passwordForm.teacherPassword,userId:this.currentData.id,type:"2"}).then(response=>{
-	      			this.getData();
 	      			this.$message({
 			            type: 'success',
 			            message: '密码修改成功!'
@@ -252,7 +251,7 @@ export default {
 	    		teacherPassword:'', 
 	    		permissionId:[]//权限
 	    	},
-	    	this.passwordForm.password = '';
+	    	this.passwordForm.teacherPassword = '';
 	    	this.activeName = 'first';
       	},
       	beforeExcelUpload(file) {

@@ -18,7 +18,7 @@
     "cross-env": "^5.1.5",
     "define-properties": "^1.1.3",
     "element-ui": "^2.10.1",
-    "file-saver": "^2.0.1",
+    "file-saver": "^2.0.2",
     "lodash.assign": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
     "shallow-clone": "^3.0.0",

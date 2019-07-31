@@ -38,30 +38,34 @@
     			</p> -->
 				<el-tabs tab-position="left" v-model="activeClass" @tab-click="tabClick2">
 					<el-tab-pane v-for="(it,eq) in item.list" :key="it.id" :label="it.typeName" :name="it.id.toString()">
-						<ul class="specialtyList" v-loading="fullscreenLoading">
-								
-								<li class="caseItem pos-r" v-for="(i,e) in listDisease" :key="i.id"
-								>
-									<el-tooltip placement="right">
-										<span :title="i.diseaseName">{{i.diseaseName}}</span> 
-
-										<div slot="content">
-											
-										  	<a style="cursor: pointer;" @click="toCaseInfo(i)">病例</a>&nbsp; 
-										  	<a style="cursor: pointer;" @click="toAddCase(i)">编辑</a>&nbsp; 
-										  	<a style="cursor: pointer;" v-if="i.count == 0" @click="deleteDis(e,i,listDisease)">删除</a>
-										
-										</div>
-									</el-tooltip>
-									<span class="diseaseNum">{{i.count}}例</span>
-								</li>
+					
+						<ul class="specialtyList" v-loading="fullscreenLoading" v-if="permissionId =='' || formatPermissionId.indexOf(it.id) > -1 ">	
+							<!-- 可以对自己管理的科编辑 -->
+							<li class="caseItem pos-r" v-for="(i,e) in listDisease" :key="i.id" >
+								<el-tooltip placement="right">
+									<span :title="i.diseaseName">{{i.diseaseName}}</span> 
+									<div slot="content">
+									  	<a style="cursor: pointer;" @click="toCaseInfo(i)">病例</a>&nbsp; 
+									  	<a style="cursor: pointer;" @click="toAddCase(i)">编辑</a>&nbsp; 
+									  	<a style="cursor: pointer;" v-if="i.count == 0" @click="deleteDis(e,i,listDisease)">删除</a>
+									</div>
+								</el-tooltip>
+								<span class="diseaseNum">{{i.count}}例</span>
+							</li>
+							<div>
 								<p v-if="listDisease.length == 0" class="textCenter m-t-10">暂无数据</p>
+							</div>
 						</ul>
-						
-						
+						<ul class="specialtyList" v-loading="fullscreenLoading" v-else>	
+							<!-- 只能查看其他科室 -->
+							<li class="caseItem pos-r" v-for="(i,e) in listDisease" >
+								<span :title="i.diseaseName">{{i.diseaseName}}</span> 
+								<span class="diseaseNum">{{i.count}}例</span>
+							</li>
+							
+						</ul>
 						<!-- <p v-for="(l,e) in it.list[0]">{{l.diseaseName}}</p> -->
 					</el-tab-pane>
-					
 				</el-tabs>
     		</el-tab-pane>
 		  
@@ -86,10 +90,17 @@ export default {
 	        caseName: '',//添加的疾病症状名称
 	        symptomList:[{name:'全部',id:'0'},{name:'腹痛',id:'1'},{name:'低热',id:'2'},{name:'食欲不振',id:'3'}], //症状
 	        symptomIndex:0,
+	        permissionId:[], //权限
+	        formatPermissionId:[], //格式化权限，便于处理
 	    }
 	},
 	mounted() {
-
+		if (JSON.parse(localStorage.getItem("uerInfo")).permissionId != '') {
+			this.permissionId = JSON.parse(JSON.parse(localStorage.getItem("uerInfo")).permissionId);
+			for (var i = 0; i < this.permissionId.length; i++) {
+				this.formatPermissionId.push(this.permissionId[i][1])
+			}
+		}
         diseaseApi.listDiseaseType({fatherTypeId:0}).then(response=>{
             this.data = response.data.data.diseaseTypeList;
             this.activeName = this.data[0].id.toString();

@@ -13,15 +13,15 @@
               </el-form-item>
               <el-form-item class="pos-a" style="left:220px;">
                 <img src="../../assets/login/mima.png" alt="" class="pos-a" style="left: 40px;">
-                <input type="password" class="pos-a" v-model="formInline.password" placeholder="密码" style="left: 80px;">
+                <input type="password" class="pos-a" v-model="formInline.password" placeholder="密码" style="left: 80px;" @keyup.enter.native="onSubmit">
               </el-form-item>
               <el-form-item class="pos-a" style="left:440px;">
                 <img src="../../assets/login/yanzm.png" alt="" class="pos-a" style="left: 80px;">
-                <img :src="codeUrl" alt="" class="pos-a" style="left: 210px;">
-                <input class="pos-a" v-model="formInline.captchaCode" placeholder="验证码" style="left: 120px;" @click="getCode">
+                <img :src="codeUrl" alt="" class="pos-a" @click="getCode" style="left: 210px; z-index: 9">
+                <input class="pos-a" v-model="formInline.captchaCode" placeholder="验证码" style="left: 120px;"  @keyup.enter="onSubmit">
               </el-form-item>
               <el-form-item class="pos-a" style="left:780px;">
-                <el-button class="m-l-20" type="primary" @click="onSubmit">登 陆</el-button>
+                <el-button class="m-l-20" type="primary" @click="onSubmit" >登 陆</el-button>
               </el-form-item>
             </el-form>
         </div>
@@ -45,8 +45,19 @@ export default {
             }
         }
     },
+    created() {
+        // let that = this;
+        // document.onkeypress = function(e) {
+        //   var keycode = document.all ? event.keyCode : e.which;
+        //   if (keycode == 13) {
+        //     that.onSubmit();// 登录方法名
+        //      return false;
+        //   }
+        // };
+    },
     mounted() {
         this.getCode();
+
     },
     methods: {
         onSubmit() {
