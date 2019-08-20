@@ -4,36 +4,35 @@
 		    <el-breadcrumb-item to="/list">虚拟病例</el-breadcrumb-item>
 		    <el-breadcrumb-item>结构化病例</el-breadcrumb-item>
 		</el-breadcrumb>
-		<el-form :inline="true" :model="formInline" class="m-t-20" label-width="80px">
-			<el-form-item label="性别：">
-			    {{formInline.gender}}
+		<el-form :inline="true" :model="formInline" class="m-t-20" label-width="90px">
+			<div>
+				<el-form-item label="性别："> {{formInline.gender}} </el-form-item>
+				<el-form-item label="年龄："> {{formInline.age}} {{formInline.ageunit}} </el-form-item>
+				<el-form-item label="就诊时间："> {{formInline.admissionTime}} </el-form-item>
+				<el-button type="primary" round size="small" @click="open">查看病历详情</el-button>
+				<el-button type="primary" round size="small" @click="openImg">查看影像</el-button>
+				<el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button>
+				<el-button type="primary" round size="small" @click="exportSample" title="请保存成功后再下载">下载病例</el-button>
+			</div>
+			<el-form-item label="参考时间：">
+			    <el-input type="number" v-model="formInline.time" placeholder="时间" size="small" style="width: 100px">
+			    </el-input> &nbsp;分钟
 			</el-form-item>
-			<el-form-item label="年龄：">
-			    {{formInline.age}} {{formInline.ageunit}}
-			</el-form-item>
-			<el-button type="primary" round size="small" @click="open">查看病历详情</el-button>
-			<el-button type="primary" round size="small" @click="openImg">查看影像</el-button>
-			<el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button><br>
-			<el-form-item label="参考时间">
-			    <el-input type="number" v-model="formInline.time" placeholder="时间" size="small" style="width: 200px">
-					<template slot="append">分钟</template>
-			    </el-input>
-			</el-form-item>
-			<el-form-item label="病历难度">
-			    <el-select v-model="formInline.grade" placeholder="活动区域" @change="change" size="small" style="width: 200px">
+			<el-form-item label="病历难度：">
+			    <el-select v-model="formInline.grade" placeholder="活动区域" @change="change" size="small" style="width: 210px">
 			      	<el-option label="初级" value="0" ></el-option>
 			      	<el-option label="中级" value="1" ></el-option>
 			      	<el-option label="高级" value="2" ></el-option>
 			    </el-select>
 			</el-form-item>
-			<el-form-item label="疾病">
+			<el-form-item label="疾病：">
 			    <el-input v-model="formInline.disease" placeholder="疾病" size="small"></el-input>
 			</el-form-item>
-			<el-form-item label="症状">
+			<el-form-item label="症状：">
 			    <el-input v-model="formInline.symptoms" placeholder="症状" size="small"></el-input>
 			</el-form-item>
-			<el-form-item label="主诉">
-			    <el-input v-model="formInline.chiefComplaint" placeholder="主诉" size="small" style="width: 494px"></el-input>
+			<el-form-item label="主诉：">
+			    <el-input v-model="formInline.chiefComplaint" placeholder="主诉" size="small" style="width: 450px"></el-input>
 			</el-form-item>			
 		</el-form>
 		<el-alert
@@ -162,7 +161,7 @@
 									</table>
 									<draggable v-model="it.parms" @update="datadragEnd" :options = "{animation:500}">
 										<!-- <transition-group> -->
-										<div v-for="(i,index) in it.parms" :key="i.id" class="questionList clearfix" style="width: 100%">
+										<div v-for="(i,index) in it.parms" :key="setQuestionNum(i,index)" class="questionList clearfix" style="width: 100%">
 											<div style="width: 6%">{{index+1}}</div>
 											<div class="questionName" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionName" placeholder="请输入问题" ></el-input></div>
 											<div class="questionAnswer" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></div>
@@ -181,6 +180,12 @@
 										          title="删除"
 										          type="text" @click.native.prevent="deleteRow(it.parms,index)">
 										          <i class="el-icon-delete"></i></el-button>
+										        <el-button
+										          title="设为上个问题的子问题"
+										          v-if="i.subQuestionList && i.subQuestionList.length == 0 && index != 0"
+										          type="text" @click.native.prevent="setSubQuse(it.parms,index)">
+										          <i class="el-icon-s-unfold"></i></el-button>
+										         
 											</div> 
 											<div style="width: 100%;" v-for="(sub,ind) in i.subQuestionList" :key="sub.id" v-if="i.subQuestionList">
 												<div class="questionList textCenter" style="width: 6%;">{{index+1}}-{{ind+1}}</div>
@@ -202,6 +207,7 @@
 											          title="删除"
 											          type="text" @click.native.prevent="deleteRow(i.subQuestionList,ind)">
 											          <i class="el-icon-delete"></i></el-button>
+											          
 												</div>
 											</div>
 										</div>
@@ -221,7 +227,7 @@
 										<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
 											<span class="pos-a" style="right: 60px">难度：
 												<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-											      	<el-option label="0" value="0" ></el-option>
+											      	<el-option label="0" value="0" >el-icon-s-unfold</el-option>
 											      	<el-option label="1" value="1" ></el-option>
 											      	<el-option label="2" value="2" ></el-option>
 											      	<el-option label="3" value="3" ></el-option>
@@ -411,7 +417,6 @@
 									        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检查')">添加项目</el-button>
 									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
 									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
-									        
 									        <el-upload
 									          v-else
 											  :id="props.row.id+'_img'"	
@@ -425,7 +430,7 @@
 	  										  :before-upload="beforeImgUpload"
 											  :file-list="fileList">
 											  <el-button size="small" type="primary">上传影像</el-button>
-											  <div slot="tip" class="el-upload__tip">只能上传jpg或zip文件</div>
+											  <span>只能上传jpg或zip文件</span>
 											</el-upload>
 									      </template>
 									    </el-table-column>
@@ -439,7 +444,7 @@
 												<el-input size="small" v-model="scope.row.questionName" placeholder="处置名称"></el-input>
 								        	</template>
 								        </el-table-column>
-								        <el-table-column label="时间" width="224">
+								        <el-table-column label="时间" width="200">
 								        	<template slot-scope="scope">
 								        		<el-input size="small" placeholder="时间" v-model="scope.row.intervalDay">
 								        			<template slot="prepend">入院</template>
@@ -461,6 +466,17 @@
 											      	<el-option label="3" value="3" ></el-option>
 											    </el-select>
 								        	</template>
+								        </el-table-column>
+								        <el-table-column v-if="item.diagnosisName == '检查'" label="结论查看权限" width="130">
+								        	<template slot-scope="scope">
+									        	<el-select v-model="scope.row.inspectRange" placeholder="请选择">
+												    <el-option  v-for="item in [{label:'全部可见', value:0},{label:'都不可见', value:1},{label:'报告可见', value:2},{label:'影像可见', value:3}]"
+												      :key="item.value"
+												      :label="item.label"
+												      :value="item.value">
+												    </el-option>
+												</el-select>
+											</template>
 								        </el-table-column>
 								        <el-table-column width="100px" label="操作">
 								        	<template slot-scope="scope">
@@ -586,7 +602,8 @@
 </template>
 <script>
 import draggable from 'vuedraggable';//拖拽排序组件
-import {recordApi} from '@/services/apis/record/record'
+import {recordApi} from '@/services/apis/record/record';
+import {formatDate} from '@/util/dataFormat';
 export default {
 	name: 'setRecord',
 	components: {draggable},
@@ -610,6 +627,7 @@ export default {
 	    	formInline:{
 	    		gender:'',
 	    		age:'',
+	    		admissionTime:'',
 	    		ageunit:'',
 	    		time:20,
 	    		grade:"0",
@@ -702,6 +720,7 @@ export default {
 			this.visitId = data.visitId;
 			this.formInline.gender = data.gender;
 			this.formInline.age = data.age;
+			this.formInline.admissionTime = data.ruyuanshijian;
 			this.formInline.ageunit = data.ageunit;
 			this.formInline.chiefComplaint = data.chiefComplaint;
 			this.formInline.symptoms = data.symptoms;
@@ -892,21 +911,26 @@ export default {
      		if (n) {
      			this.isNo = 'no';
      		}else{this.isNo = '';}
-
+     		let reason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name]
+     		//诊断依据
+     		let zhenduanReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions;
+     		//鉴别诊断依据
+     		let zhenduanJBReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions
+     		//鉴别诊断排除依据
+     		let zhenduanJBReasonUn = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions
      		if (this.currentZhenduan == 'zhenduan') {
-     			if (this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions) {}else{
-     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions = []
+     			if (zhenduanReason) {}else{
+     				zhenduanReason = []
      			}
-     			this.noCheckReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions
+     			this.noCheckReason = zhenduanReason;
      		}else if (this.currentZhenduan == 'unsupport') {
-     			if (this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions) {}else{
-     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions = []
+     			if (!zhenduanJBReason) {
+     				zhenduanJBReason = []
      			}
-     			if(this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions){}else{
-     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions = []
+     			if(!zhenduanJBReasonUn){
+     				zhenduanJBReasonUn = []
      			}
-
-     			this.noCheckReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions.concat(this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions)
+     			this.noCheckReason = zhenduanJBReason.concat(zhenduanJBReasonUn)
      		}
      		this.noCheckReasonId = [];
      		for (var i = 0; i < this.noCheckReason.length; i++) {
@@ -915,33 +939,23 @@ export default {
      	},
      	//确定依据
      	reasonSure(){
-     		if (this.currentZhenduan == 'zhenduan') {
-     			for (var i = 0; i < this.checkReason.length; i++) {
-     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions.push({
-     					questionId: this.checkReason[i].questionId,
-     					questionName: this.checkReason[i].questionName,
-     					score: '0'
-     				})
+     		for (var i = 0; i < this.checkReason.length; i++) {
+     			let reason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name];
+     			let reasonObj = {
+     				questionId: this.checkReason[i].questionId,
+ 					questionName: this.checkReason[i].questionName,
+ 					score: '0'
      			}
-     		}else if (this.currentZhenduan == 'unsupport') {
-     			if (this.isNo == 'no') {
-     				for (var i = 0; i < this.checkReason.length; i++) {
-	     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions.push({
-	     					questionId: this.checkReason[i].questionId,
-	     					questionName: this.checkReason[i].questionName,
-	     					score: '0'
-	     				})
+     			if (this.currentZhenduan == 'zhenduan') {
+	     			reason.support[this.currentZhenduanNum].supportQuestions.push(reasonObj)
+	     		}else if (this.currentZhenduan == 'unsupport') {
+	     			if (this.isNo == 'no') {
+	     				reason.unsupport[this.currentZhenduanNum].unSupportQuestions.push(reasonObj)
+	     			}else{
+	     				reason.unsupport[this.currentZhenduanNum].supportQuestions.push(reasonObj)
 	     			}
-     			}else{
-     				for (var i = 0; i < this.checkReason.length; i++) {
-	     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions.push({
-	     					questionId: this.checkReason[i].questionId,
-	     					questionName: this.checkReason[i].questionName,
-	     					score: '0'
-	     				})
-	     			}
-     			}
-     		}
+	     		}
+ 			}
      		this.dialogVisibleTree = false;
      	},
      	dialogClose(){
@@ -965,6 +979,14 @@ export default {
 	        }).catch(() => {
 	                  
 	        });
+     	},
+     	//设置为子问题
+     	setSubQuse(rows,index){
+     		//console.log(arguments)
+     		rows[index].fatherQuestionId = rows[index-1].questionId;
+     		rows[index-1].subQuestionList.push(rows[index]);
+     		rows.splice(index, 1);
+     		
      	},
      	//添加检查检验
      	addCheck(rows,type){
@@ -1047,6 +1069,10 @@ export default {
 	                  
 	        });
 	    },
+	    setQuestionNum(item,index){
+	    	item.questionNum = index+1;
+	    	return item.id;
+	    },
      	//保存
      	save(type){
      		this.loading = true;
@@ -1056,15 +1082,7 @@ export default {
      		this.allQuestion.suggestDuration = this.formInline.time;
      		this.allQuestion.difficultyDegree = this.formInline.grade;
      		this.allQuestion.status = type;
-     		for (var i = 0; i < this.allQuestion.trees.length; i++) {
-	    		for (var j = 0; j < this.allQuestion.trees[i].children.length; j++) {
-	    			for (var k = 0; k < this.allQuestion.trees[i].children[j].children.length; k++) {
-		    			for (var l = 0; l < this.allQuestion.trees[i].children[j].children[k].parms.length; l++) {
-			    			this.allQuestion.trees[i].children[j].children[k].parms[l].questionNum = l+1
-			    		}
-		    		}
-	    		}
-			}
+
         	if (this.$route.query.type == 'edit') {
      			recordApi.updateRecord({
 					sampleId:this.$route.query.sampleId,
@@ -1122,6 +1140,22 @@ export default {
 	    	}else if (hasImage == 'yes') {
 	    		window.open(process.env.HOST+'/teachai/yingxiang/dicom/image/'+id+'.jpg', '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
 	    	}else{return false}
+	    },
+	    
+	    exportSample(){
+	    	recordApi.exportSampleExcel({
+				sampleId:this.$route.query.sampleId
+			}).then(response=>{
+			    var blob = new Blob([response.data], {type: 'application/vnd.ms-excel;charset=utf-8'});
+                var downloadElement = document.createElement('a');
+                var href = window.URL.createObjectURL(blob); // 创建下载的链接
+                downloadElement.href = href;
+                downloadElement.download = this.formInline.chiefComplaint +" - "+ formatDate(new Date(), "yyyy-MM-dd") + '.xlsx'; // 下载后文件名
+                document.body.appendChild(downloadElement);
+                downloadElement.click(); // 点击下载
+                document.body.removeChild(downloadElement); // 下载完成移除元素
+                window.URL.revokeObjectURL(href); // 释放掉blob对象
+			})
 	    }
     }
 }

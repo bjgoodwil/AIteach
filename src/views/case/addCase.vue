@@ -43,20 +43,33 @@
 								<div class="scroll-y">
 									<table style="width: 100%;" class="m-t-10">
 										<thead>
-											<th style="width: 10%">序号</th>
-											<th style="width: 40%">问题</th>
-											<th style="width: 40%">映射关系</th>
-											<th style="width: 10%">操作</th>
+											<th style="width: 5%">序号</th>
+											<th style="width: 35%">问题</th>
+											<th>映射关系</th>
+											<th style="width: 8%">分数</th>
+											<th style="width: 8%">难度</th>
+											<th style="width: 5%">操作</th>
 										</thead>
 									</table>
 									<table style="width: 100%;">
 										<tbody>
 											<draggable v-model="it.parms" @update="datadragEnd" :options = "{animation:500}">
 												<tr v-for="(i,index) in it.parms" :key="i.id" class="questionList">
-													<td>{{index+1}}</td>
-													<td style="width: 40%"><el-input v-model="i.questionName" size="small" placeholder="问题"></el-input></td>
-													<td style="width: 50%">{{i.questionPath}}</td>
-													<td style="width: 10%">
+													<td style="width: 5%">{{index+1}}</td>
+													<td style="width: 35%"><el-input v-model="i.questionName" size="small" placeholder="问题"></el-input></td>
+													<td>{{i.questionPath}}</td>
+													<td style="width: 8%">
+														<el-input v-model="i.questionScore" type="number" size="small" @input="inputScoreListern(i.questionScore)" placeholder="得分"></el-input>
+													</td>
+													<td style="width: 8%">
+														<el-select v-model="i.difficultyDegree" placeholder="难度"size="small">
+													      	<el-option label="0" value="0" ></el-option>
+													      	<el-option label="1" value="1" ></el-option>
+													      	<el-option label="2" value="2" ></el-option>
+													      	<el-option label="3" value="3" ></el-option>
+													    </el-select>
+													</td>
+													<td style="width: 5%">
 														<el-button
 												          title="删除"
 												          type="text" @click.native.prevent="deleteRow(it.parms,index)">
@@ -360,7 +373,9 @@ export default {
 	    		for (var j = 0; j < this.dataForm.questions[i].children.length; j++) {
 	    			for (var k = 0; k < this.dataForm.questions[i].children[j].children.length; k++) {
 		    			for (var l = 0; l < this.dataForm.questions[i].children[j].children[k].parms.length; l++) {
-			    			this.dataForm.questions[i].children[j].children[k].parms[l].questionNum = l+1
+		    				let a = this.dataForm.questions[i].children[j].children[k].parms[l];
+			    			a.questionNum = l+1;
+			    			a.questionScore = parseInt(a.questionScore);
 			    		}
 		    		}
 	    		}
@@ -412,9 +427,21 @@ export default {
 	    },
 	    formatJson(filterVal, jsonData) {
 	        return jsonData[this.activeScene].children.map(v => filterVal.map(j => v[j]))
-	    }
+	    },
+	    //分值检验，最大5粉，最小-1分
+	    inputScoreListern:function(val){//输入监听
+	    
+            if(val<-1 || val>5){
+                this.$message({
+		            type: 'warning',
+		            message: '分值建议-1 至 5!'
+		        });
+            }
+        },
     },
+
     watch:{
+    	
     	searchQuestion(){
     		let _this = this
     		let scene = _this.allQuestion2[this.activeScene].children;

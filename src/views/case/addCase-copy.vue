@@ -43,7 +43,7 @@
 			></el-tree> -->
 		<p class="m-b-10 m-t-10">
 			
-			</el-input> <el-button type="primary" round size="small" @click="openYWD">查看病历</el-button> <el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button>
+			<el-button type="primary" round size="small" @click="openYWD">查看病历</el-button> <el-button type="primary" round size="small" @click="openBMJ">BMJ临床实践</el-button>
 		</p>
 		<div class="clearfix">
 			<div class="problemList m-r-20" v-loading="loading">

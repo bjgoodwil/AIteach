@@ -7,6 +7,9 @@ export default [
 	{
 		path: 'my',
 		name: 'my',
-		component: My
+		component: My,
+		meta: {
+            title: '个人中心'
+        },
 	}
 ]

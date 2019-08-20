@@ -57,6 +57,7 @@ instance.interceptors.request.use(function (config) {
             config.data = qs.stringify(config.data)
         }
     }
+
     // if(config.method=='post'){  //设置固定入参
     //     config.data = {
     //         ...config.data,

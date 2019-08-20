@@ -101,6 +101,11 @@ export default {
                 url:'/teacher',
                 icon:require('../assets/icon04.png'),
                 role:['管理员'],
+            },{
+                name:'统计',
+                url:'/stat',
+                icon:require('../assets/icon01.png'),
+                role:['教师','管理员'],
             }]
         }
     },

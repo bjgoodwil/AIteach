@@ -180,10 +180,12 @@ export default {
 			})
 	    },
 	    toSearch(){
+	    	let main = '';
+	    	main = process.env.NODE_ENV == 'production'?process.env.HOST:window.location.host;
 	    	this.$router.push({
 	    		name:'search',
 	    		query:{
-	    			host:window.location.host,
+	    			host:main,
 		    		disease:this.$route.params.diseaseName,
 		    		diseaseId:this.$route.params.id
 	    		}

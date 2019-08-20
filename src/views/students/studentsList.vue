@@ -41,27 +41,16 @@
 	        </el-table-column>
 			<el-table-column prop="name" label="账号">
 	        </el-table-column>
-	        <!-- <el-table-column prop="password" label="密码">
-	        </el-table-column> -->
-	        <el-table-column prop="hospital" label="医院">
+	        <el-table-column prop="identity" label="学生类型">
 	        </el-table-column>
 			<el-table-column prop="grade" label="班级">
 	        </el-table-column>
-	        <el-table-column label="所属科室">
-	        	<template slot-scope="scope">
-	        		<!-- {{scope.row.permissionId}} -->
-	        		<el-cascader 
-	        			   
-	        			disabled
-				        style="width: 100%"
-				        size="small"
-					    :options="permissions"
-					    :props="props"
-					    :value="JSON.parse(scope.row.permissionId)"
-					    clearable>
-					</el-cascader>
-
-				</template>
+	        <el-table-column prop="studentNumber" label="学号">
+	        </el-table-column>
+	        <el-table-column prop="deptName" label="学科专业">
+	        </el-table-column>
+	        <el-table-column prop="deptSubName" label="科室">
+	        
 	        </el-table-column>
 	        <el-table-column label="操作" width="100">
 		      <template slot-scope="scope">
@@ -88,37 +77,55 @@
 		<el-dialog
 		  title="编辑学生信息"
 		  :visible.sync="dialogVisibleStudents"
-		  width="400px"
+		  width="630px"
 		  @close="dialogClose"
 		  :close-on-click-modal="false"
 		  >
 		    <el-tabs v-model="activeName">
 			    <el-tab-pane label="基本信息" name="first" @tab-click="handleClick">
-					<el-form label-width="60px" :model="studentsForm">
-				  		<el-form-item label="姓名">
-							<el-input v-model="studentsForm.name" placeholder="请输入姓名" size="small"></el-input> 
+					<el-form label-width="80px" :model="studentsForm" :inline="true" class="demo-form-inline" ref="form" :rules="rules">
+				  		<el-form-item label="姓名" prop="userName">
+							<el-input v-model="studentsForm.userName" placeholder="请输入姓名" size="small"></el-input> 
 						</el-form-item>
-						<el-form-item label="性别">
+						<el-form-item label="性别" prop="sex">
 						    <el-radio-group v-model="studentsForm.sex">
 						      <el-radio label="男">男</el-radio>
 						      <el-radio label="女">女</el-radio>
 						    </el-radio-group>
 						</el-form-item>
-						<el-form-item label="账号">
-						    <el-input v-model="studentsForm.account" placeholder="请输入手机号" size="small"></el-input> 
+						<el-form-item label="账号" prop="accountName">
+						    <el-input v-model="studentsForm.accountName" placeholder="请输入手机号" size="small"></el-input> 
 						</el-form-item>
-						<el-form-item label="密码" v-if="addOrEdit == 'add'">
+						<el-form-item label="密码" prop="password" v-if="addOrEdit == 'add'">
 						    <el-input type="password" v-model="studentsForm.password" placeholder="请输入密码" size="small"></el-input> 
 						</el-form-item>
-						<el-form-item label="医院">
-						    <el-input v-model="studentsForm.hospital" placeholder="请输入医院" size="small"></el-input> 
+						<el-form-item label="学号">
+						    <el-input v-model="studentsForm.studentNumber" placeholder="请输入学号" size="small"></el-input> 
+						</el-form-item>
+						<el-form-item label="身份证号" prop="identificationNumber">
+						    <el-input v-model="studentsForm.identificationNumber" placeholder="请输入身份证号" size="small"></el-input> 
+						</el-form-item>
+						<el-form-item label="附属账号">
+						    <el-input v-model="studentsForm.affiliateAccount" placeholder="请输入附属账号" size="small"></el-input> 
+						</el-form-item>
+						<el-form-item label="主账号">
+						    <el-input v-model="studentsForm.mainAccount" placeholder="请输入主账号" size="small"></el-input> 
+						</el-form-item>
+						<el-form-item label="学生类别">
+						    <el-select v-model="studentsForm.identity" placeholder="学生类别" size="small" style="width: 200px">
+						      	<el-option  v-for="item in [{label:'住培生[一阶段]', value:'住培生[一阶段]'},{label:'住培生[二阶段]', value:'住培生[二阶段]'},{label:'研究生[硕士]', value:'研究生[硕士]'},{label:'研究生[博士]', value:'研究生[博士]'},{label:'医学生[本科]', value:'医学生[本科]'},{label:'医学生[博士]', value:'医学生[博士]'}]"
+							      :key="item.value"
+							      :label="item.label"
+							      :value="item.value">
+							    </el-option>
+						    </el-select>
 						</el-form-item>
 						<el-form-item label="班级">
 						    <el-input v-model="studentsForm.grade" placeholder="请输入班级" size="small"></el-input> 
 						</el-form-item>
 						<el-form-item label="科室">
 						    <el-cascader
-						        style="width: 300px"
+						        style="width: 200px"
 						        size="small"
 							    :options="permissions"
 							    :props="props"
@@ -141,7 +148,7 @@
 		    <span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleStudents = false">取 消</el-button>
 			    <el-button type="primary" @click="editPassword" v-if="activeName == 'second'">确 定</el-button :loading="btnLoading">
-			    <el-button type="primary" @click="addStudent" v-else :loading="btnLoading">确 定</el-button>
+			    <el-button type="primary" @click="addStudent('form')" v-else :loading="btnLoading">确 定</el-button>
 			</span>
 		</el-dialog>
     </div>
@@ -160,15 +167,20 @@ export default {
 	    	tableData:[],
 	    	dialogVisibleStudents:false,
 	    	studentsForm:{
-	    		id:'',
-	    		name:'',
+	    		userId:'',
+	    		userName:'',
 	    		sex:'男',
-	    		account:'',
+	    		accountName:'',
 	    		password:'', 
-	    		hospital:'',//医院
+	    		studentNumber:'', //学号
+	    		identificationNumber:'', //身份证号
+	    		affiliateAccount:'', //附属账号
+	    		mainAccount:'', //主账号
+	    		identity:'住培生[一阶段]',//学生类别
 	    		grade:'',//班级
 	    		permissionId:[]//权限
 	    	},
+	    	resetStudentsForm:'', //重置学生信息
 	    	passwordForm:{ //修改密码
 	    		password:'',
 	    	},
@@ -188,13 +200,34 @@ export default {
 	    		count:10, //每页数量
 	        	page:1 //当前页码
 	    	},
-	    	pageTotla:null,  //总条数
+	    	pageTotla:null,  //总条数,
+	    	rules: {
+                userName: [
+                    { required: true, message: '姓名不能为空', trigger: 'blur' }
+                ],
+                accountName: [
+                    { required: true, message: '账号不能为空', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: '密码不能为空', trigger: 'blur' },
+                    { min: 6, message: '长度最少 6 个字符', trigger: 'blur' }
+                ],
+                identificationNumber: [
+                	{ required: true, message: '身份证号不能为空', trigger: 'blur' }
+                ]
+            },
 	    	studentTemplate: [
-		        {'account':'13112311233', 'password':'zhangsan', 'name':'张三', 'phone':'13112311233', 'cord':'111111194412011111', 'type':'学生', 'class':'一年二班', 'sex':'男', 'classify':'内科_呼吸内科'},
+		        {'account':'学生手机号', 'name':'张三', 'sex':'男', 'studentNum':'102', 'cord':'111111194412011111', 'affiliateAccount':'10005', 'masterAccount':'10005', 'type':'住培生[一阶段]', 'class':'学生班级', 'major':'内科', 'classify':'心内科'},
+		        {'account':'', 'name':'小芳', 'sex':'女', 'studentNum':'', 'cord':'', 'affiliateAccount':'', 'masterAccount':'', 'type':'住培生[二阶段]', 'class':'', 'major':'外科', 'classify':'呼吸科'},
+		        {'account':'', 'name':'', 'sex':'', 'studentNum':'', 'cord':'', 'affiliateAccount':'', 'masterAccount':'', 'type':'研究生[硕士]', 'class':'', 'major':'妇产科', 'classify':'妇科'},
+		        {'account':'', 'name':'', 'sex':'', 'studentNum':'', 'cord':'', 'affiliateAccount':'', 'masterAccount':'', 'type':'研究生[博士]', 'class':'', 'major':'儿科', 'classify':'儿科疾病'},
+		        {'account':'', 'name':'', 'sex':'', 'studentNum':'', 'cord':'', 'affiliateAccount':'', 'masterAccount':'', 'type':'医学生[本科]', 'class':'', 'major':'', 'classify':''},
+		        {'account':'', 'name':'', 'sex':'', 'studentNum':'', 'cord':'', 'affiliateAccount':'', 'masterAccount':'', 'type':'医学生[博士]', 'class':'', 'major':'', 'classify':''},
 		    ]
 	    }
 	},
 	mounted() {
+		this.resetStudentsForm = JSON.parse(JSON.stringify(this.studentsForm));
 		this.uploadUrl = process.env.BASE_API+'/teachai/med/user/uploadStudentDetail.json'
 		this.getData();
 		teachersApi.selectPer().then(response=>{
@@ -214,22 +247,6 @@ export default {
       		this.dialogVisibleStudents = true;
       		this.addOrEdit = type;
       	},
-      	setData(data){
-      		let param = {
-      			userId:data.id,
-      			accountName: data.account,
-      			userName: data.name,
-      			sex: data.sex,
-      			phone: data.account,
-      			password: data.password,
-      			hospitalName: data.hospital,
-      			grade: data.grade,
-      			identificationNumber:'',
-      			identity:'',
-      			permissionId:JSON.stringify(data.permissionId)|| ""
-      		}
-      		return param;
-      	},
       	handleClick(tab, event) {
 	        console.log(tab, event);
 	    },
@@ -238,7 +255,6 @@ export default {
 	    	this.studentsForm.permissionId = val;
 	    },
 	    handleChangeClass(val){
-	    	
 	    	if (val.length == 1) {
 	    		this.params.permissionId = val[0]
 	    	}else if (val.length == 2) {
@@ -263,16 +279,21 @@ export default {
 	        this.params.page = val;
 	        this.getData();
 	    },
-      	addStudent(){
-      		this.btnLoading = true;
-      		studentsApi.addOrEdit(this.setData(this.studentsForm)).then(response=>{
-      			this.getData();
-      			this.$message({
-		            type: 'success',
-		            message: '编辑成功!'
-		        });
-				this.dialogVisibleStudents = false;
-			})
+      	addStudent(formName){
+      		this.studentsForm.permissionId = JSON.stringify(this.studentsForm.permissionId)|| "";
+      		this.$refs[formName].validate((valid) => {
+                if (valid) {
+                	this.btnLoading = true;
+		      		studentsApi.addOrEdit(this.studentsForm).then(response=>{
+		      			this.getData();
+		      			this.$message({
+				            type: 'success',
+				            message: '编辑成功!'
+				        });
+						this.dialogVisibleStudents = false;
+					})
+                }
+            })
       	},
       	editPassword(){
       		this.btnLoading = true;
@@ -280,6 +301,11 @@ export default {
       			this.$message({
 		            type: 'warning',
 		            message: '请输入密码!'
+		        });
+      		}else if(this.passwordForm.password.length <6){
+      			this.$message({
+		            type: 'warning',
+		            message: '密码长度最少 6 个字符!'
 		        });
       		}else{
       			studentsApi.updatePassword({password:this.passwordForm.password,userId:this.currentData.id}).then(response=>{
@@ -297,16 +323,20 @@ export default {
       		this.currentData = row;
       		this.addOrEdit = type;
       		this.studentsForm={
-	  			id:this.currentData.id,
-	    		name:this.currentData.userName,
+	  			userId:this.currentData.id,
+	    		userName:this.currentData.userName,
 	    		sex:this.currentData.sex,
-	    		account:this.currentData.name,
+	    		accountName:this.currentData.name,
 	    		password:'', 
 	    		hospital:this.currentData.hospital,//医院
+	    		studentNumber:this.currentData.studentNumber, //学号
+	    		identity: this.currentData.identity, //学生类别
+	    		identificationNumber:this.currentData.identificationNumber, //身份证号
+	    		affiliateAccount:this.currentData.affiliateAccount, //附属账号
+	    		mainAccount:this.currentData.mainAccount, //主账号
 	    		grade:this.currentData.grade,//班级
 	    		permissionId:JSON.parse(this.currentData.permissionId)//权限
 	    	}
-	    	console.log(this.studentsForm)
       	},
       	deleteStudent(row){
       		this.currentData = row;
@@ -328,15 +358,8 @@ export default {
       	},
       	dialogClose(){
       		this.btnLoading = false;
-      		this.studentsForm={
-	    		name:'',
-	    		sex:'男',
-	    		account:'',
-	    		password:'', 
-	    		hospital:'',//医院
-	    		grade:'',//班级
-	    		permissionId:[]//权限
-	    	},
+      		this.$refs.form.resetFields();
+      		this.studentsForm=this.resetStudentsForm;
 	    	this.passwordForm.password = '';
 	    	this.activeName = 'first';
       	},
@@ -365,9 +388,9 @@ export default {
 	    downloadTemplate(){
 	    	require.ensure([], () => {
 		        const { export_json_to_excel } = require('@/vendor/Export2Excel');
-		        const tHeader = ['登陆账号', '初始密码', '姓名', '手机号码', '证件号码', '类别', '班级', '性别', '科室' ];
+		        const tHeader = ['登陆账号', '姓名', '性别', '学号', '身份证号', '附属账号', '主账号', '学生类别', '班级', '学科专业', '科室' ];
 		        // 上面设置Excel的表格第一行的标题
-		        const filterVal = ['account', 'password', 'name', 'phone', 'cord', 'type', 'class', 'sex', 'classify'];
+		        const filterVal = ['account', 'password', 'name', 'sex', 'studentNum', 'cord', 'affiliateAccount', 'masterAccount', 'type', 'class', 'major', 'classify'];
 		        // 上面的index、nickName、name是tableData里对象的属性
 		        const list = this.studentTemplate;  //把data里的tableData存到list
 		        const data = this.formatJson(filterVal, list);
@@ -388,8 +411,5 @@ export default {
 	.el-icon-delete{
 		color: red;
 	}
-}
-.el-form-item {
-    margin-bottom: 0;
 }
 </style>

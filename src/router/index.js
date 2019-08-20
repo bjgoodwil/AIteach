@@ -20,6 +20,8 @@ import Record from './record/record'
 import Students from './students/students'
 //教师管理
 import Teacher from './teacher/teacher'
+//统计
+import Stat from './stat/statistics'
 
 const router = new Router({
 	//mode: 'history',
@@ -41,7 +43,8 @@ const router = new Router({
 				...Record,
 				...MapTable,
 				...Students,
-				...Teacher
+				...Teacher,
+				...Stat
 			],
 			meta:{
 	            requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的,暂时设置为false，否则不能进入home
@@ -56,8 +59,9 @@ const router = new Router({
  * @return {[type]}      [description]
  */
 router.beforeEach((to, from, next) => {
-	 if (to.matched.some(record => record.meta.requireAuth)){  // 判断该路由是否需要登录权限
+	if (to.matched.some(record => record.meta.requireAuth)){  // 判断该路由是否需要登录权限
         if (localStorage.getItem("uerId")) {
+        	/* 路由发生变化修改页面title */
           next();
         }else{
         	next({

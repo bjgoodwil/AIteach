@@ -1,5 +1,5 @@
 <template>
-    <div class="login" v-loading="loading">
+    <div class="my" v-loading="loading">
         <p style="height: 32px;"><i class="el-icon-location-outline"></i> 个人中心 </p>
         <el-card class="box-card">
             
@@ -85,13 +85,14 @@ export default {
             permissions:[], //权限
             rules: {
                 oldPassword: [
-                    { required: true, message: '请输入旧密码', trigger: 'change' }
+                    { required: true, message: '请输入旧密码', trigger: 'blur' }
                 ],
                 newPassword: [
-                    { required: true, message: '请输入新密码', trigger: 'change' }
+                    { required: true, message: '请输入新密码', trigger: 'blur' },
+                    { min: 6, message: '长度最少 6 个字符', trigger: 'blur' }
                 ],
                 surePasswowrd: [
-                    { required: true, message: '请确认新密码', trigger: 'change' }
+                    { required: true, message: '请确认新密码', trigger: 'blur' }
                 ],
             }
         }
@@ -116,11 +117,12 @@ export default {
             this.formUser.permissionId = val;
         },
         dialogClose(){
-            this.passwordForm = {
-                oldPassword:'',
-                newPassword:'',
-                surePasswowrd:'',
-            }
+            this.$refs.passwordForm.resetFields();
+            // this.passwordForm = {
+            //     oldPassword:'',
+            //     newPassword:'',
+            //     surePasswowrd:'',
+            // }
         },
         sure(formName){
             this.$refs[formName].validate((valid) => {

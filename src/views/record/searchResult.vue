@@ -68,12 +68,11 @@ export default {
 	},
 	mounted() {
 		console.log(this.$route.query.keywords)
-		this.param.disease = this.$route.query.disease
-		// ywd.getToken({token:'token'}).then(response=>{
-		// 	localStorage.setItem("token", response.data.result);
-		// 	this.getData(this.param);
-  //       })
-  		this.getData(this.param);
+		ywd.getToken({token:'token'}).then(response=>{
+			localStorage.setItem("token", response.data.result);
+			this.getData(this.param);
+        })
+  		//this.getData(this.param);
 		
 	},
 	beforeRouteEnter(to, from, next) {

@@ -64,8 +64,8 @@
 		  >
 		    <el-tabs v-model="activeName">
 			    <el-tab-pane label="基本信息" name="first" @tab-click="handleClick">
-					<el-form label-width="80px" :model="teachersForm">
-				  		<el-form-item label="姓名">
+					<el-form label-width="80px" :model="teachersForm" ref="form" :rules="rules">
+				  		<el-form-item label="姓名" prop="name">
 							<el-input v-model="teachersForm.name" placeholder="请输入姓名" size="small"></el-input> 
 						</el-form-item>
 						<el-form-item label="性别">
@@ -74,15 +74,14 @@
 						      <el-radio label="女">女</el-radio>
 						    </el-radio-group>
 						</el-form-item>
-						<el-form-item label="账号">
+						<el-form-item label="账号" prop="teacherName">
 						    <el-input v-model="teachersForm.teacherName" placeholder="请输入账号" size="small"></el-input> 
 						</el-form-item>
-						<el-form-item label="密码" v-if="addOrEdit == 'add'">
+						<el-form-item label="密码" v-if="addOrEdit == 'add'" prop="teacherPassword">
 						    <el-input type="password" v-model="teachersForm.teacherPassword" placeholder="请输入密码" size="small"></el-input> 
 						</el-form-item>
 						<el-form-item label="管理科室">
 						    <el-cascader
-
 						        style="width: 280px"
 						        size="small"
 							    :options="permissions"
@@ -106,7 +105,7 @@
 		    <span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleStudents = false">取 消</el-button>
 			    <el-button type="primary" @click="editPassword" v-if="activeName == 'second'">确 定</el-button :loading="btnLoading">
-			    <el-button type="primary" @click="addTeacher" v-else :loading="btnLoading">确 定</el-button>
+			    <el-button type="primary" @click="addTeacher('form')" v-else :loading="btnLoading">确 定</el-button>
 			</span>
 		</el-dialog>
     </div>
@@ -143,7 +142,19 @@ export default {
 	    	addOrEdit:'',  //新增还是编辑
 	    	currentData:'', //当前操作对象
 	    	uploadUrl:'',
-	    	activeName: 'first'
+	    	activeName: 'first',
+	    	rules: {
+                name: [
+                    { required: true, message: '姓名不能为空', trigger: 'blur' }
+                ],
+                teacherName: [
+                    { required: true, message: '账号不能为空', trigger: 'blur' }
+                ],
+                teacherPassword: [
+                    { required: true, message: '密码不能为空', trigger: 'blur' },
+                    { min: 6, message: '长度最少 6 个字符', trigger: 'blur' }
+                ],
+            },
 	    }
 	},
 	mounted() {
@@ -182,17 +193,23 @@ export default {
 	    handleChange(val){	
 	    	this.teachersForm.permissionId = val;
 	    },
-      	addTeacher(){
-      		this.btnLoading = true;
-      		this.teachersForm.permissionId = JSON.stringify(this.teachersForm.permissionId) || ""
-      		teachersApi.addOrEdit(this.teachersForm).then(response=>{
-      			this.getData();
-      			this.$message({
-		            type: 'success',
-		            message: '编辑成功!'
-		        });
-				this.dialogVisibleStudents = false;
-			})
+      	addTeacher(formName){
+      		this.teachersForm.permissionId = JSON.stringify(this.teachersForm.permissionId) || "";
+      		this.$refs[formName].validate((valid) => {
+                if (valid) {
+                	this.btnLoading = true;
+                	teachersApi.addOrEdit(this.teachersForm).then(response=>{
+		      			this.getData();
+		      			this.$message({
+				            type: 'success',
+				            message: '编辑成功!'
+				        });
+
+						this.dialogVisibleStudents = false;
+					})
+                }
+            })
+      		
       	},
       	editPassword(){
       		this.btnLoading = true;
@@ -243,14 +260,15 @@ export default {
 	        })
       	},
       	dialogClose(){
+      		this.$refs.form.resetFields();
       		this.btnLoading = false;
-      		this.teachersForm={
-	    		name:'',
-	    		sex:'男',
-	    		teacherName:'',
-	    		teacherPassword:'', 
-	    		permissionId:[]//权限
-	    	},
+      // 		this.teachersForm={
+	    	// 	name:'',
+	    	// 	sex:'男',
+	    	// 	teacherName:'',
+	    	// 	teacherPassword:'', 
+	    	// 	permissionId:[]//权限
+	    	// },
 	    	this.passwordForm.teacherPassword = '';
 	    	this.activeName = 'first';
       	},
@@ -259,7 +277,6 @@ export default {
 			const extension = testmsg === 'xls'
 			const extension2 = testmsg === 'xlsx'
 	        const isLt2M = file.size / 1024 / 1024 < 2;
-
 	        if (!extension && !extension2) {
 	          this.$message.error('只能上传 Excel 文件!');
 	        }
@@ -286,8 +303,5 @@ export default {
 	.el-icon-delete{
 		color: red;
 	}
-}
-.el-form-item {
-    margin-bottom: 0;
 }
 </style>

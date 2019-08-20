@@ -88,7 +88,7 @@ export default {
                         this.$router.push({path:this.$route.query.redirect || '/'})
                     }else{
                         this.$message({
-                            message: response.data.errMsg + '('+response.data.data+')',
+                            message: response.data.errMsg,
                             type: 'error'
                         });
                     }

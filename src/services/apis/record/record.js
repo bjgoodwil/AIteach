@@ -96,6 +96,15 @@ export const recordApi = {
             data: data
         });
     },
+    //导出病例
+    exportSampleExcel(data) {
+        return axios({
+            url: '/teachai/med/disease/exportSampleQuestionExcel.json',
+            method: 'post',
+            data: data,
+            responseType:"blob"
+        });
+    },
     //删除场景
     deleteSampleScene(data) {
         return axios({
