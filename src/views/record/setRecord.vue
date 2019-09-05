@@ -4,7 +4,11 @@
 		    <el-breadcrumb-item to="/list">虚拟病例</el-breadcrumb-item>
 		    <el-breadcrumb-item>结构化病例</el-breadcrumb-item>
 		</el-breadcrumb>
-		<el-form :inline="true" :model="formInline" class="m-t-20" label-width="90px">
+		<!-- <el-row class="floatLeft integrity">
+			<el-col :span="4"><label for="">病例完整度：</label></el-col>
+			<el-col :span="20"><el-progress :percentage="50" style="margin-top: 4px;"></el-progress></el-col>
+		</el-row> -->
+		<el-form :inline="true" :model="formInline" class="m-t-20"td label-width="90px">
 			<div>
 				<el-form-item label="性别："> {{formInline.gender}} </el-form-item>
 				<el-form-item label="年龄："> {{formInline.age}} {{formInline.ageunit}} </el-form-item>
@@ -56,199 +60,425 @@
 			</el-popover>
 			<el-tabs type="border-card" v-model="activeScene" @tab-click="tabClick" class="m-t-10"
 			    closable @tab-remove="removeScene">
-				<el-tab-pane :key="index" :label="scene.name.split('_')[0]+'_'+(index+1)" v-for="(scene,index) in allQuestion.trees" :name="index.toString()">
-					<el-button :disabled="!showAddButton" type="primary" round class="addBtn" size="small" @click="showQuestinForm" ><i class="el-icon-plus"></i> 添加问题</el-button>
-					<el-tabs v-model="activeName" @tab-click="tabClick1">
-					    <el-tab-pane v-for="item in scene.children" :key="item.id" :label="item.name" :name="item.id">	
-					    	<p class="history" v-if="item.name == '查体' && activeScene == 0"><span>体格检查：</span>{{allQuestion.chatisrc}}</p>
-					    	<el-tabs tab-position="left" v-model="activeClass" v-if="activeScene != 0&&item.name == '报告'">
-								<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
-									
-									<el-table :data="it.parms">
-										<el-table-column type="expand" v-if="it.name == '检验'" >
-									      <template slot-scope="props">
-									        <el-table 
-									            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
-												<el-table-column
-											      type="index"
-											      label="序号"
-											      width="50">
-											    </el-table-column>
-											    <el-table-column label="检验细项" prop="检验细项">
-											    </el-table-column>
-											    <el-table-column label="定量结果" prop="定量结果">
-											    </el-table-column>
-											    <el-table-column label="定性结果" prop="定性结果">
-											    </el-table-column>
-											    <el-table-column label="参考范围" prop="参考范围">
-											    </el-table-column>
-									        </el-table>
-									      </template>
-									    </el-table-column>
-									    <el-table-column type="expand" v-if="it.name == '检查'" >
-									      <template slot-scope="props">
-									      	<el-table 
-									            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
-												<el-table-column
-											      type="index"
-											      label="序号"
-											      width="50">
-											    </el-table-column>
-											    <el-table-column label="检查类型" prop="检查类型">
-											    </el-table-column>
-											    <el-table-column label="检查项目名称" prop="检查项目名称">
-											    </el-table-column>
-											    <el-table-column label="检查所见" prop="检查所见">
-											    </el-table-column>
-											    <el-table-column label="检查结论" prop="检查结论">
-											    </el-table-column>
-									        </el-table>
-									        <!-- <el-upload
-											  class="upload-demo"
-											  action=""
-											  :http-request="upLoadImg"
-											  :on-preview="handlePictureCardPreview"
-											  :on-success="handleImgSuccess"
-	  										  :before-upload="beforeImgUpload"
-											  list-type="picture-card"
-											  :file-list="fileList">
-											  <i class="el-icon-plus"></i>
-											  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2m</div>
-											</el-upload> -->
-									      </template>
-									    </el-table-column>
-							    		<el-table-column
-									      type="index"
-									      label="序号"
-									      width="50">
-									    </el-table-column>
-								        <el-table-column :label="it.name">
-								        	<template slot-scope="scope">
-												<el-input size="small" v-model="scope.row.questionName" placeholder="it.name"></el-input>
-								        	</template>
-								        </el-table-column>
-								        <!-- <el-table-column width="100px" label="操作">
-								        	<template slot-scope="scope">
-										        <el-button
-										          title="删除"
-										          type="text" @click.native.prevent="deleteRow(it.parms,scope.$index)">
-										          <i class="el-icon-delete"></i></el-button>
-								        	</template>
-								        </el-table-column> -->
-								    </el-table>
-								</el-tab-pane>
-					    	</el-tabs>
-							<el-tabs tab-position="left" v-model="activeClass" v-else>
-								<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
-									<div class="scroll-y">
-									<p v-if="it.name == '出生史'" class="history"><span>出生史：</span>{{allQuestion.chushengshisrc}}</p>
-									<p v-if="it.name == '婚育史'" class="history"><span>婚育史：</span>{{allQuestion.hunyushisrc}}</p>
-									<p v-if="it.name == '现病史'" class="history"><span>现病史：</span>{{allQuestion.xianbingshisrc}}</p>
-									<p v-if="it.name == '既往史'" class="history"><span>既往史：</span>{{allQuestion.jiwangshisrc}}</p>
-									<p v-if="it.name == '个人史'" class="history"><span>个人史：</span>{{allQuestion.gerenshisrc}}</p>
-									<p v-if="it.name == '家族史'" class="history"><span>家族史：</span>{{allQuestion.jiazushisrc}}</p>
-									<p v-if="it.name == '喂养史'" class="history"><span>喂养史：</span>{{allQuestion.weiyangshisrc}}</p>
-									<p v-if="it.name == '新生儿状况'" class="history"><span>新生儿状况：</span>{{allQuestion.xinshengerzhuangkuang}}</p>
-									<table style="width: 100%;">
-										<thead>
-											<th style="width: 8%">序号</th>
-											<th style="width: 34%">{{it.name}}</th>
-											<th style="width: 34%">答案</th>
-											<th style="width: 8%">得分</th>
-											<th style="width: 8%">难度</th>
-											<th style="width: 8%">操作</th>
-										</thead>
-									</table>
-									<draggable v-model="it.parms" @update="datadragEnd" :options = "{animation:500}">
-										<!-- <transition-group> -->
-										<div v-for="(i,index) in it.parms" :key="setQuestionNum(i,index)" class="questionList clearfix" style="width: 100%">
-											<div style="width: 6%">{{index+1}}</div>
-											<div class="questionName" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionName" placeholder="请输入问题" ></el-input></div>
-											<div class="questionAnswer" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></div>
-											<div style="width: 8%"><el-input v-model="i.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
-											<div style="width: 8%">
-												<el-select v-model="i.difficultyDegree" placeholder="难度"size="small" v-if="item.name !== '报告'">
-											      	<el-option label="0" value="0" ></el-option>
-											      	<el-option label="1" value="1" ></el-option>
-											      	<el-option label="2" value="2" ></el-option>
-											      	<el-option label="3" value="3" ></el-option>
-											    </el-select>
-											    <div style="width: 100%" v-else>--</div>
-											</div>
-											<div style="width: 8%">
-												<el-button
-										          title="删除"
-										          type="text" @click.native.prevent="deleteRow(it.parms,index)">
-										          <i class="el-icon-delete"></i></el-button>
-										        <el-button
-										          title="设为上个问题的子问题"
-										          v-if="i.subQuestionList && i.subQuestionList.length == 0 && index != 0"
-										          type="text" @click.native.prevent="setSubQuse(it.parms,index)">
-										          <i class="el-icon-s-unfold"></i></el-button>
-										         
-											</div> 
-											<div style="width: 100%;" v-for="(sub,ind) in i.subQuestionList" :key="sub.id" v-if="i.subQuestionList">
-												<div class="questionList textCenter" style="width: 6%;">{{index+1}}-{{ind+1}}</div>
-												<div class="questionList" style="width: 35%;">
-													<el-input type="textarea" autosize v-model="sub.questionName" size="small" placeholder="请输入问题"></el-input></div>
-												<div class="questionList" style="width: 35%;">
-													<el-input type="textarea" autosize v-model="sub.questionAnswer instanceof Array?sub.questionAnswer.toString().replace(/\[|]/g,''):sub.questionAnswer" size="small" placeholder="请输入答案"></el-input></div>
-												<div class="questionList" style="width: 8%"><el-input v-model="sub.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
-												<div class="questionList" style="width: 8%">
-													<el-select v-model="sub.difficultyDegree" placeholder="难度"size="small">
+				<el-tab-pane :key="index" :label="scene.name.split('_')[0]+'_'+(index+1)" v-for="(scene,index) in allQuestion.trees" :name="index.toString()" >
+					<div v-if="scene.name.split('_')[0] =='查房'" :ref="'editorElem'+(index+1)"></div>
+					<div v-else>
+						<el-button :disabled="!showAddButton" type="primary" round class="addBtn" size="small" @click="showQuestinForm" ><i class="el-icon-plus"></i> 添加问题</el-button>
+						<el-tabs v-model="activeName" @tab-click="tabClick1">
+						    <el-tab-pane v-for="item in scene.children" :key="item.id" :label="item.name" :name="item.id">	
+						    	<p class="history" v-if="item.name == '查体' && activeScene == 0"><span>体格检查：</span>{{allQuestion.chatisrc}}</p>
+						    	<el-tabs tab-position="left" v-model="activeClass" v-if="activeScene != 0&&item.name == '报告'">
+									<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
+										
+										<el-table :data="it.parms">
+											<el-table-column type="expand" v-if="it.name == '检验'" >
+										      <template slot-scope="props">
+										        <el-table 
+										            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
+													<el-table-column
+												      type="index"
+												      label="序号"
+												      width="50">
+												    </el-table-column>
+												    <el-table-column label="检验细项" prop="检验细项">
+												    </el-table-column>
+												    <el-table-column label="定量结果" prop="定量结果">
+												    </el-table-column>
+												    <el-table-column label="定性结果" prop="定性结果">
+												    </el-table-column>
+												    <el-table-column label="参考范围" prop="参考范围">
+												    </el-table-column>
+										        </el-table>
+										      </template>
+										    </el-table-column>
+										    <el-table-column type="expand" v-if="it.name == '检查'" >
+										      <template slot-scope="props">
+										      	<el-table 
+										            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
+													<el-table-column
+												      type="index"
+												      label="序号"
+												      width="50">
+												    </el-table-column>
+												    <el-table-column label="检查类型" prop="检查类型">
+												    </el-table-column>
+												    <el-table-column label="检查项目名称" prop="检查项目名称">
+												    </el-table-column>
+												    <el-table-column label="检查所见" prop="检查所见">
+												    </el-table-column>
+												    <el-table-column label="检查结论" prop="检查结论">
+												    </el-table-column>
+										        </el-table>
+										        <!-- <el-upload
+												  class="upload-demo"
+												  action=""
+												  :http-request="upLoadImg"
+												  :on-preview="handlePictureCardPreview"
+												  :on-success="handleImgSuccess"
+		  										  :before-upload="beforeImgUpload"
+												  list-type="picture-card"
+												  :file-list="fileList">
+												  <i class="el-icon-plus"></i>
+												  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2m</div>
+												</el-upload> -->
+										      </template>
+										    </el-table-column>
+								    		<el-table-column
+										      type="index"
+										      label="序号"
+										      width="50">
+										    </el-table-column>
+									        <el-table-column :label="it.name">
+									        	<template slot-scope="scope">
+													<el-input size="small" v-model="scope.row.questionName" placeholder="it.name"></el-input>
+									        	</template>
+									        </el-table-column>
+									        <!-- <el-table-column width="100px" label="操作">
+									        	<template slot-scope="scope">
+											        <el-button
+											          title="删除"
+											          type="text" @click.native.prevent="deleteRow(it.parms,scope.$index)">
+											          <i class="el-icon-delete"></i></el-button>
+									        	</template>
+									        </el-table-column> -->
+									    </el-table>
+									</el-tab-pane>
+						    	</el-tabs>
+								<el-tabs tab-position="left" v-model="activeClass" v-else>
+									<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
+										<div class="scroll-y">
+										<p v-if="it.name == '出生史'" class="history"><span>出生史：</span>{{allQuestion.chushengshisrc}}</p>
+										<p v-if="it.name == '婚育史'" class="history"><span>婚育史：</span>{{allQuestion.hunyushisrc}}</p>
+										<p v-if="it.name == '现病史'" class="history"><span>现病史：</span>{{allQuestion.xianbingshisrc}}</p>
+										<p v-if="it.name == '既往史'" class="history"><span>既往史：</span>{{allQuestion.jiwangshisrc}}</p>
+										<p v-if="it.name == '个人史'" class="history"><span>个人史：</span>{{allQuestion.gerenshisrc}}</p>
+										<p v-if="it.name == '家族史'" class="history"><span>家族史：</span>{{allQuestion.jiazushisrc}}</p>
+										<p v-if="it.name == '喂养史'" class="history"><span>喂养史：</span>{{allQuestion.weiyangshisrc}}</p>
+										<p v-if="it.name == '新生儿状况'" class="history"><span>新生儿状况：</span>{{allQuestion.xinshengerzhuangkuang}}</p>
+										<table style="width: 100%;">
+											<thead>
+												<th style="width: 8%">序号</th>
+												<th style="width: 34%">{{it.name}}</th>
+												<th style="width: 34%">答案</th>
+												<th style="width: 8%">得分</th>
+												<th style="width: 8%">难度</th>
+												<th style="width: 8%">操作</th>
+											</thead>
+										</table>
+										<draggable v-model="it.parms" @update="datadragEnd" :options = "{animation:500}">
+											<div v-for="(i,index) in it.parms" :key="setQuestionNum(i,index)" class="questionList clearfix" style="width: 100%">
+												<div style="width: 6%">{{index+1}}</div>
+												<div class="questionName" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionName" placeholder="请输入问题" ></el-input></div>
+												<div class="questionAnswer" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></div>
+												<div style="width: 8%"><el-input v-model="i.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
+												<div style="width: 8%">
+													<el-select v-model="i.difficultyDegree" placeholder="难度"size="small" v-if="item.name !== '报告'">
 												      	<el-option label="0" value="0" ></el-option>
 												      	<el-option label="1" value="1" ></el-option>
 												      	<el-option label="2" value="2" ></el-option>
 												      	<el-option label="3" value="3" ></el-option>
 												    </el-select>
+												    <div style="width: 100%" v-else>--</div>
 												</div>
-												<div class="questionList" style="width: 8%">
+												<div style="width: 8%">
 													<el-button
 											          title="删除"
-											          type="text" @click.native.prevent="deleteRow(i.subQuestionList,ind)">
+											          type="text" @click.native.prevent="deleteRow(it.parms,index)">
 											          <i class="el-icon-delete"></i></el-button>
-											          
+											        <el-button
+											          title="设为上个问题的子问题"
+											          v-if="i.subQuestionList && i.subQuestionList.length == 0 && index != 0"
+											          type="text" @click.native.prevent="setSubQuse(it.parms,index)">
+											          <i class="el-icon-s-unfold"></i></el-button>
+											         
+												</div> 
+												<div style="width: 100%;" v-for="(sub,ind) in i.subQuestionList" :key="sub.id" v-if="i.subQuestionList">
+													<div class="questionList textCenter" style="width: 6%;">{{index+1}}-{{ind+1}}</div>
+													<div class="questionList" style="width: 35%;">
+														<el-input type="textarea" autosize v-model="sub.questionName" size="small" placeholder="请输入问题"></el-input></div>
+													<div class="questionList" style="width: 35%;">
+														<el-input type="textarea" autosize v-model="sub.questionAnswer instanceof Array?sub.questionAnswer.toString().replace(/\[|]/g,''):sub.questionAnswer" size="small" placeholder="请输入答案"></el-input></div>
+													<div class="questionList" style="width: 8%"><el-input v-model="sub.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
+													<div class="questionList" style="width: 8%">
+														<el-select v-model="sub.difficultyDegree" placeholder="难度"size="small">
+													      	<el-option label="0" value="0" ></el-option>
+													      	<el-option label="1" value="1" ></el-option>
+													      	<el-option label="2" value="2" ></el-option>
+													      	<el-option label="3" value="3" ></el-option>
+													    </el-select>
+													</div>
+													<div class="questionList" style="width: 8%">
+														<el-button
+												          title="删除"
+												          type="text" @click.native.prevent="deleteRow(i.subQuestionList,ind)">
+												          <i class="el-icon-delete"></i></el-button>
+													</div>
 												</div>
 											</div>
+										</draggable>
+										<p v-if="it.parms.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
-										<!-- </transition-group> -->
-									</draggable>
-										
-									<p v-if="it.parms.length == 0" class="textCenter m-t-10">暂无数据</p>
-									</div>
-								</el-tab-pane>
-							</el-tabs>
-					    </el-tab-pane>
-					    <el-tab-pane label="诊断" name="诊断">
-					    	<el-tabs tab-position="left" v-model="activeClass">
-					    		<el-tab-pane label="诊断" name="诊断">
-					    			<div class="scroll-y">
-									<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].support">
-										<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
-											<span class="pos-a" style="right: 60px">难度：
-												<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-											      	<el-option label="0" value="0" >el-icon-s-unfold</el-option>
-											      	<el-option label="1" value="1" ></el-option>
-											      	<el-option label="2" value="2" ></el-option>
-											      	<el-option label="3" value="3" ></el-option>
-											    </el-select>
-											</span>
-											<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-											<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].support,index)">删除</a>
-										</p>
-										<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
-										<el-table :data="item.supportQuestions" :show-header="false">
+									</el-tab-pane>
+								</el-tabs>
+						    </el-tab-pane>
+						    <el-tab-pane label="诊断" name="诊断">
+						    	<el-tabs tab-position="left" v-model="activeClass">
+						    		<el-tab-pane label="诊断" name="诊断">
+						    			<div class="scroll-y">
+										<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].support">
+											<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
+												<span class="pos-a" style="right: 60px">难度：
+													<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
+												      	<el-option label="0" value="0" >el-icon-s-unfold</el-option>
+												      	<el-option label="1" value="1" ></el-option>
+												      	<el-option label="2" value="2" ></el-option>
+												      	<el-option label="3" value="3" ></el-option>
+												    </el-select>
+												</span>
+												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].support,index)">删除</a>
+											</p>
+											<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
+											<el-table :data="item.supportQuestions" :show-header="false">
+									    		<el-table-column
+											      type="index"
+											      label="序号"
+											      width="50">
+											    </el-table-column>
+										        <el-table-column prop="questionName">	
+										        </el-table-column>
+										        <el-table-column label="得分" width="120">
+										        	<template slot-scope="scope">
+										        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
+										        	</template>
+										        </el-table-column>
+										        <el-table-column width="100px" label="操作">
+										        	<template slot-scope="scope">
+												        <el-button
+												          title="删除"
+												          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
+												          <i class="el-icon-delete"></i></el-button>
+										        	</template>
+										        </el-table-column>
+										    </el-table>
+										</div>
+										<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
+										</div>
+									</el-tab-pane>
+									<el-tab-pane label="鉴别诊断" name="鉴别诊断">
+										<div class="scroll-y">
+										<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport">
+											<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
+												<span class="pos-a" style="right: 60px">难度：
+													<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
+												      	<el-option label="0" value="0" ></el-option>
+												      	<el-option label="1" value="1" ></el-option>
+												      	<el-option label="2" value="2" ></el-option>
+												      	<el-option label="3" value="3" ></el-option>
+												    </el-select>
+												</span>
+												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport,index)">删除</a>
+											</p>
+											<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
+											<el-table :data="item.supportQuestions" :show-header="false">
+									    		<el-table-column
+											      type="index"
+											      label="序号"
+											      width="50">
+											    </el-table-column>
+										        <el-table-column prop="questionName">
+										        </el-table-column>
+										        <el-table-column label="得分" width="120">
+										        	<template slot-scope="scope">
+										        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分" style="width: 62px"></el-input>
+										        	</template>
+										        </el-table-column>
+										        <el-table-column width="100px" label="操作">
+										        	<template slot-scope="scope">
+												        <el-button
+												          title="删除"
+												          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
+												          <i class="el-icon-delete"></i></el-button>
+										        	</template>
+										        </el-table-column>
+										    </el-table>
+											<p class="reason clearfix">排除理由<span class="floatRight" @click="showReasonLog('unsupport',index,'no')">添加</span></p>
+											<el-table :data="item.unSupportQuestions" :show-header="false">
+									    		<el-table-column
+											      type="index"
+											      label="序号"
+											      width="50">
+											    </el-table-column>
+										        <el-table-column prop="questionName">
+										        </el-table-column>
+										        <el-table-column label="得分" width="120">
+										        	<template slot-scope="scope">
+										        		<el-input type="number" v-model="scope.row.score" placeholder="得分" style="width: 60px"></el-input>
+										        	</template>
+										        </el-table-column>
+										        <el-table-column width="100px" label="操作">
+										        	<template slot-scope="scope">
+												        <el-button
+												          title="删除"
+												          type="text" @click.native.prevent="deleteRow(item.unSupportQuestions,scope.$index)">
+												          <i class="el-icon-delete"></i></el-button>
+										        	</template>
+										        </el-table-column>
+										    </el-table>
+										</div>
+										<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
+										</div>
+									</el-tab-pane>
+								</el-tabs>
+						    </el-tab-pane>
+						    <el-tab-pane label="处置" name="处置">
+								<el-tabs tab-position="left" v-model="activeClass">
+						    		<el-tab-pane v-for="(item,index) in chuzhi[activeScene][allQuestion.trees[activeScene].name]" :key="item.diagnosisName" :label="item.diagnosisName+'('+item.supportQuestions.length+')'" :name="item.diagnosisName">
+						    			<div class="scroll-y">
+										<el-table :data="item.supportQuestions">
+											<el-table-column type="expand" v-if="item.diagnosisName == '检验'" >
+										      <template slot-scope="props">
+										        <el-table 
+										            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
+													<el-table-column
+												      type="index"
+												      label="序号"
+												      width="50">
+												    </el-table-column>
+												    <el-table-column label="检验细项">
+												    	<template slot-scope="scope">
+															<el-input size="small" v-model="scope.row.检验细项" placeholder="检验细项"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="定量结果">
+												    	<template slot-scope="scope">
+															<el-input size="small" v-model="scope.row.定量结果" placeholder="定量结果"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="定性结果">
+												    	<template slot-scope="scope">
+															<el-input size="small" v-model="scope.row.定性结果" placeholder="定性结果"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="参考范围">
+												    	<template slot-scope="scope">
+															<el-input size="small" v-model="scope.row.参考范围" placeholder="参考范围"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="操作" width="50px">
+												    	<template slot-scope="scope">
+															<el-button
+													          title="删除"
+													          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
+													          <i class="el-icon-delete"></i></el-button>
+											        	</template>
+												    </el-table-column>
+										        </el-table>
+										        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检验')">添加项目</el-button>
+										      </template>
+										    </el-table-column>
+										    <el-table-column type="expand" v-if="item.diagnosisName == '检查'" >
+										      <template slot-scope="props">
+										      	<el-table 
+										            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
+													<el-table-column
+												      type="index"
+												      label="序号"
+												      width="50">
+												    </el-table-column>
+												    <el-table-column label="检查类型">
+												    	<template slot-scope="scope">
+															<el-input size="small" v-model="scope.row.检查类型" placeholder="检查类型"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="检查项目名称">
+												    	<template slot-scope="scope">
+															<el-input size="small" v-model="scope.row.检查项目名称" placeholder="检查项目名称"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="检查所见">
+												    	<template slot-scope="scope">
+															<el-input type="textarea" autosize size="small" v-model="scope.row.检查所见" placeholder="检查所见"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="检查结论">
+												    	<template slot-scope="scope">
+															<el-input type="textarea" autosize size="small" v-model="scope.row.检查结论" placeholder="检查结论"></el-input>
+											        	</template>
+												    </el-table-column>
+												    <el-table-column label="操作" width="50px">
+												    	<template slot-scope="scope">
+															<el-button
+													          title="删除"
+													          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
+													          <i class="el-icon-delete"></i></el-button>
+											        	</template>
+												    </el-table-column>
+										        </el-table>
+										        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检查')">添加项目</el-button>
+										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
+										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
+										        <el-upload
+										          v-else
+												  :id="props.row.id+'_img'"	
+												  class="upload-demo"
+												  multiple
+	  											  :limit="1"
+	  											  :on-exceed="handleExceed"
+												  action=""
+												  :http-request="(file)=>upLoadImg(file,props.row.id)"
+												  :on-success="handleImgSuccess"
+		  										  :before-upload="beforeImgUpload"
+												  :file-list="fileList">
+												  <el-button size="small" type="primary">上传影像</el-button>
+												  <span>只能上传jpg或zip文件</span>
+												</el-upload>
+										      </template>
+										    </el-table-column>
 								    		<el-table-column
 										      type="index"
 										      label="序号"
 										      width="50">
 										    </el-table-column>
-									        <el-table-column prop="questionName">	
-									        </el-table-column>
-									        <el-table-column label="得分" width="120">
+									        <el-table-column :label="item.diagnosisName">
 									        	<template slot-scope="scope">
-									        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
+													<el-input size="small" v-model="scope.row.questionName" placeholder="处置名称"></el-input>
 									        	</template>
+									        </el-table-column>
+									        <el-table-column label="时间" width="200">
+									        	<template slot-scope="scope">
+									        		<el-input size="small" placeholder="时间" v-model="scope.row.intervalDay">
+									        			<template slot="prepend">入院</template>
+									        			<template slot="append">天</template>
+													</el-input>
+									        	</template>
+									        </el-table-column>
+									        <el-table-column label="得分" width="100">
+									        	<template slot-scope="scope">
+									        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分"></el-input>
+									        	</template>
+									        </el-table-column>
+									        <el-table-column label="难度" width="100">
+									        	<template slot-scope="scope">
+									        		<el-select v-model="scope.row.difficultyDegree" placeholder="难度" size="small">
+												      	<el-option label="0" value="0" ></el-option>
+												      	<el-option label="1" value="1" ></el-option>
+												      	<el-option label="2" value="2" ></el-option>
+												      	<el-option label="3" value="3" ></el-option>
+												    </el-select>
+									        	</template>
+									        </el-table-column>
+									        <el-table-column v-if="item.diagnosisName == '检查'" label="结论查看权限" width="130">
+									        	<template slot-scope="scope">
+										        	<el-select v-model="scope.row.inspectRange" placeholder="请选择">
+													    <el-option  v-for="item in [{label:'全部可见', value:0},{label:'都不可见', value:1},{label:'报告可见', value:2},{label:'影像可见', value:3}]"
+													      :key="item.value"
+													      :label="item.label"
+													      :value="item.value">
+													    </el-option>
+													</el-select>
+												</template>
 									        </el-table-column>
 									        <el-table-column width="100px" label="操作">
 									        	<template slot-scope="scope">
@@ -259,239 +489,12 @@
 									        	</template>
 									        </el-table-column>
 									    </el-table>
-									</div>
-									<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
-									</div>
-								</el-tab-pane>
-								<el-tab-pane label="鉴别诊断" name="鉴别诊断">
-									<div class="scroll-y">
-									<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport">
-										<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
-											<span class="pos-a" style="right: 60px">难度：
-												<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-											      	<el-option label="0" value="0" ></el-option>
-											      	<el-option label="1" value="1" ></el-option>
-											      	<el-option label="2" value="2" ></el-option>
-											      	<el-option label="3" value="3" ></el-option>
-											    </el-select>
-											</span>
-											<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-											<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport,index)">删除</a>
-										</p>
-										<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
-										<el-table :data="item.supportQuestions" :show-header="false">
-								    		<el-table-column
-										      type="index"
-										      label="序号"
-										      width="50">
-										    </el-table-column>
-									        <el-table-column prop="questionName">
-									        </el-table-column>
-									        <el-table-column label="得分" width="120">
-									        	<template slot-scope="scope">
-									        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分" style="width: 62px"></el-input>
-									        	</template>
-									        </el-table-column>
-									        <el-table-column width="100px" label="操作">
-									        	<template slot-scope="scope">
-											        <el-button
-											          title="删除"
-											          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
-											          <i class="el-icon-delete"></i></el-button>
-									        	</template>
-									        </el-table-column>
-									    </el-table>
-										<p class="reason clearfix">排除理由<span class="floatRight" @click="showReasonLog('unsupport',index,'no')">添加</span></p>
-										<el-table :data="item.unSupportQuestions" :show-header="false">
-								    		<el-table-column
-										      type="index"
-										      label="序号"
-										      width="50">
-										    </el-table-column>
-									        <el-table-column prop="questionName">
-									        </el-table-column>
-									        <el-table-column label="得分" width="120">
-									        	<template slot-scope="scope">
-									        		<el-input type="number" v-model="scope.row.score" placeholder="得分" style="width: 60px"></el-input>
-									        	</template>
-									        </el-table-column>
-									        <el-table-column width="100px" label="操作">
-									        	<template slot-scope="scope">
-											        <el-button
-											          title="删除"
-											          type="text" @click.native.prevent="deleteRow(item.unSupportQuestions,scope.$index)">
-											          <i class="el-icon-delete"></i></el-button>
-									        	</template>
-									        </el-table-column>
-									    </el-table>
-									</div>
-									<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
-									</div>
-								</el-tab-pane>
-							</el-tabs>
-					    </el-tab-pane>
-					    <el-tab-pane label="处置" name="处置">
-							<el-tabs tab-position="left" v-model="activeClass">
-					    		<el-tab-pane v-for="(item,index) in chuzhi[activeScene][allQuestion.trees[activeScene].name]" :key="item.diagnosisName" :label="item.diagnosisName+'('+item.supportQuestions.length+')'" :name="item.diagnosisName">
-					    			<div class="scroll-y">
-									<el-table :data="item.supportQuestions">
-										<el-table-column type="expand" v-if="item.diagnosisName == '检验'" >
-									      <template slot-scope="props">
-									        <el-table 
-									            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
-												<el-table-column
-											      type="index"
-											      label="序号"
-											      width="50">
-											    </el-table-column>
-											    <el-table-column label="检验细项">
-											    	<template slot-scope="scope">
-														<el-input size="small" v-model="scope.row.检验细项" placeholder="检验细项"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="定量结果">
-											    	<template slot-scope="scope">
-														<el-input size="small" v-model="scope.row.定量结果" placeholder="定量结果"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="定性结果">
-											    	<template slot-scope="scope">
-														<el-input size="small" v-model="scope.row.定性结果" placeholder="定性结果"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="参考范围">
-											    	<template slot-scope="scope">
-														<el-input size="small" v-model="scope.row.参考范围" placeholder="参考范围"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="操作" width="50px">
-											    	<template slot-scope="scope">
-														<el-button
-												          title="删除"
-												          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
-												          <i class="el-icon-delete"></i></el-button>
-										        	</template>
-											    </el-table-column>
-									        </el-table>
-									        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检验')">添加项目</el-button>
-									      </template>
-									    </el-table-column>
-									    <el-table-column type="expand" v-if="item.diagnosisName == '检查'" >
-									      <template slot-scope="props">
-									      	<el-table 
-									            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
-												<el-table-column
-											      type="index"
-											      label="序号"
-											      width="50">
-											    </el-table-column>
-											    <el-table-column label="检查类型">
-											    	<template slot-scope="scope">
-														<el-input size="small" v-model="scope.row.检查类型" placeholder="检查类型"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="检查项目名称">
-											    	<template slot-scope="scope">
-														<el-input size="small" v-model="scope.row.检查项目名称" placeholder="检查项目名称"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="检查所见">
-											    	<template slot-scope="scope">
-														<el-input type="textarea" autosize size="small" v-model="scope.row.检查所见" placeholder="检查所见"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="检查结论">
-											    	<template slot-scope="scope">
-														<el-input type="textarea" autosize size="small" v-model="scope.row.检查结论" placeholder="检查结论"></el-input>
-										        	</template>
-											    </el-table-column>
-											    <el-table-column label="操作" width="50px">
-											    	<template slot-scope="scope">
-														<el-button
-												          title="删除"
-												          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
-												          <i class="el-icon-delete"></i></el-button>
-										        	</template>
-											    </el-table-column>
-									        </el-table>
-									        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检查')">添加项目</el-button>
-									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
-									        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
-									        <el-upload
-									          v-else
-											  :id="props.row.id+'_img'"	
-											  class="upload-demo"
-											  multiple
-  											  :limit="1"
-  											  :on-exceed="handleExceed"
-											  action=""
-											  :http-request="(file)=>upLoadImg(file,props.row.id)"
-											  :on-success="handleImgSuccess"
-	  										  :before-upload="beforeImgUpload"
-											  :file-list="fileList">
-											  <el-button size="small" type="primary">上传影像</el-button>
-											  <span>只能上传jpg或zip文件</span>
-											</el-upload>
-									      </template>
-									    </el-table-column>
-							    		<el-table-column
-									      type="index"
-									      label="序号"
-									      width="50">
-									    </el-table-column>
-								        <el-table-column :label="item.diagnosisName">
-								        	<template slot-scope="scope">
-												<el-input size="small" v-model="scope.row.questionName" placeholder="处置名称"></el-input>
-								        	</template>
-								        </el-table-column>
-								        <el-table-column label="时间" width="200">
-								        	<template slot-scope="scope">
-								        		<el-input size="small" placeholder="时间" v-model="scope.row.intervalDay">
-								        			<template slot="prepend">入院</template>
-								        			<template slot="append">天</template>
-												</el-input>
-								        	</template>
-								        </el-table-column>
-								        <el-table-column label="得分" width="100">
-								        	<template slot-scope="scope">
-								        		<el-input type="number" size="small" v-model="scope.row.score" placeholder="得分"></el-input>
-								        	</template>
-								        </el-table-column>
-								        <el-table-column label="难度" width="100">
-								        	<template slot-scope="scope">
-								        		<el-select v-model="scope.row.difficultyDegree" placeholder="难度" size="small">
-											      	<el-option label="0" value="0" ></el-option>
-											      	<el-option label="1" value="1" ></el-option>
-											      	<el-option label="2" value="2" ></el-option>
-											      	<el-option label="3" value="3" ></el-option>
-											    </el-select>
-								        	</template>
-								        </el-table-column>
-								        <el-table-column v-if="item.diagnosisName == '检查'" label="结论查看权限" width="130">
-								        	<template slot-scope="scope">
-									        	<el-select v-model="scope.row.inspectRange" placeholder="请选择">
-												    <el-option  v-for="item in [{label:'全部可见', value:0},{label:'都不可见', value:1},{label:'报告可见', value:2},{label:'影像可见', value:3}]"
-												      :key="item.value"
-												      :label="item.label"
-												      :value="item.value">
-												    </el-option>
-												</el-select>
-											</template>
-								        </el-table-column>
-								        <el-table-column width="100px" label="操作">
-								        	<template slot-scope="scope">
-										        <el-button
-										          title="删除"
-										          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
-										          <i class="el-icon-delete"></i></el-button>
-								        	</template>
-								        </el-table-column>
-								    </el-table>
-									</div>
-								</el-tab-pane>
-							</el-tabs>
-					    </el-tab-pane> 
-					</el-tabs>
+										</div>
+									</el-tab-pane>
+								</el-tabs>
+						    </el-tab-pane> 
+						</el-tabs>
+					</div>
 				</el-tab-pane>
 			</el-tabs>
 		</div>
@@ -522,10 +525,7 @@
 							    		</el-checkbox>
 							    	</div>
 								</div>
-								<!-- <el-checkbox v-for="i in list.parms" :label="i" :key="i.questionId" class="m-t-20" :disabled="noCheckReasonId.indexOf(i.questionId) > -1"><span>[{{item.name}}]</span> {{i.questionName}} (<span v-for="(sub,index) in i.subQuestionList">{{sub.questionName}}，</span>)
-							    </el-checkbox> -->
 							</el-checkbox-group>
-							
 						</div>	
 					</el-collapse-item>
 				</div>
@@ -604,6 +604,7 @@
 import draggable from 'vuedraggable';//拖拽排序组件
 import {recordApi} from '@/services/apis/record/record';
 import {formatDate} from '@/util/dataFormat';
+import E from "wangeditor"; //富文本编辑
 export default {
 	name: 'setRecord',
 	components: {draggable},
@@ -616,6 +617,7 @@ export default {
 	    	showAddButton:true,
 	    	showDifficultyDegree: true,  //显示难度
 	    	activeScene:0,
+	    	activeSceneName:'', //场景名字
 	    	activeName:'',
 	    	activeClass:'',
 	    	currentZhenduan: '',//当前诊断
@@ -658,7 +660,9 @@ export default {
 	        sceneName:'查房',//场景名
 	        checkrecordList:[],//查房记录
 	        gist:[],  //依据
-	        fileList: []
+	        fileList: [],
+	        editor: null, //富文本编辑相关数据
+      		editorContent:''
 	    }
 	},
 	mounted() {
@@ -702,7 +706,8 @@ export default {
         document.body.ondrop = function (event) {
             event.preventDefault();
             event.stopPropagation();
-        }
+        }   
+        
 	},
   	methods: {
   		//根据Sample查询数据
@@ -742,6 +747,14 @@ export default {
 	        	this.dialogVisibleCheckrecord = false;
 	        }).catch(() => {}); 
   		},
+  		//创建富文本
+  		createEditor(index){
+  			this.editor = new E(this.$refs['editorElem'+index]);
+	        this.editor.customConfig.menus = ['link'];
+	        this.editor.create(); // 创建富文本实例
+	    	this.editor.txt.html('<p>入CCU后患者<a href="5" target="_blank">胸痛持续不缓解</a>，予吗啡3mg静脉冲入后2min症状逐渐好转，后安静入睡，未诉不适。异舒吉<a href="4" target="_blank">30ug/min</a>静脉泵入，心电监护示血压110/60mmHg，心率65次/分，氧饱和度100%。查体:颈静脉无怒张。双肺呼吸音清，未闻及干湿罗音。心率62次/分，心律齐，心音有力，A2=P2，各瓣膜听诊区未闻及杂音，未闻及心包摩擦音。腹软无压痛、反跳痛，肠鸣音正常，4次/分。双下肢无水肿。 TIMI评分:5分；GRACE评分103分；CRUSADE评分26分。 化验回报: 2017-08-08 生化:快速丙氨酸氨基转移酶 22(U/L)，快速肌酸激酶同工酶MB 75(U/L)↑，快速肌酸激酶 515(U/L)↑，快速钾 3.3(mmol/L)↓，快速肌酐 67(umol/L)； 2017-08-08 急查肌钙蛋白T 0.271(ng/ml)↑，急查N末端脑钠肽前体 172(pg/ml)↑； 2017-08-08 D-二聚体定量 0.03(μg/ml)； 2017-08-08 血常规:白细胞 10.36(*10^9/L)↑，血红蛋白 133(g/L)，血小板 197(*10^9/L)，中性粒细胞百分数 74.6(%)；&nbsp;&nbsp;&nbsp;<br></p>')
+	    
+  		},
   		//添加和删除场景
      	addScene(){
 			if (this.sceneName == '查房') {
@@ -777,9 +790,12 @@ export default {
 					this.allQuestion.zhenduan.push({
 						[scName]:response.data.data.zhenduan[0][this.sceneName]
 					});
-
 					this.allQuestion.chuzhi.push({
 						[scName]:response.data.data.chuzhi[0][this.sceneName]
+					})
+					this.$nextTick(function(){
+						this.activeScene = (this.allQuestion.trees.length-1).toString();
+						if (scName.split('_')[0] =='查房') this.createEditor(this.allQuestion.trees.length);
 					})
 				}else{
 					this.$message({
@@ -787,11 +803,12 @@ export default {
 			            message: response.data.errMsg
 			        });
 				}
-				
 			})
      	},
      	removeScene(index){
-     		if(index == 0){
+     		//index 为字符串，转number
+     		let Indexing = parseInt(index)
+     		if(Indexing == 0){
      			this.$message({
 		            type: 'warning',
 		            message: '该场景不可删除!'
@@ -802,19 +819,21 @@ export default {
 		          cancelButtonText: '取消',
 		          type: 'warning'
 		        }).then(() => {
+		        	console.log(this.allQuestion.trees[Indexing])
 		        	recordApi.deleteSampleScene({
-						sampleSceneNameAndId:this.allQuestion.trees[index].name
+						sampleSceneNameAndId:this.allQuestion.trees[Indexing].name
 					}).then(response=>{
 						this.$message({
 				            type: 'success',
 				            message: '删除成功!'
 				        });
-				        this.activeScene = "0";
+				        if (parseInt(this.activeScene) >= Indexing ) this.activeScene = "0";
+				        console.log(this.activeScene )			        
 				        this.activeName = this.allQuestion.trees[0].children[0].id;
 	    				this.activeClass = this.allQuestion.trees[0].children[0].children[0].id;
-				        this.allQuestion.trees.splice(index,1);
-				        this.allQuestion.zhenduan.splice(index,1);
-				        this.allQuestion.chuzhi.splice(index,1);
+				        this.allQuestion.trees.splice(Indexing,1);
+				        this.allQuestion.zhenduan.splice(Indexing,1);
+				        this.allQuestion.chuzhi.splice(Indexing,1);
 					})
 		        })
      		}
@@ -823,6 +842,7 @@ export default {
      		//console.log(val)
      	},
      	tabClick(tag){
+     		this.activeSceneName = tag.label;
      		this.showAddButton = true;
      		this.activeName = this.allQuestion.trees[tag.index].children[0].id;
 	    	this.activeClass = this.allQuestion.trees[tag.index].children[0].children[0].id;
@@ -913,23 +933,19 @@ export default {
      		}else{this.isNo = '';}
      		let reason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name]
      		//诊断依据
-     		let zhenduanReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions;
-     		//鉴别诊断依据
-     		let zhenduanJBReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions
-     		//鉴别诊断排除依据
-     		let zhenduanJBReasonUn = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions
      		if (this.currentZhenduan == 'zhenduan') {
+     			let zhenduanReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].support[this.currentZhenduanNum].supportQuestions;
      			if (zhenduanReason) {}else{
      				zhenduanReason = []
      			}
      			this.noCheckReason = zhenduanReason;
      		}else if (this.currentZhenduan == 'unsupport') {
-     			if (!zhenduanJBReason) {
-     				zhenduanJBReason = []
-     			}
-     			if(!zhenduanJBReasonUn){
-     				zhenduanJBReasonUn = []
-     			}
+     			//鉴别诊断依据
+	     		let zhenduanJBReason = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].supportQuestions
+	     		//鉴别诊断排除依据
+	     		let zhenduanJBReasonUn = this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport[this.currentZhenduanNum].unSupportQuestions
+     			if (!zhenduanJBReason) zhenduanJBReason = [];
+     			if (!zhenduanJBReasonUn)zhenduanJBReasonUn = [];
      			this.noCheckReason = zhenduanJBReason.concat(zhenduanJBReasonUn)
      		}
      		this.noCheckReasonId = [];
@@ -976,17 +992,13 @@ export default {
 		            type: 'success',
 		            message: '删除成功!'
 		        });
-	        }).catch(() => {
-	                  
-	        });
+	        }).catch(() => { });
      	},
      	//设置为子问题
      	setSubQuse(rows,index){
-     		//console.log(arguments)
      		rows[index].fatherQuestionId = rows[index-1].questionId;
      		rows[index-1].subQuestionList.push(rows[index]);
      		rows.splice(index, 1);
-     		
      	},
      	//添加检查检验
      	addCheck(rows,type){
@@ -1004,8 +1016,7 @@ export default {
 	     			检查所见:"",
 	     			检查结论:""
 	     		})
-     		}
-     		
+     		}	
      	},
      	handleExceed(files, fileList) {
 	        this.$message.warning(`当前限制选择 1 个文件`);
@@ -1065,15 +1076,13 @@ export default {
 			        });
 			        this.getListSampleDetailBysample();
 				})
-	        }).catch(() => {
-	                  
-	        });
+	        }).catch(() => {});
 	    },
 	    setQuestionNum(item,index){
 	    	item.questionNum = index+1;
 	    	return item.id;
 	    },
-     	//保存
+     	//保存病例
      	save(type){
      		this.loading = true;
      		this.allQuestion.diagnosis = this.formInline.disease
@@ -1094,7 +1103,6 @@ export default {
 			            message: '保存成功!'
 			        });
 			        this.getListSampleDetailBysample();
-			        
 				})
      		}else{
      			this.$set(this.allQuestion, "sampleParms",{
@@ -1120,10 +1128,10 @@ export default {
             evt.preventDefault();
         },
 	    open(){
-	    	window.open(process.env.HOST+'search/bysy/casehistory.html?pid='+this.patientId+'&sex='+this.formInline.gender+'&age='+this.formInline.age+'&occup='+this.formInline.profession+'&mrKey='+this.formInline.mrKey+'&sonlist=default&datelist='+this.formInline.hospitalizedTime+'&form=AI', '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    	this.openWindow(process.env.HOST+'search/bysy/casehistory.html?pid='+this.patientId+'&sex='+this.formInline.gender+'&age='+this.formInline.age+'&occup='+this.formInline.profession+'&mrKey='+this.formInline.mrKey+'&sonlist=default&datelist='+this.formInline.hospitalizedTime+'&form=AI')
 	    },
 	    openImg(){
-	    	window.open('http://10.2.98.65/ZFP-XDS/Main?DomainId=1.2.156.112636.1.1.1.3.1&PatientId='+this.patientId, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    	this.openWindow('http://10.2.98.65/ZFP-XDS/Main?DomainId=1.2.156.112636.1.1.1.3.1&PatientId='+this.patientId)
 	    },
 	    openBMJ(){
 	    	let main = '';
@@ -1132,16 +1140,21 @@ export default {
 	    	}else{
 	    		main = 'http://192.168.8.74:8080'
 	    	}
-	    	window.open(main+'/search/ZH_CN?q='+this.formInline.disease, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    	this.openWindow(main+'/search/ZH_CN?q='+this.formInline.disease)
 	    },
+	    //查看影像
 	    checkImage(id,hasDicomImage,hasImage){
 	    	if (hasDicomImage == 'yes') {
-	    		window.open(process.env.HOST+'/teachai/yingxiang/ImageShare.htm?reportid='+id, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    		this.openWindow(process.env.HOST+'/teachai/yingxiang/ImageShare.htm?reportid='+id)
 	    	}else if (hasImage == 'yes') {
-	    		window.open(process.env.HOST+'/teachai/yingxiang/dicom/image/'+id+'.jpg', '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no') 
+	    		this.openWindow(process.env.HOST+'/teachai/yingxiang/dicom/image/'+id+'.jpg')
 	    	}else{return false}
 	    },
-	    
+	    //浏览器打开新窗口
+	    openWindow(url){
+	    	window.open(url, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no')
+	    },
+	    //导出病例
 	    exportSample(){
 	    	recordApi.exportSampleExcel({
 				sampleId:this.$route.query.sampleId
@@ -1163,6 +1176,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .setRecord{
+	.integrity{
+		width: 650px;margin-top: -18px;margin-left: 200px;font-size: 14px;
+	}
 	.el-form-item {
 	    margin-bottom: 0;
 	}

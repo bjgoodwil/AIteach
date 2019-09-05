@@ -242,19 +242,25 @@ export default {
 
     },
     methods:{
+
         handleChange(value){
 	        this.dataForm.disease.departmentId = value[1];
         },
         changeQuestion(value){
-        	if (this.standandTypeName == '') {this.questionForm.questionParm == ''}
-        	for (var i = 0; i < this.standandTypeList.length; i++) {
-        		if(this.standandTypeList[i].id == JSON.parse(value).standandTypeId){
-        			this.standandTypeName = this.standandTypeList[i].standandTypeName+"="
-        		}
+        	if (JSON.parse(value).standandTypeId == '') {
+        		this.standandTypeName = '';
+        		this.questionForm.questionParm = ''
+        	}else{
+        		for (var i = 0; i < this.standandTypeList.length; i++) {
+	        		if(this.standandTypeList[i].id == JSON.parse(value).standandTypeId){
+	        			this.standandTypeName = this.standandTypeList[i].standandTypeName+"="
+	        		}
+	        	}
         	}
         },
         //切换场景
         tabClick(tag){
+        	console.log(this.activeScene)
         	this.activeName = this.allQuestion[tag.index].children[0].id;
 	    	this.activeClass = this.allQuestion[tag.index].children[0].children[0].id;
         },
@@ -310,12 +316,26 @@ export default {
 	    },
      	addQuestion(){
      		this.btnDisabled = true;
+     		//定义查找问题分类的方法
+     		let searchQestionFun = (data) => {
+     			for (var i = 0; i < data.children.length; i++) {
+	        		if (this.activeName == data.children[i].id) {
+	        			for (var j = 0; j < data.children[i].children.length; j++) {
+	        				if (this.activeClass == data.children[i].children[j].id){
+	        					return data.children[i].children[j].parms
+	        					
+	        				}
+	        			}
+	        		}
+        		}
+     		}
+     		const a = this.allQuestion[this.activeScene];
      		let param = {
      			diseaseId:this.$route.query.diseaseId,
      			classifyId:this.activeClass,
      			standandQuestionId:'',
      			parms:this.questionForm.questionParm,
-     			questionNum:'',
+     			questionNum:searchQestionFun(a).length + 1,
      			//自定义问题时的参数
      			questionName:this.questionForm.questionName || '',
      			questionPath:this.questionForm.questionPath || ''
@@ -325,16 +345,17 @@ export default {
      		}else{
      			param.standandQuestionId = ''
      		}
-     		let a = this.allQuestion[this.activeScene];
-     		for (var i = 0; i < a.children.length; i++) {
-        		if (this.activeName == a.children[i].id) {
-        			for (var j = 0; j < a.children[i].children.length; j++) {
-        				if (this.activeClass == a.children[i].children[j].id){
-        					param.questionNum = a.children[i].children[j].parms.length+1
-        				}
-        			}
-        		}
-        	}
+     		
+     		// for (var i = 0; i < a.children.length; i++) {
+       //  		if (this.activeName == a.children[i].id) {
+       //  			for (var j = 0; j < a.children[i].children.length; j++) {
+       //  				if (this.activeClass == a.children[i].children[j].id){
+       //  					param.questionNum = a.children[i].children[j].parms.length+1
+       //  				}
+       //  			}
+       //  		}
+       //  	}
+        	//diseaseId为0是新增问题，重置为空
         	if (this.$route.query.diseaseId == 0) {
     			param.diseaseId = '';
     		}
@@ -343,13 +364,13 @@ export default {
 		            type: 'success',
 		            message: '添加成功!'
 		        });
-
-	    		diseaseApi.diseaseWithQuestion({diseaseId:param.diseaseId}).then(response=>{
-		    		this.dataForm = response.data.data;
-					this.allQuestion = response.data.data.questions;
-					this.allQuestion2 = JSON.parse(JSON.stringify(this.allQuestion));
-		            this.loading = false;
-		    	})
+		        //当问题有参数时返回的是数组
+		        if (response.data.data instanceof Array) {
+		        	searchQestionFun(a).push(response.data.data[0])
+		        }else{
+		        	searchQestionFun(a).push(response.data.data)
+		        }
+		        this.loading = false
 		    	this.dialogVisibleTree = false;
 		    	this.btnDisabled = false;
 	    	})
@@ -362,7 +383,9 @@ export default {
 	          type: 'warning'
 	        }).then(() => {
 	        	rows.splice(index, 1);
+	        	
 	        }).catch(() => {});
+
      	},
 	    //保存
 	    save(){

@@ -43,9 +43,11 @@
 		</el-tabs>
     	<el-table :data="tableData" class="m-t-20" stripe v-loading="loading">
     		<el-table-column
-		      type="index"
 		      label="序号"
 		      width="50">
+		      <template slot-scope="scope">
+				{{(form.page-1)*10+(scope.$index+1)}}
+		      </template>
 		    </el-table-column>
 	        <el-table-column prop="diseaseName" label="所属疾病">
 	        </el-table-column>
@@ -62,6 +64,8 @@
 	        </el-table-column>
 	        <el-table-column prop="createDate" label="发布时间" width="150">
 	        </el-table-column>
+	        <!-- <el-table-column label="完整度" width="100">
+	        </el-table-column> -->
 	        <el-table-column prop="status" label="状态" width="80">
 	        	<template slot-scope="scope">
 	        		<el-tag v-if="scope.row.status == 1" type="success">已发布</el-tag>

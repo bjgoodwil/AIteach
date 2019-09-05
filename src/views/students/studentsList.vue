@@ -29,9 +29,11 @@
 	    <el-input v-model="params.searchKey" placeholder="请输入姓名或手机号" size="small" @input="handleChangeSearchKey" clearable style="width: 220px" ></el-input>
     	<el-table :data="tableData" class="m-t-20" v-loading="loading">
     		<el-table-column
-		      type="index"
 		      label="序号"
 		      width="50">
+		      <template slot-scope="scope">
+				{{(params.page-1)*10+(scope.$index+1)}}
+		      </template>
 		    </el-table-column>
 		    <!-- <el-table-column prop="id" label="Id" width="160">
 		    </el-table-column> -->
@@ -52,8 +54,11 @@
 	        <el-table-column prop="deptSubName" label="科室">
 	        
 	        </el-table-column>
-	        <el-table-column label="操作" width="100">
+	        <el-table-column label="操作" width="120">
 		      <template slot-scope="scope">
+		      	<el-button
+		      	  title="查看统计"
+		          type="text" @click="lookStatistics(scope.row.id)"><i class="el-icon-pie-chart"></i></el-button>
 		      	<el-button
 		      	  title="编辑"
 		          type="text" @click="edit(scope.row,'edit')"><i class="el-icon-edit"></i></el-button>
@@ -123,7 +128,7 @@
 						<el-form-item label="班级">
 						    <el-input v-model="studentsForm.grade" placeholder="请输入班级" size="small"></el-input> 
 						</el-form-item>
-						<el-form-item label="科室">
+						<el-form-item label="科室" prop="permissionId">
 						    <el-cascader
 						        style="width: 200px"
 						        size="small"
@@ -151,6 +156,15 @@
 			    <el-button type="primary" @click="addStudent('form')" v-else :loading="btnLoading">确 定</el-button>
 			</span>
 		</el-dialog>
+		<!-- 成绩统计弹出框 -->
+		<el-dialog
+		  title="成绩统计"
+		  :visible.sync="statisticsDialogVisible"
+		  width="800px">
+		    <statistics-score :userId="userId"></statistics-score>
+			<!-- <div id="statisticScore" ref="statisticScore" style="height: 360px"></div> -->
+		  </span>
+		</el-dialog>
     </div>
 </template>
 <script>
@@ -158,13 +172,19 @@ import {studentsApi} from '@/services/apis/students/students'
 import {teachersApi} from '@/services/apis/teachers/teachers'
 //import Blob from '@/vendor/Blob'
 import Export2Excel from '@/vendor/Export2Excel.js'
+import StatisticsScore from '@/components/statistics/statistics'
 export default {
 	name: 'students',
+	components: {
+        StatisticsScore,
+    },
 	data () {
 	    return {
+	    	userId:'',
 	    	loading:true,
 	    	btnLoading: false,
 	    	tableData:[],
+	    	statisticsDialogVisible:false,
 	    	dialogVisibleStudents:false,
 	    	studentsForm:{
 	    		userId:'',
@@ -178,7 +198,7 @@ export default {
 	    		mainAccount:'', //主账号
 	    		identity:'住培生[一阶段]',//学生类别
 	    		grade:'',//班级
-	    		permissionId:[]//权限
+	    		permissionId:''//权限
 	    	},
 	    	resetStudentsForm:'', //重置学生信息
 	    	passwordForm:{ //修改密码
@@ -214,6 +234,9 @@ export default {
                 ],
                 identificationNumber: [
                 	{ required: true, message: '身份证号不能为空', trigger: 'blur' }
+                ],
+                permissionId: [
+                	{ required: true, message: '请选择专业科室', trigger: 'blur' }
                 ]
             },
 	    	studentTemplate: [
@@ -227,6 +250,7 @@ export default {
 	    }
 	},
 	mounted() {
+		console.log(StatisticsScore)
 		this.resetStudentsForm = JSON.parse(JSON.stringify(this.studentsForm));
 		this.uploadUrl = process.env.BASE_API+'/teachai/med/user/uploadStudentDetail.json'
 		this.getData();
@@ -280,7 +304,10 @@ export default {
 	        this.getData();
 	    },
       	addStudent(formName){
-      		this.studentsForm.permissionId = JSON.stringify(this.studentsForm.permissionId)|| "";
+      		console.log(this.studentsForm)
+      		if (this.studentsForm.permissionId != '') {
+      			this.studentsForm.permissionId = JSON.stringify(this.studentsForm.permissionId);
+      		}
       		this.$refs[formName].validate((valid) => {
                 if (valid) {
                 	this.btnLoading = true;
@@ -356,6 +383,118 @@ export default {
 				})
 	        })
       	},
+      	lookStatistics(id){
+      		this.userId = id;
+  			//studentsApi.statisticalSampleByUserId({userId:id}).then(response=>{
+
+  		// 		let statisticScore = echarts.init(this.$refs.statisticScore);
+  		// 		let startTime = [];
+  		// 		let scoreData = [];
+  		// 		let chiefComplaintData = [];
+  		// 		response.data.data.forEach(v=>{  
+				//     if (v.chiefComplaint) {
+    //                     chiefComplaintData.push(v.chiefComplaint)
+    //                 }else{
+    //                     chiefComplaintData.push('xx病例');
+    //                 } 
+    //                 startTime.push(v.startTime);
+    //                 scoreData.push(v.score);
+				// });
+  				
+  		// 		let option = {
+    //                 tooltip: {
+    //                     trigger: 'axis',
+    //                     axisPointer: {
+    //                         snap: true,
+    //                         lineStyle: {
+    //                             color: '#1790cf',
+    //                             width: 2
+    //                         }
+    //                     },
+    //                 },
+    //                 xAxis:  {
+    //                     type: 'category',
+    //                     boundaryGap: false,
+    //                     nameGap:20,
+    //                     axisTick: {
+    //                         show: false
+    //                     },
+    //                     splitArea : {
+    //                         show : true,
+    //                     },//保留网格区域
+    //                     data: startTime.reverse(),
+    //                     name:'学习时间',
+    //                     splitLine:{
+    //                         show:true
+    //                     },
+    //                     nameTextStyle: {
+    //                         color: ['#0087ED'],
+    //                         fontSize:'14',
+    //                     },
+    //                     axisLine:{
+    //                         lineStyle:{
+    //                             color:'#1790cf',
+    //                             style:'solid',
+    //                             width:'2'//坐标线的宽度
+    //                         }
+    //                     },
+    //                     axisLabel: {
+    //                         textStyle: {
+    //                             color:'#333',
+    //                             fontSize:'13',
+    //                         }
+    //                     }
+
+    //                 },
+    //                 yAxis: {
+    //                     type: 'value',
+    //                     name:'分数',
+    //                     min:0,
+    //                     max:100,
+    //                     nameGap:30,
+    //                     axisTick: {
+    //                         show: false
+    //                     },
+    //                     splitArea : {
+    //                         show : true,
+        
+    //                     },//保留网格区域
+    //                     splitLine:{
+    //                         show:true
+    //                     },
+
+    //                 },
+    //                 dataZoom: [
+    //                     {
+    //                         type: 'inside',
+    //                         start: 0,
+    //                         end: 100
+    //                     },
+    //                     {
+    //                         start: 0,
+    //                         end: 100
+    //                     }
+    //                 ],
+    //                 series: [
+    //                     {
+    //                         name:'本人成绩',
+    //                         type:'line',
+    //                         lineStyle:{
+    //                             normal:{
+    //                                 width:2,  //连线粗细
+    //                                 color: "#f1797c"  //连线颜色
+    //                             }
+    //                         },
+    //                         data:scoreData.reverse()
+    //                     }
+    //                 ]
+    //             };
+    //             statisticScore.setOption(option);
+    //   			console.log(response.data)
+				this.statisticsDialogVisible = true;
+			//})
+
+      	},
       	dialogClose(){
       		this.btnLoading = false;
       		this.$refs.form.resetFields();
@@ -390,7 +529,7 @@ export default {
 		        const { export_json_to_excel } = require('@/vendor/Export2Excel');
 		        const tHeader = ['登陆账号', '姓名', '性别', '学号', '身份证号', '附属账号', '主账号', '学生类别', '班级', '学科专业', '科室' ];
 		        // 上面设置Excel的表格第一行的标题
-		        const filterVal = ['account', 'password', 'name', 'sex', 'studentNum', 'cord', 'affiliateAccount', 'masterAccount', 'type', 'class', 'major', 'classify'];
+		        const filterVal = ['account', 'name', 'sex', 'studentNum', 'cord', 'affiliateAccount', 'masterAccount', 'type', 'class', 'major', 'classify'];
 		        // 上面的index、nickName、name是tableData里对象的属性
 		        const list = this.studentTemplate;  //把data里的tableData存到list
 		        const data = this.formatJson(filterVal, list);

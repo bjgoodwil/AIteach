@@ -39,5 +39,13 @@ export const studentsApi = {
             method: 'post',
             data: data
         });
+    },
+    //成绩统计
+    statisticalSampleByUserId(data) {
+        return axios({
+            url: '/teachai/med/user/getStatisticalSampleByUserId.json',
+            method: 'post',
+            data: data
+        });
     }
 }

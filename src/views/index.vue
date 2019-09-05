@@ -6,14 +6,14 @@
                 <h1 style="font-size: 20px;line-height: 60px;" class="floatLeft title">
                 北京大学第三医院人工智能临床医学教学辅助数据库管理平台</h1>
                 <el-dropdown class="floatRight" @command="handleCommand">
-                  <span class="el-dropdown-link">
-                    {{name}} ({{roleName}})<i class="el-icon-arrow-down el-icon--right"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="my">个人中心</el-dropdown-item>
-                    <el-dropdown-item command="loginOut">退出</el-dropdown-item>
-            
-                  </el-dropdown-menu>
+                    <span class="el-dropdown-link">
+                        {{name}} ({{roleName}})<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item command="my">个人中心</el-dropdown-item>
+                        <el-dropdown-item command="loginOut">退出</el-dropdown-item>
+                
+                    </el-dropdown-menu>
                 </el-dropdown>
                 
             </el-header>

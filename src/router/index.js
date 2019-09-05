@@ -27,6 +27,11 @@ const router = new Router({
 	//mode: 'history',
 	routes: [
 		{
+			path: '/hello',
+			name: 'hello',
+			component: HelloWorld,	
+		},
+		{
 			path: '/login',
 			name: 'login',
 			component: Login,	
