@@ -17,6 +17,14 @@
                 <div id="statisticsCaseNumber" ref="statisticsCaseNumber" style="height: 360px"></div>
             </div>
         </el-card>
+        <el-card class="box-card m-t-20">
+            <div slot="header" class="clearfix">
+                <span class="p-l-10">多维度统计</span>
+            </div>
+            <div class="text item">
+                <div id="statisticsDimensions " ref="statisticsDimensions" style="height: 360px"></div>
+            </div>
+        </el-card>
     </div>
 </template>
 
@@ -36,9 +44,10 @@ export default {
 
         this.draw();
         this.draw2();
+        this.draw3();
     },
     methods: {
-        draw () {
+        draw(){
              // 实例化echarts对象
             let statisticsStudentUser = echarts.init(this.$refs.statisticsStudentUser);
             statApi.statisticalSampleUser().then(response=>{
@@ -81,83 +90,6 @@ export default {
                 }
                 statisticsStudentUser.setOption(option);
             })
-            
-            
-            // 绘制条形图
-            //let option = {
-                // title: {
-                //     text: '折线图堆叠',
-                // },
-                // tooltip: {
-                //     trigger: 'axis'
-                // },
-                // legend: {
-                //     data:['住培生[一阶段]','住培生[二阶段]','研究生[硕士]','研究生[博士]','医学生[本科]','医学生[博士]'],
-                //     orient:'vertical',
-                //     top:'50',
-                //     right:'20'
-                // },
-                // grid: {
-                //     left: '3%',
-                //     right: '150',
-                //     bottom: '3%',
-                //     containLabel: true,
-
-                // },
-                // toolbox: {
-                //     feature: {
-                //         saveAsImage: {}
-                //     }
-                // },
-                // xAxis: {
-                //     type: 'category',
-                //     boundaryGap: false,
-                //     data: ['周一','周二','周三','周四','周五','周六','周日'],
-                //     name: '时间'
-                // },
-                // yAxis: {
-                //     type: 'value',
-                //     name: '人次'
-                // },
-                // series: [
-                    // {
-                    //     name:'住培生[一阶段]',
-                    //     type:'line',
-                    //     stack: '总量',
-                    //     data:[120, 132, 101, 134, 90, 230, 210]
-                    // },
-                    // {
-                    //     name:'住培生[二阶段]',
-                    //     type:'line',
-                    //     stack: '总量',
-                    //     data:[220, 182, 191, 234, 290, 330, 310]
-                    // },
-                    // {
-                    //     name:'研究生[硕士]',
-                    //     type:'line',
-                    //     stack: '总量',
-                    //     data:[150, 232, 201, 154, 190, 330, 410]
-                    // },
-                    // {
-                    //     name:'研究生[博士]',
-                    //     type:'line',
-                    //     stack: '总量',
-                    //     data:[320, 332, 301, 334, 390, 330, 320]
-                    // },
-                    // {
-                    //     name:'医学生[本科]',
-                    //     type:'line',
-                    //     stack: '总量',
-                    //     data:[820, 932, 901, 934, 1290, 1330, 1320]
-                    // },
-                    // {
-                    //     name:'医学生[博士]',
-                    //     type:'line',
-                    //     stack: '总量',
-                    //     data:[920, 930, 890, 910, 1280, 1230, 1350]
-                    // }
-                //]
-            //};
 
         },
         draw2(){
@@ -226,6 +158,65 @@ export default {
                 ]
             };
             
+        },
+        draw3(){
+            let statisticsDimensions = echarts.init(this.$refs.statisticsDimensions);
+            let option = {
+                legend: {
+                    data: ['住培生[一阶段]','住培生[二阶段]', '研究生[硕士]', '研究生[博士]', '医学生[本科]', '医学生[博士]'],
+                    orient: 'vertical',
+                    x: 'left',
+                },
+                tooltip: {},
+                radar: {
+                    // shape: 'circle',
+                    name: {
+                        textStyle: {
+                            color: '#fff',
+                            backgroundColor: '#999',
+                            borderRadius: 3,
+                            padding: [3, 5]
+                       }
+                    },
+                    indicator: [
+                       { name: '系统性', max: 100},
+                       { name: '精准性', max: 100},
+                       { name: '全面性', max: 100},
+                       { name: '逻辑性', max: 100},
+                       { name: '敏捷性', max: 100},
+                    ],
+                
+                },
+                series: [{
+                    type: 'radar',
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    
+                    data: [
+                        {
+                            value: [60,73,85,40,70],
+                            name: '住培生[一阶段]'
+                        },{
+                            value: [64,70,56,48,60],
+                            name: '住培生[二阶段]'
+                        },{
+                            value: [86,64,70,54,76],
+                            name: '研究生[硕士]'
+                        },{
+                            value: [67,87,85,65,74],
+                            name: '研究生[博士]'
+                        },{
+                            value: [65,68,75,60,75],
+                            name: '医学生[本科]'
+                        },{
+                            value: [70,86,85,64,73],
+                            name: '医学生[博士]'
+                        }
+                    ]
+                }]
+            };
+            statisticsDimensions.setOption(option);
         }
     }
 }

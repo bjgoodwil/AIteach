@@ -55,17 +55,17 @@
 	        </el-table-column>
 	        <el-table-column prop="gender" label="性别" width="50">
 	        </el-table-column>
-	        <el-table-column label="年龄" width="60">
+	        <el-table-column label="年龄" width="56">
 	        	<template slot-scope="scope">
 	        		{{scope.row.age}} {{scope.row.ageUnit}}
 	        	</template>
 	        </el-table-column>
 	        <el-table-column prop="chiefComplaint" label="病历概述">
 	        </el-table-column>
-	        <el-table-column prop="createDate" label="发布时间" width="150">
+	        <el-table-column prop="createDate" label="创建时间" width="150">
 	        </el-table-column>
-	        <!-- <el-table-column label="完整度" width="100">
-	        </el-table-column> -->
+	        <el-table-column prop="integrity" label="完整度" width="70">
+	        </el-table-column>
 	        <el-table-column prop="status" label="状态" width="80">
 	        	<template slot-scope="scope">
 	        		<el-tag v-if="scope.row.status == 1" type="success">已发布</el-tag>
@@ -531,6 +531,7 @@ export default {
 	    	this.$router.push({
 	    		name:'setRecord',
 	    		query:{
+	    			status:row.status,
 	    			disease:row.diseaseName,
 	    			type:'edit',
 	    			sampleId:row.id,

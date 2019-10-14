@@ -4,6 +4,7 @@
         <div class="describe">
             <p style="font-size: 24px; font-weight: 400; margin-top: 10%;">致力于培养优秀临床思维人才</p>
             <p class="m-t-20">实现临床实践能力，加快人才培养，从“学生”走向<br>合格“医生”</p>
+            <el-button type="primary" plain class="m-t-20" @click="toStudy">去 学 习 <i class="el-icon-arrow-right"></i></el-button>
         </div>
         <div class="loginForm">
             <el-form :inline="true" :model="formInline" class="demo-form-inline pos-r">
@@ -21,7 +22,7 @@
                 <input class="pos-a" v-model="formInline.captchaCode" placeholder="验证码" style="left: 120px;"  @keyup.enter="onSubmit">
               </el-form-item>
               <el-form-item class="pos-a" style="left:780px;">
-                <el-button class="m-l-20" type="primary" @click="onSubmit" >登 陆</el-button>
+                <el-button class="m-l-20" type="success" @click="onSubmit" >登 陆</el-button>
               </el-form-item>
             </el-form>
         </div>
@@ -101,6 +102,10 @@ export default {
             loginApi.getCode().then(response=>{
                 this.codeUrl = "data:image/png;base64,"+response.data.data.codePic;
             })
+        },
+        //去往学习端
+        toStudy(){
+            window.open(process.env.BASE_API+"/study")
         }
     }
 }
@@ -138,7 +143,7 @@ export default {
         width: 1000px;
         margin: 0 auto;
     }
-    .el-button--primary {
+    .el-button--success {
         color: #5B88FF;
         background-color: #fff; 
         border-color: #fff; 

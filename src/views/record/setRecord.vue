@@ -4,10 +4,10 @@
 		    <el-breadcrumb-item to="/list">虚拟病例</el-breadcrumb-item>
 		    <el-breadcrumb-item>结构化病例</el-breadcrumb-item>
 		</el-breadcrumb>
-		<!-- <el-row class="floatLeft integrity">
+		<el-row class="floatLeft integrity">
 			<el-col :span="4"><label for="">病例完整度：</label></el-col>
-			<el-col :span="20"><el-progress :percentage="50" style="margin-top: 4px;"></el-progress></el-col>
-		</el-row> -->
+			<el-col :span="20"><el-progress :percentage="formInline.integrity" style="margin-top: 4px;"></el-progress></el-col>
+		</el-row>
 		<el-form :inline="true" :model="formInline" class="m-t-20"td label-width="90px">
 			<div>
 				<el-form-item label="性别："> {{formInline.gender}} </el-form-item>
@@ -52,6 +52,7 @@
 			  width="280"
 			  trigger="click">
 			    <el-select v-model="sceneName" placeholder="请选择场景" @change="change" size="small" style="width: 200px">
+			    	<el-option label="首次查房" value="首次查房" ></el-option>
 			      	<el-option label="查房" value="查房" ></el-option>
 			      	<el-option label="手术" value="手术" ></el-option>
 			      	<el-option label="出院" value="出院" ></el-option>
@@ -60,14 +61,14 @@
 			</el-popover>
 			<el-tabs type="border-card" v-model="activeScene" @tab-click="tabClick" class="m-t-10"
 			    closable @tab-remove="removeScene">
-				<el-tab-pane :key="index" :label="scene.name.split('_')[0]+'_'+(index+1)" v-for="(scene,index) in allQuestion.trees" :name="index.toString()" >
-					<div v-if="scene.name.split('_')[0] =='查房'" :ref="'editorElem'+(index+1)"></div>
+				<el-tab-pane :key="scene.name+indexScene" :label="scene.name.split('_')[0]+'_'+(indexScene+1)" v-for="(scene,indexScene) in allQuestion.trees" :name="indexScene.toString()" >
+					<div v-if="scene.name.split('_')[0] =='首次查房'" :ref="'editorElem'+(indexScene+1)" class="editorElem"></div>
 					<div v-else>
 						<el-button :disabled="!showAddButton" type="primary" round class="addBtn" size="small" @click="showQuestinForm" ><i class="el-icon-plus"></i> 添加问题</el-button>
 						<el-tabs v-model="activeName" @tab-click="tabClick1">
 						    <el-tab-pane v-for="item in scene.children" :key="item.id" :label="item.name" :name="item.id">	
-						    	<p class="history" v-if="item.name == '查体' && activeScene == 0"><span>体格检查：</span>{{allQuestion.chatisrc}}</p>
-						    	<el-tabs tab-position="left" v-model="activeClass" v-if="activeScene != 0&&item.name == '报告'">
+						    	<p class="history" v-if="item.name == '查体' && indexScene == 0"><span>体格检查：</span>{{allQuestion.chatisrc}}</p>
+						    	<el-tabs tab-position="left" v-model="activeClass" v-if="indexScene != 0&&item.name == '报告'">
 									<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
 										
 										<el-table :data="it.parms">
@@ -189,7 +190,7 @@
 											          title="设为上个问题的子问题"
 											          v-if="i.subQuestionList && i.subQuestionList.length == 0 && index != 0"
 											          type="text" @click.native.prevent="setSubQuse(it.parms,index)">
-											          <i class="el-icon-s-unfold"></i></el-button>
+											          <i class="el-icon-s-fold"></i></el-button>
 											         
 												</div> 
 												<div style="width: 100%;" v-for="(sub,ind) in i.subQuestionList" :key="sub.id" v-if="i.subQuestionList">
@@ -225,18 +226,18 @@
 						    	<el-tabs tab-position="left" v-model="activeClass">
 						    		<el-tab-pane label="诊断" name="诊断">
 						    			<div class="scroll-y">
-										<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].support">
+										<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
 											<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
 												<span class="pos-a" style="right: 60px">难度：
 													<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-												      	<el-option label="0" value="0" >el-icon-s-unfold</el-option>
+												      	<el-option label="0" value="0" ></el-option>
 												      	<el-option label="1" value="1" ></el-option>
 												      	<el-option label="2" value="2" ></el-option>
 												      	<el-option label="3" value="3" ></el-option>
 												    </el-select>
 												</span>
 												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].support,index)">删除</a>
+												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
 											</p>
 											<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
 											<el-table :data="item.supportQuestions" :show-header="false">
@@ -262,12 +263,12 @@
 										        </el-table-column>
 										    </el-table>
 										</div>
-										<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
+										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
 									</el-tab-pane>
 									<el-tab-pane label="鉴别诊断" name="鉴别诊断">
 										<div class="scroll-y">
-										<div class="zhenduanItem" v-for="(item,index) in zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport">
+										<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport">
 											<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
 												<span class="pos-a" style="right: 60px">难度：
 													<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
@@ -278,7 +279,7 @@
 												    </el-select>
 												</span>
 												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport,index)">删除</a>
+												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport,index)">删除</a>
 											</p>
 											<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
 											<el-table :data="item.supportQuestions" :show-header="false">
@@ -327,14 +328,15 @@
 										        </el-table-column>
 										    </el-table>
 										</div>
-										<p v-if="zhenduan[activeScene][allQuestion.trees[activeScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
+										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
 									</el-tab-pane>
+
 								</el-tabs>
 						    </el-tab-pane>
-						    <el-tab-pane label="处置" name="处置">
+						 	<el-tab-pane label="处置" name="处置">
 								<el-tabs tab-position="left" v-model="activeClass">
-						    		<el-tab-pane v-for="(item,index) in chuzhi[activeScene][allQuestion.trees[activeScene].name]" :key="item.diagnosisName" :label="item.diagnosisName+'('+item.supportQuestions.length+')'" :name="item.diagnosisName">
+						    		<el-tab-pane v-for="(item,index) in chuzhi[indexScene][allQuestion.trees[indexScene].name]" :key="item.diagnosisName" :label="item.diagnosisName+'('+item.supportQuestions.length+')'" :name="item.diagnosisName">
 						    			<div class="scroll-y">
 										<el-table :data="item.supportQuestions">
 											<el-table-column type="expand" v-if="item.diagnosisName == '检验'" >
@@ -596,6 +598,7 @@
 		</el-dialog>
 		<div class="clearfix m-t-20">
 			<el-button type="success" round class="floatRight m-l-10" size="small" @click="save('1')"> 发 布 </el-button>
+			<el-button type="warning" round class="floatRight m-l-10" size="small" @click="save('2')"> 已审核 </el-button>
 			<el-button type="primary" round class="floatRight " size="small" @click="save('0')"> 保 存 </el-button>
 		</div>
     </div>
@@ -639,6 +642,7 @@ export default {
 	    		mrKey:'',
 			    profession:'',
 			    hospitalizedTime:'',
+			    integrity:0 //病例完整度
 	    	},
 	    	questionForm:{
 	    		classifyId: "",
@@ -661,7 +665,7 @@ export default {
 	        checkrecordList:[],//查房记录
 	        gist:[],  //依据
 	        fileList: [],
-	        editor: null, //富文本编辑相关数据
+	        editor: [], //富文本编辑相关数据
       		editorContent:''
 	    }
 	},
@@ -702,7 +706,7 @@ export default {
 				})
 			}
 		}
-		//为了防止火狐浏览器拖拽的时候以新标签打开，此代码真实有效
+		//为了防止火狐浏览器拖拽的时候以新标签打开
         document.body.ondrop = function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -731,10 +735,18 @@ export default {
 			this.formInline.symptoms = data.symptoms;
 			this.formInline.time = data.suggestDuration;
      		this.formInline.grade = data.difficultyDegree;
+     		this.formInline.integrity = parseInt(data.integrity);
 			this.allQuestion = data;
 			this.zhenduan = data.zhenduan;
 			this.chuzhi = data.chuzhi;
 			this.gist = this.allQuestion.trees[this.activeScene].children;
+			this.$nextTick(function(){
+				for (var i = 0; i < this.allQuestion.trees.length; i++) {
+					if (this.allQuestion.trees[i].name.split('_')[0] == '首次查房') {
+						this.createEditor(this.allQuestion.trees[i].chafangshi,i+1)
+					}
+				}
+			})
   		},
   		//选择查房记录
   		selectCheckRecord(data){
@@ -748,16 +760,16 @@ export default {
 	        }).catch(() => {}); 
   		},
   		//创建富文本
-  		createEditor(index){
-  			this.editor = new E(this.$refs['editorElem'+index]);
-	        this.editor.customConfig.menus = ['link'];
-	        this.editor.create(); // 创建富文本实例
-	    	this.editor.txt.html('<p>入CCU后患者<a href="5" target="_blank">胸痛持续不缓解</a>，予吗啡3mg静脉冲入后2min症状逐渐好转，后安静入睡，未诉不适。异舒吉<a href="4" target="_blank">30ug/min</a>静脉泵入，心电监护示血压110/60mmHg，心率65次/分，氧饱和度100%。查体:颈静脉无怒张。双肺呼吸音清，未闻及干湿罗音。心率62次/分，心律齐，心音有力，A2=P2，各瓣膜听诊区未闻及杂音，未闻及心包摩擦音。腹软无压痛、反跳痛，肠鸣音正常，4次/分。双下肢无水肿。 TIMI评分:5分；GRACE评分103分；CRUSADE评分26分。 化验回报: 2017-08-08 生化:快速丙氨酸氨基转移酶 22(U/L)，快速肌酸激酶同工酶MB 75(U/L)↑，快速肌酸激酶 515(U/L)↑，快速钾 3.3(mmol/L)↓，快速肌酐 67(umol/L)； 2017-08-08 急查肌钙蛋白T 0.271(ng/ml)↑，急查N末端脑钠肽前体 172(pg/ml)↑； 2017-08-08 D-二聚体定量 0.03(μg/ml)； 2017-08-08 血常规:白细胞 10.36(*10^9/L)↑，血红蛋白 133(g/L)，血小板 197(*10^9/L)，中性粒细胞百分数 74.6(%)；&nbsp;&nbsp;&nbsp;<br></p>')
-	    
+  		createEditor(data,index){
+  			let editor = new E(this.$refs['editorElem'+index]);
+	        editor.customConfig.menus = ['link','undo'];
+	        editor.create(); // 创建富文本实例
+	    	editor.txt.html(data)
+	    	this.editor.push(editor)
   		},
   		//添加和删除场景
      	addScene(){
-			if (this.sceneName == '查房') {
+			if (this.sceneName == '首次查房') {
 				recordApi.getChafang({
 					patientId:this.patientId,
 					visitId:this.visitId,
@@ -782,21 +794,38 @@ export default {
 			}).then(response=>{
 				this.loading = false;
 				if (response.data.errCode == '0') {
-					let sc = response.data.data.trees[0];
-					let scName = sc.name;
-					scName = scName+"_"+(this.allQuestion.trees.length+1);
-					this.allQuestion.trees.push(sc);
-					this.allQuestion.trees[this.allQuestion.trees.length-1].name = scName;
-					this.allQuestion.zhenduan.push({
-						[scName]:response.data.data.zhenduan[0][this.sceneName]
-					});
-					this.allQuestion.chuzhi.push({
-						[scName]:response.data.data.chuzhi[0][this.sceneName]
-					})
+					let sc = '',scName = '';
+					
+					if (this.sceneName == '首次查房') {
+						sc = response.data.data.chafang[0];
+						scName = sc.name;
+						scName = scName+"_"+(this.allQuestion.trees.length+1);
+				
+						this.allQuestion.zhenduan.push({});
+						this.allQuestion.chuzhi.push({});
+						this.$nextTick(function(){
+							this.createEditor(sc.chafangshi,this.allQuestion.trees.length);
+						})
+					}else{
+						sc = response.data.data.trees[0];
+						scName = sc.name;
+						scName = scName+"_"+(this.allQuestion.trees.length+1);
+						sc.name = scName;
+						this.editor.push({})
+						this.allQuestion.zhenduan.push({
+							[scName]:response.data.data.zhenduan[0][this.sceneName]
+						});
+						this.allQuestion.chuzhi.push({
+							[scName]:response.data.data.chuzhi[0][this.sceneName]
+						})
+						this.activeName = sc.children[0].id;
+		    			this.activeClass = sc.children[0].children[0].id;
+					}	
+					this.allQuestion.trees.push(sc);				
 					this.$nextTick(function(){
-						this.activeScene = (this.allQuestion.trees.length-1).toString();
-						if (scName.split('_')[0] =='查房') this.createEditor(this.allQuestion.trees.length);
+						this.activeScene = this.allQuestion.trees.length-1 + '';
 					})
+					console.log(this.allQuestion)
 				}else{
 					this.$message({
 			            type: 'warning',
@@ -819,21 +848,23 @@ export default {
 		          cancelButtonText: '取消',
 		          type: 'warning'
 		        }).then(() => {
-		        	console.log(this.allQuestion.trees[Indexing])
 		        	recordApi.deleteSampleScene({
+		        		sampleId:this.$route.query.sampleId,
 						sampleSceneNameAndId:this.allQuestion.trees[Indexing].name
 					}).then(response=>{
 						this.$message({
 				            type: 'success',
 				            message: '删除成功!'
 				        });
-				        if (parseInt(this.activeScene) >= Indexing ) this.activeScene = "0";
-				        console.log(this.activeScene )			        
-				        this.activeName = this.allQuestion.trees[0].children[0].id;
-	    				this.activeClass = this.allQuestion.trees[0].children[0].children[0].id;
+				        this.activeScene = "0";
+				        if (this.allQuestion.trees[Indexing].name.split('_')[0] !='首次查房') {        
+					        this.activeName = this.allQuestion.trees[0].children[0].id;
+		    				this.activeClass = this.allQuestion.trees[0].children[0].children[0].id;
+				        }
+				        this.editor.splice(Indexing,1); //删除富文本编辑器
 				        this.allQuestion.trees.splice(Indexing,1);
 				        this.allQuestion.zhenduan.splice(Indexing,1);
-				        this.allQuestion.chuzhi.splice(Indexing,1);
+					    this.allQuestion.chuzhi.splice(Indexing,1);	
 					})
 		        })
      		}
@@ -843,9 +874,11 @@ export default {
      	},
      	tabClick(tag){
      		this.activeSceneName = tag.label;
-     		this.showAddButton = true;
-     		this.activeName = this.allQuestion.trees[tag.index].children[0].id;
-	    	this.activeClass = this.allQuestion.trees[tag.index].children[0].children[0].id;
+     		if (tag.label.split('_')[0] !='首次查房') {
+     			this.showAddButton = true;
+     			this.activeName = this.allQuestion.trees[tag.index].children[0].id;
+	    		this.activeClass = this.allQuestion.trees[tag.index].children[0].children[0].id;
+     		}
      	},
      	//点击一级分类
      	tabClick1(tag){
@@ -1040,7 +1073,7 @@ export default {
 		            message: '上传成功!'
 		        });
 		        this.loading = false;
-		        this.getListSampleDetailBysample();
+		        this.sava(this.$route.query.status);
 			})
      	},
      	handleImgSuccess(res, file) {
@@ -1074,7 +1107,7 @@ export default {
 			            type: 'success',
 			            message: '删除成功!'
 			        });
-			        this.getListSampleDetailBysample();
+			        this.sava(this.$route.query.status);
 				})
 	        }).catch(() => {});
 	    },
@@ -1091,7 +1124,26 @@ export default {
      		this.allQuestion.suggestDuration = this.formInline.time;
      		this.allQuestion.difficultyDegree = this.formInline.grade;
      		this.allQuestion.status = type;
-
+     		//this.allQuestion.status = type=='1'?type: this.$route.query.status;
+     		let j = 0;
+     		for (var i = 0; i < this.allQuestion.trees.length; i++) {
+     			if (this.allQuestion.trees[i].name.split('_')[0] == '首次查房') {
+     				this.allQuestion.trees[i].keyWordList = [];
+     				this.allQuestion.trees[i].chafangshi = this.editor[j].txt.html();
+     				let div = document.createElement('div');
+     				div.innerHTML = this.editor[j].txt.html();
+     				let doc = div.childNodes[0];
+     				let as = doc.getElementsByTagName('a');
+     				for (var x = 0, y=as.length; x < y; x++) {
+     					let a = {
+			                keyword:as[x].innerHTML,
+			                score:as[x].attributes["href"].value 
+			            }
+			            this.allQuestion.trees[i].keyWordList.push(a)
+     				}
+     				j++
+     			}
+     		}
         	if (this.$route.query.type == 'edit') {
      			recordApi.updateRecord({
 					sampleId:this.$route.query.sampleId,
@@ -1135,11 +1187,7 @@ export default {
 	    },
 	    openBMJ(){
 	    	let main = '';
-	    	if (window.location.host == '192.168.132.13:8804') {
-	    		main = 'http://10.2.3.96:8080'
-	    	}else{
-	    		main = 'http://192.168.8.74:8080'
-	    	}
+	    	main = process.env.NODE_ENV == 'production'?'http://10.2.3.96:8080':'http://192.168.8.74:8080';
 	    	this.openWindow(main+'/search/ZH_CN?q='+this.formInline.disease)
 	    },
 	    //查看影像
@@ -1251,5 +1299,9 @@ export default {
 	.checkrecordList li:hover{
 		background-color: #f0f5fa;
 	}
+	
+}
+/deep/ .editorElem .w-e-text-container a{
+	color:blue;
 }
 </style>

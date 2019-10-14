@@ -2,6 +2,7 @@
   <div class="hello">
     <div ref="editorElem" style="text-align:left;"></div>
     <el-button @click="setHtml">默认按钮</el-button>
+    <p id="chafang"></p>
   </div>
 </template>
 
@@ -54,14 +55,25 @@ export default {
         var as = document.getElementsByTagName('a');
         for(var i=0,j=as.length;i<j;i++){
             let a = {
-                name:as[i].innerHTML,
+                keyword:as[i].innerHTML,
                 score:as[i].attributes["href"].value 
             }
 
             l.push(a)
         }
-        console.log(l)
-        console.log(this.editor.txt.html())
+        // console.log(l)
+        // console.log(this.editor.txt.html())
+
+        //this.editor.txt.html()[10] = '<input type="text">'
+        for (var i = 0; i < as.length; i++) {
+          let index = this.editor.txt.html().indexOf(as[i].outerHTML);
+          var para = document.createElement("input");//新建标签元素
+          para.type = "text";
+          as[i].parentNode.insertBefore(para,as[i]);
+          as[i].style.display = "none"
+        }
+        
+        //document.getElementById('chafang').innerHTML=this.editor.txt.html()
     }
   }
 }

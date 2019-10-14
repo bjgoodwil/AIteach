@@ -95,6 +95,7 @@ export default {
 	    }
 	},
 	mounted() {
+		console.log(process.env.BASE_API)
 		if (JSON.parse(localStorage.getItem("uerInfo")).permissionId != '') {
 			this.permissionId = JSON.parse(JSON.parse(localStorage.getItem("uerInfo")).permissionId);
 			for (var i = 0; i < this.permissionId.length; i++) {
