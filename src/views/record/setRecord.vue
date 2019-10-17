@@ -64,11 +64,11 @@
 				<el-tab-pane :key="scene.name+indexScene" :label="scene.name.split('_')[0]+'_'+(indexScene+1)" v-for="(scene,indexScene) in allQuestion.trees" :name="indexScene.toString()" >
 					<div v-if="scene.name.split('_')[0] =='首次查房'" :ref="'editorElem'+(indexScene+1)" class="editorElem"></div>
 					<div v-else>
-						<el-button :disabled="!showAddButton" type="primary" round class="addBtn" size="small" @click="showQuestinForm" ><i class="el-icon-plus"></i> 添加问题</el-button>
+						<el-button :disabled="!showAddButton" type="primary" round class="addBtn" size="small" @click="showQuestinForm" ><i class="el-icon-plus"></i> 添加</el-button>
 						<el-tabs v-model="activeName" @tab-click="tabClick1">
 						    <el-tab-pane v-for="item in scene.children" :key="item.id" :label="item.name" :name="item.id">	
 						    	<p class="history" v-if="item.name == '查体' && indexScene == 0"><span>体格检查：</span>{{allQuestion.chatisrc}}</p>
-						    	<el-tabs tab-position="left" v-model="activeClass" v-if="indexScene != 0&&item.name == '报告'">
+						    	<el-tabs tab-position="left" v-model="activeClass" v-if="item.name == '报告'">
 									<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
 										
 										<el-table :data="it.parms">
@@ -92,7 +92,7 @@
 										        </el-table>
 										      </template>
 										    </el-table-column>
-										    <el-table-column type="expand" v-if="it.name == '检查'" >
+										    <el-table-column type="expand" v-else-if="it.name == '检查'" >
 										      <template slot-scope="props">
 										      	<el-table 
 										            :data="props.row.questionAnswer instanceof Array?props.row.questionAnswer:JSON.parse(props.row.questionAnswer)" stripe>
@@ -124,6 +124,28 @@
 												</el-upload> -->
 										      </template>
 										    </el-table-column>
+										    <el-table-column type="expand" v-else>
+										      <template slot-scope="props">
+										      	<el-input type="textarea" autosize v-model="props.row.questionAnswer" size="small" placeholder="请输入答案"></el-input>
+										      	<el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
+										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
+										        <el-upload
+										          v-else
+												  :id="props.row.id+'_img'"	
+												  class="upload-demo"
+												  multiple
+	  											  :limit="1"
+	  											  :on-exceed="handleExceed"
+												  action=""
+												  :http-request="(file)=>upLoadImg(file,props.row.id)"
+												  :on-success="handleImgSuccess"
+		  										  :before-upload="beforeImgUpload"
+												  :file-list="fileList">
+												  <el-button size="small" type="primary">上传影像</el-button>
+												  <span>只能上传jpg或zip文件</span>
+												</el-upload>
+										      </template>
+										    </el-table-column>
 								    		<el-table-column
 										      type="index"
 										      label="序号"
@@ -134,14 +156,19 @@
 													<el-input size="small" v-model="scope.row.questionName" placeholder="it.name"></el-input>
 									        	</template>
 									        </el-table-column>
-									        <!-- <el-table-column width="100px" label="操作">
+									        <!-- <el-table-column label="得分" width="100px" v-if="activeScene == 0">
+									        	<template slot-scope="scope">
+													<el-input size="small" v-model="scope.row.questionScore" type="number" placeholder="得分"></el-input>
+									        	</template>
+									        </el-table-column> -->
+									        <el-table-column width="100px" label="操作">
 									        	<template slot-scope="scope">
 											        <el-button
 											          title="删除"
 											          type="text" @click.native.prevent="deleteRow(it.parms,scope.$index)">
 											          <i class="el-icon-delete"></i></el-button>
 									        	</template>
-									        </el-table-column> -->
+									        </el-table-column>
 									    </el-table>
 									</el-tab-pane>
 						    	</el-tabs>
@@ -191,7 +218,6 @@
 											          v-if="i.subQuestionList && i.subQuestionList.length == 0 && index != 0"
 											          type="text" @click.native.prevent="setSubQuse(it.parms,index)">
 											          <i class="el-icon-s-fold"></i></el-button>
-											         
 												</div> 
 												<div style="width: 100%;" v-for="(sub,ind) in i.subQuestionList" :key="sub.id" v-if="i.subQuestionList">
 													<div class="questionList textCenter" style="width: 6%;">{{index+1}}-{{ind+1}}</div>
@@ -1073,7 +1099,7 @@ export default {
 		            message: '上传成功!'
 		        });
 		        this.loading = false;
-		        this.sava(this.$route.query.status);
+		        this.save(this.$route.query.status);
 			})
      	},
      	handleImgSuccess(res, file) {
@@ -1107,7 +1133,7 @@ export default {
 			            type: 'success',
 			            message: '删除成功!'
 			        });
-			        this.sava(this.$route.query.status);
+			        this.save(this.$route.query.status);
 				})
 	        }).catch(() => {});
 	    },
@@ -1193,9 +1219,9 @@ export default {
 	    //查看影像
 	    checkImage(id,hasDicomImage,hasImage){
 	    	if (hasDicomImage == 'yes') {
-	    		this.openWindow(process.env.HOST+'/teachai/yingxiang/ImageShare.htm?reportid='+id)
+	    		this.openWindow(process.env.HOST+'teachai/yingxiang/ImageShare.htm?reportid='+id)
 	    	}else if (hasImage == 'yes') {
-	    		this.openWindow(process.env.HOST+'/teachai/yingxiang/dicom/image/'+id+'.jpg')
+	    		this.openWindow(process.env.HOST+'teachai/yingxiang/dicom/image/'+id+'.jpg')
 	    	}else{return false}
 	    },
 	    //浏览器打开新窗口

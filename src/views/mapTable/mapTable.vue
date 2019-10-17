@@ -19,7 +19,7 @@
 				</table>
 				<table style="width: 100%;">
 					<tbody>
-						<draggable v-model="tableData" @update="datadragEnd" :options = "{animation:500}">
+						<!-- <draggable v-model="tableData" @update="datadragEnd" :options = "{animation:500}"> -->
 							<tr v-for="(it,index) in tableData" :key="it.id" class="questionList">
 								<td style="width: 8%">{{index+1}}</td>
 								<td style="width: 36%"><el-input v-model="it.questionName" size="small" placeholder="问题"></el-input></td>
@@ -32,7 +32,7 @@
 							          <i class="el-icon-delete"></i></el-button>
 							    </td>
 							</tr>
-						</draggable>
+						<!-- </draggable> -->
 					</tbody>
 					<p v-if="tableData.length == 0" class="textCenter m-t-10">暂无数据</p>
 				</table>
