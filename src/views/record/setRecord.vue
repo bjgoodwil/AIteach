@@ -110,24 +110,13 @@
 												    <el-table-column label="检查结论" prop="检查结论">
 												    </el-table-column>
 										        </el-table>
-										        <!-- <el-upload
-												  class="upload-demo"
-												  action=""
-												  :http-request="upLoadImg"
-												  :on-preview="handlePictureCardPreview"
-												  :on-success="handleImgSuccess"
-		  										  :before-upload="beforeImgUpload"
-												  list-type="picture-card"
-												  :file-list="fileList">
-												  <i class="el-icon-plus"></i>
-												  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2m</div>
-												</el-upload> -->
 										      </template>
 										    </el-table-column>
 										    <el-table-column type="expand" v-else>
 										      <template slot-scope="props">
 										      	<el-input type="textarea" autosize v-model="props.row.questionAnswer" size="small" placeholder="请输入答案"></el-input>
-										      	<el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
+										      	<upload-image :questionData="props.row" v-on:save="save"></upload-image>
+										      	<!-- <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
 										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
 										        <el-upload
 										          v-else
@@ -143,7 +132,7 @@
 												  :file-list="fileList">
 												  <el-button size="small" type="primary">上传影像</el-button>
 												  <span>只能上传jpg或zip文件</span>
-												</el-upload>
+												</el-upload> -->
 										      </template>
 										    </el-table-column>
 								    		<el-table-column
@@ -252,43 +241,45 @@
 						    	<el-tabs tab-position="left" v-model="activeClass">
 						    		<el-tab-pane label="诊断" name="诊断">
 						    			<div class="scroll-y">
-										<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
-											<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
-												<span class="pos-a" style="right: 60px">难度：
-													<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-												      	<el-option label="0" value="0" ></el-option>
-												      	<el-option label="1" value="1" ></el-option>
-												      	<el-option label="2" value="2" ></el-option>
-												      	<el-option label="3" value="3" ></el-option>
-												    </el-select>
-												</span>
-												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
-											</p>
-											<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
-											<el-table :data="item.supportQuestions" :show-header="false">
-									    		<el-table-column
-											      type="index"
-											      label="序号"
-											      width="50">
-											    </el-table-column>
-										        <el-table-column prop="questionName">	
-										        </el-table-column>
-										        <el-table-column label="得分" width="120">
-										        	<template slot-scope="scope">
-										        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
-										        	</template>
-										        </el-table-column>
-										        <el-table-column width="100px" label="操作">
-										        	<template slot-scope="scope">
-												        <el-button
-												          title="删除"
-												          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
-												          <i class="el-icon-delete"></i></el-button>
-										        	</template>
-										        </el-table-column>
-										    </el-table>
-										</div>
+						    				<draggable v-model="zhenduan[indexScene][allQuestion.trees[indexScene].name].support" @update="datadragEnd" :options = "{animation:500}">
+												<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
+													<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
+														<span class="pos-a" style="right: 60px">难度：
+															<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
+														      	<el-option label="0" value="0" ></el-option>
+														      	<el-option label="1" value="1" ></el-option>
+														      	<el-option label="2" value="2" ></el-option>
+														      	<el-option label="3" value="3" ></el-option>
+														    </el-select>
+														</span>
+														<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+														<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
+													</p>
+													<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
+													<el-table :data="item.supportQuestions" :show-header="false">
+											    		<el-table-column
+													      type="index"
+													      label="序号"
+													      width="50">
+													    </el-table-column>
+												        <el-table-column prop="questionName">	
+												        </el-table-column>
+												        <el-table-column label="得分" width="120">
+												        	<template slot-scope="scope">
+												        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
+												        	</template>
+												        </el-table-column>
+												        <el-table-column width="100px" label="操作">
+												        	<template slot-scope="scope">
+														        <el-button
+														          title="删除"
+														          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
+														          <i class="el-icon-delete"></i></el-button>
+												        	</template>
+												        </el-table-column>
+												    </el-table>
+												</div>
+											</draggable>
 										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
 									</el-tab-pane>
@@ -357,7 +348,6 @@
 										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
 									</el-tab-pane>
-
 								</el-tabs>
 						    </el-tab-pane>
 						 	<el-tab-pane label="处置" name="处置">
@@ -444,24 +434,7 @@
 											        	</template>
 												    </el-table-column>
 										        </el-table>
-										        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检查')">添加项目</el-button>
-										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
-										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
-										        <el-upload
-										          v-else
-												  :id="props.row.id+'_img'"	
-												  class="upload-demo"
-												  multiple
-	  											  :limit="1"
-	  											  :on-exceed="handleExceed"
-												  action=""
-												  :http-request="(file)=>upLoadImg(file,props.row.id)"
-												  :on-success="handleImgSuccess"
-		  										  :before-upload="beforeImgUpload"
-												  :file-list="fileList">
-												  <el-button size="small" type="primary">上传影像</el-button>
-												  <span>只能上传jpg或zip文件</span>
-												</el-upload>
+										        <upload-image :questionData="props.row" v-on:save="save"></upload-image>
 										      </template>
 										    </el-table-column>
 								    		<el-table-column
@@ -595,7 +568,6 @@
 				      	<el-option label="3" value="3" ></el-option>
 				    </el-select>
 			  	</el-form-item>
-			  	
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 			    <el-button @click="dialogVisibleQuestion = false">取 消</el-button>
@@ -626,6 +598,11 @@
 			<el-button type="success" round class="floatRight m-l-10" size="small" @click="save('1')"> 发 布 </el-button>
 			<el-button type="warning" round class="floatRight m-l-10" size="small" @click="save('2')"> 已审核 </el-button>
 			<el-button type="primary" round class="floatRight " size="small" @click="save('0')"> 保 存 </el-button>
+			<el-form :inline="true" >
+			  <el-form-item label="审批人：">
+			    <el-input v-model="formInline.updateByUserName" placeholder="审核人" size="small"></el-input>
+			  </el-form-item>
+			</el-form>
 		</div>
     </div>
 </template>
@@ -634,9 +611,10 @@ import draggable from 'vuedraggable';//拖拽排序组件
 import {recordApi} from '@/services/apis/record/record';
 import {formatDate} from '@/util/dataFormat';
 import E from "wangeditor"; //富文本编辑
+import UpLoadImage from '@/components/sampleDetail/uploadImage'
 export default {
 	name: 'setRecord',
-	components: {draggable},
+	components: {draggable, "upload-image":UpLoadImage},
 	data () {
 	    return {
 	    	loading:false,
@@ -668,7 +646,8 @@ export default {
 	    		mrKey:'',
 			    profession:'',
 			    hospitalizedTime:'',
-			    integrity:0 //病例完整度
+			    integrity:0, //病例完整度
+			    updateByUserName:''//审核人
 	    	},
 	    	questionForm:{
 	    		classifyId: "",
@@ -737,7 +716,6 @@ export default {
             event.preventDefault();
             event.stopPropagation();
         }   
-        
 	},
   	methods: {
   		//根据Sample查询数据
@@ -762,6 +740,7 @@ export default {
 			this.formInline.time = data.suggestDuration;
      		this.formInline.grade = data.difficultyDegree;
      		this.formInline.integrity = parseInt(data.integrity);
+     		this.formInline.updateByUserName = data.updateByUserName;
 			this.allQuestion = data;
 			this.zhenduan = data.zhenduan;
 			this.chuzhi = data.chuzhi;
@@ -960,7 +939,7 @@ export default {
      					this.chuzhi[this.activeScene][this.allQuestion.trees[this.activeScene].name][i].supportQuestions.push({
      						questionName: formParam.diagnosisName,
 							score: formParam.questionScore,
-							questionAnswer:'[]',
+							questionAnswer:[],
 							difficultyDegree:formParam.difficultyDegree,
 							hasDicomImage: "no",
 							hasImage: "no",
@@ -1077,66 +1056,8 @@ export default {
 	     		})
      		}	
      	},
-     	handleExceed(files, fileList) {
-	        this.$message.warning(`当前限制选择 1 个文件`);
-	    },
-     	upLoadImg(file,id){
-     		this.loading = true;
-     		let imgType = ''
-		    var testmsg=file.file.name.substring(file.file.name.lastIndexOf('.')+1);
 
-	        if (testmsg == 'zip') {
-	        	imgType = 'dicom'
-	        }else if(testmsg == 'jpg'){
-	        	imgType = 'image'
-	        }else{
-	        	this.$message.error('只能上传 jpg和zip 文件!');
-	        	return false;
-	        }
-		    recordApi.uploadSampleImage({files:file.file,handleId:id,imagetype:imgType,jianchaUpload:true}).then(response=>{
-				this.$message({
-		            type: 'success',
-		            message: '上传成功!'
-		        });
-		        this.loading = false;
-		        this.save(this.$route.query.status);
-			})
-     	},
-     	handleImgSuccess(res, file) {
-	    	this.$message({
-	            type: 'success',
-	            message: '上传成功!'
-	        });
-	    },
-	    beforeImgUpload(file) {
-	    	var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)				
-			const extension = testmsg === 'zip'
-			const extension2 = testmsg === 'jpg'
-	        //const isLt2M = file.size / 1024 / 1024 < 2;
-	        if (!extension && !extension2) {
-	          this.$message.error('只能上传 jpg和zip 文件!');
-	        }
-	        // if (!isLt2M) {
-	        //   this.$message.error('文件大小不能超过 2MB!');
-	        // }
-	        return extension || extension2;
-	    },
-	    deleteImage(id,hasDicomImage,hasImage){
-	    	this.$confirm('确定删除该项目?', '提示', {
-	          confirmButtonText: '确定',
-	          cancelButtonText: '取消',
-	          type: 'warning'
-	        }).then(() => {
-	        	hasDicomImage = 'no',hasImage = 'no';
-		    	recordApi.deleteSampleImage({handleId:id,imagetype:''}).then(response=>{
-					this.$message({
-			            type: 'success',
-			            message: '删除成功!'
-			        });
-			        this.save(this.$route.query.status);
-				})
-	        }).catch(() => {});
-	    },
+	    //设置问题序号
 	    setQuestionNum(item,index){
 	    	item.questionNum = index+1;
 	    	return item.id;
@@ -1149,6 +1070,7 @@ export default {
      		this.allQuestion.chiefComplaint = this.formInline.chiefComplaint;
      		this.allQuestion.suggestDuration = this.formInline.time;
      		this.allQuestion.difficultyDegree = this.formInline.grade;
+     		this.allQuestion.updateByUserName = this.formInline.updateByUserName || JSON.parse(localStorage.getItem("uerInfo")).name;
      		this.allQuestion.status = type;
      		//this.allQuestion.status = type=='1'?type: this.$route.query.status;
      		let j = 0;
@@ -1215,14 +1137,6 @@ export default {
 	    	let main = '';
 	    	main = process.env.NODE_ENV == 'production'?'http://10.2.3.96:8080':'http://192.168.8.74:8080';
 	    	this.openWindow(main+'/search/ZH_CN?q='+this.formInline.disease)
-	    },
-	    //查看影像
-	    checkImage(id,hasDicomImage,hasImage){
-	    	if (hasDicomImage == 'yes') {
-	    		this.openWindow(process.env.HOST+'teachai/yingxiang/ImageShare.htm?reportid='+id)
-	    	}else if (hasImage == 'yes') {
-	    		this.openWindow(process.env.HOST+'teachai/yingxiang/dicom/image/'+id+'.jpg')
-	    	}else{return false}
 	    },
 	    //浏览器打开新窗口
 	    openWindow(url){
@@ -1325,7 +1239,6 @@ export default {
 	.checkrecordList li:hover{
 		background-color: #f0f5fa;
 	}
-	
 }
 /deep/ .editorElem .w-e-text-container a{
 	color:blue;
