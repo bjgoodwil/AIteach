@@ -116,23 +116,6 @@
 										      <template slot-scope="props">
 										      	<el-input type="textarea" autosize v-model="props.row.questionAnswer" size="small" placeholder="请输入答案"></el-input>
 										      	<upload-image :questionData="props.row" v-on:save="save"></upload-image>
-										      	<!-- <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="checkImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)">查看影像</el-button>
-										        <el-button type="text" v-if="props.row.hasDicomImage == 'yes' || props.row.hasImage == 'yes'" @click="deleteImage(props.row.id,props.row.hasDicomImage,props.row.hasImage)" style="color: red">删除影像</el-button>
-										        <el-upload
-										          v-else
-												  :id="props.row.id+'_img'"	
-												  class="upload-demo"
-												  multiple
-	  											  :limit="1"
-	  											  :on-exceed="handleExceed"
-												  action=""
-												  :http-request="(file)=>upLoadImg(file,props.row.id)"
-												  :on-success="handleImgSuccess"
-		  										  :before-upload="beforeImgUpload"
-												  :file-list="fileList">
-												  <el-button size="small" type="primary">上传影像</el-button>
-												  <span>只能上传jpg或zip文件</span>
-												</el-upload> -->
 										      </template>
 										    </el-table-column>
 								    		<el-table-column
@@ -241,45 +224,48 @@
 						    	<el-tabs tab-position="left" v-model="activeClass">
 						    		<el-tab-pane label="诊断" name="诊断">
 						    			<div class="scroll-y">
-						    				<draggable v-model="zhenduan[indexScene][allQuestion.trees[indexScene].name].support" @update="datadragEnd" :options = "{animation:500}">
-												<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
-													<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
-														<span class="pos-a" style="right: 60px">难度：
-															<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-														      	<el-option label="0" value="0" ></el-option>
-														      	<el-option label="1" value="1" ></el-option>
-														      	<el-option label="2" value="2" ></el-option>
-														      	<el-option label="3" value="3" ></el-option>
-														    </el-select>
-														</span>
-														<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-														<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
-													</p>
-													<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
-													<el-table :data="item.supportQuestions" :show-header="false">
-											    		<el-table-column
-													      type="index"
-													      label="序号"
-													      width="50">
-													    </el-table-column>
-												        <el-table-column prop="questionName">	
-												        </el-table-column>
-												        <el-table-column label="得分" width="120">
-												        	<template slot-scope="scope">
-												        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
-												        	</template>
-												        </el-table-column>
-												        <el-table-column width="100px" label="操作">
-												        	<template slot-scope="scope">
-														        <el-button
-														          title="删除"
-														          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
-														          <i class="el-icon-delete"></i></el-button>
-												        	</template>
-												        </el-table-column>
-												    </el-table>
-												</div>
-											</draggable>
+						    				
+											<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
+												<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
+													<el-input size="small" type="number" v-model="item.diagnosisNumber" class="pos-a" style="width: 144px">
+									        			<template slot="prepend">第</template>
+									        			<template slot="append">诊断</template>
+													</el-input>
+													<span class="pos-a" style="right: 60px">难度：
+														<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
+													      	<el-option label="0" value="0" ></el-option>
+													      	<el-option label="1" value="1" ></el-option>
+													      	<el-option label="2" value="2" ></el-option>
+													      	<el-option label="3" value="3" ></el-option>
+													    </el-select>
+													</span>
+													<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+													<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
+												</p>
+												<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
+												<el-table :data="item.supportQuestions" :show-header="false">
+										    		<el-table-column
+												      type="index"
+												      label="序号"
+												      width="50">
+												    </el-table-column>
+											        <el-table-column prop="questionName">	
+											        </el-table-column>
+											        <el-table-column label="得分" width="120">
+											        	<template slot-scope="scope">
+											        		<el-input type="number" v-model="scope.row.score" size="small" placeholder="得分" style="width: 62px"></el-input>
+											        	</template>
+											        </el-table-column>
+											        <el-table-column width="100px" label="操作">
+											        	<template slot-scope="scope">
+													        <el-button
+													          title="删除"
+													          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
+													          <i class="el-icon-delete"></i></el-button>
+											        	</template>
+											        </el-table-column>
+											    </el-table>
+											</div>
 										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
 									</el-tab-pane>
@@ -434,6 +420,7 @@
 											        	</template>
 												    </el-table-column>
 										        </el-table>
+										        <el-button plain style="width: 100%" icon="el-icon-circle-plus-outline" @click="addCheck(props.row.questionAnswer,'检查')">添加项目</el-button>
 										        <upload-image :questionData="props.row" v-on:save="save"></upload-image>
 										      </template>
 										    </el-table-column>
@@ -1162,7 +1149,7 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
 .setRecord{
 	.integrity{
 		width: 650px;margin-top: -18px;margin-left: 200px;font-size: 14px;
@@ -1238,6 +1225,9 @@ export default {
 	}
 	.checkrecordList li:hover{
 		background-color: #f0f5fa;
+	}
+	.el-input-group__append, .el-input-group__prepend{
+		padding: 0 10px;
 	}
 }
 /deep/ .editorElem .w-e-text-container a{
