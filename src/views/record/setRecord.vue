@@ -589,6 +589,9 @@
 			  <el-form-item label="审批人：">
 			    <el-input v-model="formInline.updateByUserName" placeholder="审核人" size="small"></el-input>
 			  </el-form-item>
+			  <!-- <el-form-item label="考察点：">
+			    <el-input v-model="formInline.teachaiPoint" placeholder="考察点" size="small" style="width: 380px;"></el-input>
+			  </el-form-item> -->
 			</el-form>
 		</div>
     </div>
@@ -634,7 +637,8 @@ export default {
 			    profession:'',
 			    hospitalizedTime:'',
 			    integrity:0, //病例完整度
-			    updateByUserName:''//审核人
+			    updateByUserName:'',//审核人
+			    teachaiPoint:''//考察点
 	    	},
 	    	questionForm:{
 	    		classifyId: "",
@@ -644,8 +648,7 @@ export default {
 				questionName: "",
 				questionPath: "",
 				questionScore: 0,
-				subQuestionList: [],
-				//添加诊断，处置
+				subQuestionList: [],//添加诊断，处置
 				diagnosisName:'',
 	    	},//添加问题表单
 	        allQuestion:[], //问诊，查体，院前检查的问题
@@ -728,6 +731,7 @@ export default {
      		this.formInline.grade = data.difficultyDegree;
      		this.formInline.integrity = parseInt(data.integrity);
      		this.formInline.updateByUserName = data.updateByUserName;
+     		this.formInline.teachaiPoint = data.teachaiPoint;
 			this.allQuestion = data;
 			this.zhenduan = data.zhenduan;
 			this.chuzhi = data.chuzhi;
@@ -1058,6 +1062,7 @@ export default {
      		this.allQuestion.suggestDuration = this.formInline.time;
      		this.allQuestion.difficultyDegree = this.formInline.grade;
      		this.allQuestion.updateByUserName = this.formInline.updateByUserName || JSON.parse(localStorage.getItem("uerInfo")).name;
+     		this.allQuestion.teachaiPoint = this.formInline.teachaiPoint;
      		this.allQuestion.status = type;
      		//this.allQuestion.status = type=='1'?type: this.$route.query.status;
      		let j = 0;

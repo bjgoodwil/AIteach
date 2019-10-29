@@ -51,9 +51,9 @@ export default {
         //查看影像
         checkImage(id,hasDicomImage,hasImage){
             if (hasDicomImage == 'yes') {
-                this.openWindow(process.env.HOST+'teachai/yingxiang/ImageShare.htm?reportid='+id)
+                this.openWindow(process.env.BASE_API+'/teachai/yingxiang/ImageShare.htm?reportid='+id)
             }else if (hasImage == 'yes') {
-                this.openWindow(process.env.HOST+'teachai/yingxiang/dicom/image/'+id+'.jpg')
+                this.openWindow(process.env.BASE_API+'/teachai/yingxiang/dicom/image/'+id+'.jpg')
             }else{return false}
         },
         //文件数量限制

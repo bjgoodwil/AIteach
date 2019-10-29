@@ -19,11 +19,12 @@
         </el-card>
         <el-card class="box-card m-t-20">
             <div slot="header" class="clearfix">
-                <span class="p-l-10">多维度统计</span>
+                <span class="p-l-10">多维度统计</span> <el-button type="text" size="mini"><i class="el-icon-warning-outline"></i></el-button>
             </div>
             <div class="text item">
                 <div id="statisticsDimensions " ref="statisticsDimensions" style="height: 360px"></div>
             </div>
+           
         </el-card>
     </div>
 </template>
@@ -180,37 +181,35 @@ export default {
                     },
                     indicator: [
                        { name: '系统性', max: 100},
-                       { name: '精准性', max: 100},
-                       { name: '全面性', max: 100},
-                       { name: '逻辑性', max: 100},
                        { name: '敏捷性', max: 100},
+                       { name: '逻辑性', max: 100},
+                       { name: '拓展性', max: 100},
+                       { name: '多维度', max: 100},
+                       { name: '严谨性', max: 100},
                     ],
-                
+                    triggerEvent: true
                 },
                 series: [{
                     type: 'radar',
-                    tooltip: {
-                        trigger: 'item'
-                    },
-                    
+                    tooltip: { trigger: 'item'},
                     data: [
                         {
-                            value: [60,73,85,40,70],
+                            value: [60,73,85,40,70,40],
                             name: '住培生[一阶段]'
                         },{
-                            value: [64,70,56,48,60],
+                            value: [64,70,56,48,60,50],
                             name: '住培生[二阶段]'
                         },{
-                            value: [86,64,70,54,76],
+                            value: [86,64,70,54,76,60],
                             name: '研究生[硕士]'
                         },{
-                            value: [67,87,85,65,74],
+                            value: [67,87,85,65,74,47],
                             name: '研究生[博士]'
                         },{
-                            value: [65,68,75,60,75],
+                            value: [65,68,75,60,75,53],
                             name: '医学生[本科]'
                         },{
-                            value: [70,86,85,64,73],
+                            value: [70,86,85,64,73,60],
                             name: '医学生[博士]'
                         }
                     ]
@@ -227,5 +226,15 @@ export default {
 .el-card .el-card__header > div span{
     border-left: 4px #068efb solid;
     font-size: 16px;
+}
+.el-icon-warning-outline{
+    font-size: 16px;
+}
+.explain{
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    border-radius: 4px;
+    padding: 6px 10px;
+    position: relative;
 }
 </style>
