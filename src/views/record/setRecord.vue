@@ -589,9 +589,9 @@
 			  <el-form-item label="审批人：">
 			    <el-input v-model="formInline.updateByUserName" placeholder="审核人" size="small"></el-input>
 			  </el-form-item>
-			  <!-- <el-form-item label="考察点：">
+			  <el-form-item label="考察点：">
 			    <el-input v-model="formInline.teachaiPoint" placeholder="考察点" size="small" style="width: 380px;"></el-input>
-			  </el-form-item> -->
+			  </el-form-item>
 			</el-form>
 		</div>
     </div>
