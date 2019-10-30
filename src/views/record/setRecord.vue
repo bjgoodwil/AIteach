@@ -172,12 +172,7 @@
 												<div class="questionAnswer" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></div>
 												<div style="width: 8%"><el-input v-model="i.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
 												<div style="width: 8%">
-													<el-select v-model="i.difficultyDegree" placeholder="难度"size="small" v-if="item.name !== '报告'">
-												      	<el-option label="0" value="0" ></el-option>
-												      	<el-option label="1" value="1" ></el-option>
-												      	<el-option label="2" value="2" ></el-option>
-												      	<el-option label="3" value="3" ></el-option>
-												    </el-select>
+													<difficult-set :value="i.difficultyDegree" v-if="item.name !== '报告'"></difficult-set>
 												    <div style="width: 100%" v-else>--</div>
 												</div>
 												<div style="width: 8%">
@@ -199,12 +194,7 @@
 														<el-input type="textarea" autosize v-model="sub.questionAnswer instanceof Array?sub.questionAnswer.toString().replace(/\[|]/g,''):sub.questionAnswer" size="small" placeholder="请输入答案"></el-input></div>
 													<div class="questionList" style="width: 8%"><el-input v-model="sub.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
 													<div class="questionList" style="width: 8%">
-														<el-select v-model="sub.difficultyDegree" placeholder="难度"size="small">
-													      	<el-option label="0" value="0" ></el-option>
-													      	<el-option label="1" value="1" ></el-option>
-													      	<el-option label="2" value="2" ></el-option>
-													      	<el-option label="3" value="3" ></el-option>
-													    </el-select>
+														<difficult-set :value="sub.difficultyDegree"></difficult-set>
 													</div>
 													<div class="questionList" style="width: 8%">
 														<el-button
@@ -224,7 +214,6 @@
 						    	<el-tabs tab-position="left" v-model="activeClass">
 						    		<el-tab-pane label="诊断" name="诊断">
 						    			<div class="scroll-y">
-						    				
 											<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
 												<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
 													<el-input size="small" type="number" v-model="item.diagnosisNumber" class="pos-a" style="width: 144px">
@@ -232,12 +221,7 @@
 									        			<template slot="append">诊断</template>
 													</el-input>
 													<span class="pos-a" style="right: 60px">难度：
-														<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-													      	<el-option label="0" value="0" ></el-option>
-													      	<el-option label="1" value="1" ></el-option>
-													      	<el-option label="2" value="2" ></el-option>
-													      	<el-option label="3" value="3" ></el-option>
-													    </el-select>
+														<difficult-set :value="item.difficultyDegree" style="width: 62px"></difficult-set>
 													</span>
 													<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 													<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
@@ -274,12 +258,7 @@
 										<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport">
 											<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
 												<span class="pos-a" style="right: 60px">难度：
-													<el-select v-model="item.difficultyDegree" placeholder="难度"size="small" style="width: 62px">
-												      	<el-option label="0" value="0" ></el-option>
-												      	<el-option label="1" value="1" ></el-option>
-												      	<el-option label="2" value="2" ></el-option>
-												      	<el-option label="3" value="3" ></el-option>
-												    </el-select>
+													<difficult-set :value="item.difficultyDegree" style="width: 62px"></difficult-set>
 												</span>
 												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport,index)">删除</a>
@@ -449,12 +428,7 @@
 									        </el-table-column>
 									        <el-table-column label="难度" width="100">
 									        	<template slot-scope="scope">
-									        		<el-select v-model="scope.row.difficultyDegree" placeholder="难度" size="small">
-												      	<el-option label="0" value="0" ></el-option>
-												      	<el-option label="1" value="1" ></el-option>
-												      	<el-option label="2" value="2" ></el-option>
-												      	<el-option label="3" value="3" ></el-option>
-												    </el-select>
+									        		<difficult-set :value="scope.row.difficultyDegree"></difficult-set>
 									        	</template>
 									        </el-table-column>
 									        <el-table-column v-if="item.diagnosisName == '检查'" label="结论查看权限" width="130">
@@ -548,12 +522,7 @@
 					<el-input v-model="questionForm.questionScore" type="number" placeholder="分数" size="small"></el-input> 
 			  	</el-form-item>
 			  	<el-form-item label="难度" class="floatRight" style="width: 240px;" v-if="showDifficultyDegree">
-					<el-select v-model="questionForm.difficultyDegree" placeholder="难度"size="small">
-				      	<el-option label="0" value="0" ></el-option>
-				      	<el-option label="1" value="1" ></el-option>
-				      	<el-option label="2" value="2" ></el-option>
-				      	<el-option label="3" value="3" ></el-option>
-				    </el-select>
+			  		<difficult-set :value="questionForm.difficultyDegree"></difficult-set>
 			  	</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -597,11 +566,21 @@
     </div>
 </template>
 <script>
+import Vue from 'vue';
 import draggable from 'vuedraggable';//拖拽排序组件
 import {recordApi} from '@/services/apis/record/record';
 import {formatDate} from '@/util/dataFormat';
 import E from "wangeditor"; //富文本编辑
-import UpLoadImage from '@/components/sampleDetail/uploadImage'
+import UpLoadImage from '@/components/sampleDetail/uploadImage';
+Vue.component('difficult-set', {
+  props: ['value'],
+  template: `<el-select v-model="value" placeholder="难度" size="small">
+		      	<el-option label="0" value="0" ></el-option>
+		      	<el-option label="1" value="1" ></el-option>
+		      	<el-option label="2" value="2" ></el-option>
+		      	<el-option label="3" value="3" ></el-option>
+		    </el-select>`
+})
 export default {
 	name: 'setRecord',
 	components: {draggable, "upload-image":UpLoadImage},
@@ -791,7 +770,6 @@ export default {
 				this.loading = false;
 				if (response.data.errCode == '0') {
 					let sc = '',scName = '';
-					
 					if (this.sceneName == '首次查房') {
 						sc = response.data.data.chafang[0];
 						scName = sc.name;
@@ -1047,7 +1025,6 @@ export default {
 	     		})
      		}	
      	},
-
 	    //设置问题序号
 	    setQuestionNum(item,index){
 	    	item.questionNum = index+1;

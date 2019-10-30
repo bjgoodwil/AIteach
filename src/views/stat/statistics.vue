@@ -17,14 +17,22 @@
                 <div id="statisticsCaseNumber" ref="statisticsCaseNumber" style="height: 360px"></div>
             </div>
         </el-card>
-        <el-card class="box-card m-t-20">
+        <el-card class="box-card m-t-20 pos-r" ref="elCard">
+            <div class="explain pos-a" :style="tipOffset" v-show="showtooltip">{{tipcontent}}</div>
             <div slot="header" class="clearfix">
                 <span class="p-l-10">多维度统计</span> <el-button type="text" size="mini"><i class="el-icon-warning-outline"></i></el-button>
+                <el-select v-model="timeRange" placeholder="请选择" size="small" class="floatRight" style="width: 100px;">
+                    <el-option  v-for="item in [{label:'近7天', value:7},{label:'近30天', value:30},{label:'近一年', value:365}]"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                </el-select>
             </div>
             <div class="text item">
                 <div id="statisticsDimensions " ref="statisticsDimensions" style="height: 360px"></div>
             </div>
-           
+            
         </el-card>
     </div>
 </template>
@@ -38,7 +46,18 @@ export default {
         return {
             loading1:true,
             loading2:true,
-            
+            timeRange:365, //时间范围
+            showtooltip: false, //显示提示语
+            tipOffset:{},   //描述语偏移量
+            tipcontent:'',  //描述语
+            appraiseList: {
+                严谨性: { text: "诊断与鉴别诊断的全面性评价"},
+                逻辑性: { text: "问诊、查体、诊断的逻辑顺序评价"},
+                系统性: { text: "答题完成率的综合评价"},
+                敏捷性: { text: "答题时间的综合评价"},
+                拓展性: { text: "诊断与鉴别诊断的准确性评价"},
+                多维度: { text: "对整体健康情况做出诊疗的综合评价"},
+            },
         }
     },
     mounted() {
@@ -55,7 +74,6 @@ export default {
                 this.loading1 = false;
                 let responseData = response.data.data;
                 let option = {
-               
                     tooltip: {
                         trigger: 'axis'
                     },
@@ -110,10 +128,6 @@ export default {
             })
             let statisticsCaseNumber = echarts.init(this.$refs.statisticsCaseNumber);
             let option = {
-                // title: {
-                //     text: '世界人口总量',
-                //     subtext: '数据来自网络'
-                // },
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -172,6 +186,7 @@ export default {
                 radar: {
                     // shape: 'circle',
                     name: {
+
                         textStyle: {
                             color: '#fff',
                             backgroundColor: '#999',
@@ -180,12 +195,12 @@ export default {
                        }
                     },
                     indicator: [
-                       { name: '系统性', max: 100},
-                       { name: '敏捷性', max: 100},
-                       { name: '逻辑性', max: 100},
-                       { name: '拓展性', max: 100},
-                       { name: '多维度', max: 100},
-                       { name: '严谨性', max: 100},
+                       { name: '系统性', max: 100,describe:'答题完成率的综合评价'},
+                       { name: '敏捷性', max: 100,describe:'答题时间的综合评价'},
+                       { name: '逻辑性', max: 100,describe:'问诊、查体、诊断的逻辑顺序评价'},
+                       { name: '拓展性', max: 100,describe:'诊断与鉴别诊断的准确性评价'},
+                       { name: '多维度', max: 100,describe:'对整体健康情况做出诊疗的综合评价'},
+                       { name: '严谨性', max: 100,describe:'诊断与鉴别诊断的全面性评价'},
                     ],
                     triggerEvent: true
                 },
@@ -216,6 +231,26 @@ export default {
                 }]
             };
             statisticsDimensions.setOption(option);
+            statisticsDimensions.on('mouseover', params=> {
+                this.showtooltip = true;
+                if(params.componentType == 'radar'){
+                    //console.log(params.event.offsetX+":"+params.event.offsetY)
+                    this.tipcontent = this.appraiseList[params.name].text;
+                    this.tipOffset = {
+                        top:(params.event.offsetY+100) + "px",
+                        left:params.event.offsetX + "px"
+                    }
+                    if (params.event.offsetX < this.$refs.elCard.$el.clientWidth/2) {
+                        this.tipOffset.left = (params.event.offsetX-100) + "px"
+                  
+                    }
+                    
+                    console.log(this.$refs.elCard.$el.clientWidth)
+                } 
+            });
+            statisticsDimensions.on('mouseout', params=> {
+                this.showtooltip = false;
+            });
         }
     }
 }
@@ -235,6 +270,7 @@ export default {
     color: #fff;
     border-radius: 4px;
     padding: 6px 10px;
-    position: relative;
+    max-width: 140px;
+    z-index: 999;
 }
 </style>
