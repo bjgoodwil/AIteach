@@ -170,9 +170,9 @@
 												<div style="width: 6%">{{index+1}}</div>
 												<div class="questionName" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionName" placeholder="请输入问题" ></el-input></div>
 												<div class="questionAnswer" style="width: 35%;"><el-input type="textarea" autosize v-model="i.questionAnswer instanceof Array?i.questionAnswer.toString().replace(/\[|]/g,''):i.questionAnswer" placeholder="请输入答案"></el-input></div>
-												<div style="width: 8%"><el-input v-model="i.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
+												<div style="width: 8%"><el-input v-model="i.questionScore" type="number" size="small" placeholder="得分" @change="numberChange(i)"></el-input></div>
 												<div style="width: 8%">
-													<difficult-set :value="i.difficultyDegree" v-if="item.name !== '报告'"></difficult-set>
+													<difficult-set :value="i" v-if="item.name !== '报告'"></difficult-set>
 												    <div style="width: 100%" v-else>--</div>
 												</div>
 												<div style="width: 8%">
@@ -192,9 +192,9 @@
 														<el-input type="textarea" autosize v-model="sub.questionName" size="small" placeholder="请输入问题"></el-input></div>
 													<div class="questionList" style="width: 35%;">
 														<el-input type="textarea" autosize v-model="sub.questionAnswer instanceof Array?sub.questionAnswer.toString().replace(/\[|]/g,''):sub.questionAnswer" size="small" placeholder="请输入答案"></el-input></div>
-													<div class="questionList" style="width: 8%"><el-input v-model="sub.questionScore" type="number" size="small" placeholder="得分"></el-input></div>
+													<div class="questionList" style="width: 8%"><el-input v-model="sub.questionScore" type="number" size="small" placeholder="得分" @change="numberChange(sub)"></el-input></div>
 													<div class="questionList" style="width: 8%">
-														<difficult-set :value="sub.difficultyDegree"></difficult-set>
+														<difficult-set :value="sub"></difficult-set>
 													</div>
 													<div class="questionList" style="width: 8%">
 														<el-button
@@ -221,7 +221,7 @@
 									        			<template slot="append">诊断</template>
 													</el-input>
 													<span class="pos-a" style="right: 60px">难度：
-														<difficult-set :value="item.difficultyDegree" style="width: 62px"></difficult-set>
+														<difficult-set :value="item" style="width: 62px"></difficult-set>
 													</span>
 													<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 													<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
@@ -253,17 +253,17 @@
 										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].support.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
 									</el-tab-pane>
-									<el-tab-pane label="鉴别诊断" name="鉴别诊断">
+									<el-tab-pane label="鉴别诊断" name="鉴别诊断" v-if="activeScene == 0">
 										<div class="scroll-y">
 										<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport">
 											<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
 												<span class="pos-a" style="right: 60px">难度：
-													<difficult-set :value="item.difficultyDegree" style="width: 62px"></difficult-set>
+													<difficult-set :value="item" style="width: 62px"></difficult-set>
 												</span>
 												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
 												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport,index)">删除</a>
 											</p>
-											<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
+											<!-- <p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
 											<el-table :data="item.supportQuestions" :show-header="false">
 									    		<el-table-column
 											      type="index"
@@ -308,7 +308,7 @@
 												          <i class="el-icon-delete"></i></el-button>
 										        	</template>
 										        </el-table-column>
-										    </el-table>
+										    </el-table> -->
 										</div>
 										<p v-if="zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport.length == 0" class="textCenter m-t-10">暂无数据</p>
 										</div>
@@ -355,6 +355,7 @@
 													          title="删除"
 													          type="text" @click.native.prevent="deleteRow(props.row.questionAnswer,scope.$index)">
 													          <i class="el-icon-delete"></i></el-button>
+
 											        	</template>
 												    </el-table-column>
 										        </el-table>
@@ -428,7 +429,7 @@
 									        </el-table-column>
 									        <el-table-column label="难度" width="100">
 									        	<template slot-scope="scope">
-									        		<difficult-set :value="scope.row.difficultyDegree"></difficult-set>
+									        		<difficult-set :value="scope.row"></difficult-set>
 									        	</template>
 									        </el-table-column>
 									        <el-table-column v-if="item.diagnosisName == '检查'" label="结论查看权限" width="130">
@@ -444,10 +445,17 @@
 									        </el-table-column>
 									        <el-table-column width="100px" label="操作">
 									        	<template slot-scope="scope">
+									        		<el-button
+									        		  v-if="item.diagnosisName == '检验'" 
+											          title="复制该检验"
+											          type="text" @click.native.prevent="copyRow(item.supportQuestions,scope.row,scope.$index)">
+											          <i class="el-icon-document-copy"></i>
+											        </el-button>
 											        <el-button
 											          title="删除"
 											          type="text" @click.native.prevent="deleteRow(item.supportQuestions,scope.$index)">
-											          <i class="el-icon-delete"></i></el-button>
+											          <i class="el-icon-delete"></i>
+											        </el-button>
 									        	</template>
 									        </el-table-column>
 									    </el-table>
@@ -522,7 +530,7 @@
 					<el-input v-model="questionForm.questionScore" type="number" placeholder="分数" size="small"></el-input> 
 			  	</el-form-item>
 			  	<el-form-item label="难度" class="floatRight" style="width: 240px;" v-if="showDifficultyDegree">
-			  		<difficult-set :value="questionForm.difficultyDegree"></difficult-set>
+			  		<difficult-set :value="questionForm"></difficult-set>
 			  	</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -566,24 +574,17 @@
     </div>
 </template>
 <script>
-import Vue from 'vue';
 import draggable from 'vuedraggable';//拖拽排序组件
 import {recordApi} from '@/services/apis/record/record';
-import {formatDate} from '@/util/dataFormat';
 import E from "wangeditor"; //富文本编辑
 import UpLoadImage from '@/components/sampleDetail/uploadImage';
-Vue.component('difficult-set', {
-  props: ['value'],
-  template: `<el-select v-model="value" placeholder="难度" size="small">
-		      	<el-option label="0" value="0" ></el-option>
-		      	<el-option label="1" value="1" ></el-option>
-		      	<el-option label="2" value="2" ></el-option>
-		      	<el-option label="3" value="3" ></el-option>
-		    </el-select>`
-})
+import DifficultyDegree from '@/components/sampleDetail/difficultyDegree';
+import mixin from '@/mixin/mixin'; // 引入mixin文件
+
 export default {
 	name: 'setRecord',
-	components: {draggable, "upload-image":UpLoadImage},
+	components: {draggable, "upload-image":UpLoadImage, "difficult-set": DifficultyDegree},
+	mixins: [mixin],
 	data () {
 	    return {
 	    	loading:false,
@@ -870,7 +871,6 @@ export default {
      	},
      	//显示添加问题弹出框
      	showQuestinForm(){
-     		//console.log(this.activeClass)
      		this.dialogVisibleQuestion = true;
      		if (this.activeClass == '诊断') {
 
@@ -1025,6 +1025,21 @@ export default {
 	     		})
      		}	
      	},
+     	/**
+     	 * 复制检验
+     	 * @param  {object} rows  [检验列表]
+     	 * @param  {[object]} row   [当前检验]
+     	 * @param  {number} index [当前检验索引]
+     	 * @return {[type]}       [description]
+     	 */
+     	copyRow(rows,row,index){
+     		let newRow = JSON.parse(JSON.stringify(row))
+     		if (newRow.id) {
+     			delete newRow.id;
+     		    delete newRow.isAsk;
+     		}
+     		rows.splice(index+1, 0, newRow);
+     	},
 	    //设置问题序号
 	    setQuestionNum(item,index){
 	    	item.questionNum = index+1;
@@ -1041,9 +1056,9 @@ export default {
      		this.allQuestion.updateByUserName = this.formInline.updateByUserName || JSON.parse(localStorage.getItem("uerInfo")).name;
      		this.allQuestion.teachaiPoint = this.formInline.teachaiPoint;
      		this.allQuestion.status = type;
-     		//this.allQuestion.status = type=='1'?type: this.$route.query.status;
      		let j = 0;
      		for (var i = 0; i < this.allQuestion.trees.length; i++) {
+     			//保存首次查房
      			if (this.allQuestion.trees[i].name.split('_')[0] == '首次查房') {
      				this.allQuestion.trees[i].keyWordList = [];
      				this.allQuestion.trees[i].chafangshi = this.editor[j].txt.html();
@@ -1096,37 +1111,6 @@ export default {
 	    datadragEnd (evt) {
             evt.preventDefault();
         },
-	    open(){
-	    	this.openWindow(process.env.HOST+'search/bysy/casehistory.html?pid='+this.patientId+'&sex='+this.formInline.gender+'&age='+this.formInline.age+'&occup='+this.formInline.profession+'&mrKey='+this.formInline.mrKey+'&sonlist=default&datelist='+this.formInline.hospitalizedTime+'&form=AI')
-	    },
-	    openImg(){
-	    	this.openWindow('http://10.2.98.65/ZFP-XDS/Main?DomainId=1.2.156.112636.1.1.1.3.1&PatientId='+this.patientId)
-	    },
-	    openBMJ(){
-	    	let main = '';
-	    	main = process.env.NODE_ENV == 'production'?'http://10.2.3.96:8080':'http://192.168.8.74:8080';
-	    	this.openWindow(main+'/search/ZH_CN?q='+this.formInline.disease)
-	    },
-	    //浏览器打开新窗口
-	    openWindow(url){
-	    	window.open(url, '_blank', 'height=600, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no')
-	    },
-	    //导出病例
-	    exportSample(){
-	    	recordApi.exportSampleExcel({
-				sampleId:this.$route.query.sampleId
-			}).then(response=>{
-			    var blob = new Blob([response.data], {type: 'application/vnd.ms-excel;charset=utf-8'});
-                var downloadElement = document.createElement('a');
-                var href = window.URL.createObjectURL(blob); // 创建下载的链接
-                downloadElement.href = href;
-                downloadElement.download = this.formInline.chiefComplaint +" - "+ formatDate(new Date(), "yyyy-MM-dd") + '.xlsx'; // 下载后文件名
-                document.body.appendChild(downloadElement);
-                downloadElement.click(); // 点击下载
-                document.body.removeChild(downloadElement); // 下载完成移除元素
-                window.URL.revokeObjectURL(href); // 释放掉blob对象
-			})
-	    }
     }
 }
 </script>
@@ -1214,5 +1198,8 @@ export default {
 }
 /deep/ .editorElem .w-e-text-container a{
 	color:blue;
+	&:visited{
+		color:blue;
+	};
 }
 </style>

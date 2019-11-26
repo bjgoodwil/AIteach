@@ -78,5 +78,10 @@ router.beforeEach((to, from, next) => {
     else {
         next();
     }
+    // if (to.name == 'login') {
+    // 	next({
+    //         path: '/',
+    //     })
+    // }
 });
 export default router;

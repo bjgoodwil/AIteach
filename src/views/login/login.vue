@@ -47,14 +47,7 @@ export default {
         }
     },
     created() {
-        // let that = this;
-        // document.onkeypress = function(e) {
-        //   var keycode = document.all ? event.keyCode : e.which;
-        //   if (keycode == 13) {
-        //     that.onSubmit();// 登录方法名
-        //      return false;
-        //   }
-        // };
+
     },
     mounted() {
         this.getCode();
@@ -86,14 +79,14 @@ export default {
                         });
                         localStorage.setItem("uerId", response.data.data.userId);
                         localStorage.setItem("uerInfo", JSON.stringify(response.data.data));
-                        this.$router.push({path:this.$route.query.redirect || '/'})
+                        this.$router.replace({path:this.$route.query.redirect || '/'})
                     }else{
                         this.$message({
                             message: response.data.errMsg,
                             type: 'error'
                         });
                     }
-                    
+                    this.getCode();
                 })
             }
             

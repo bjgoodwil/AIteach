@@ -74,7 +74,7 @@ export default {
             menuItem:[{
                 name:'疾病分类',
                 url:'/case',
-                icon:require('../assets/icon01.png'),
+                icon:require('../assets/icon04.png'),
                 role:['教师','管理员'],
             },{
                 name:'虚拟病例',
@@ -89,17 +89,17 @@ export default {
             },{
                 name:'问题分类表',
                 url:'/mapTable',
-                icon:require('../assets/icon02.png'),
+                icon:require('../assets/icon05.png'),
                 role:['管理员'],
             },{
                 name:'学生管理',
                 url:'/students',
-                icon:require('../assets/icon04.png'),
+                icon:require('../assets/icon07.png'),
                 role:['教师','管理员'],
             },{
                 name:'教师管理',
                 url:'/teacher',
-                icon:require('../assets/icon04.png'),
+                icon:require('../assets/icon06.png'),
                 role:['管理员'],
             },{
                 name:'统计',

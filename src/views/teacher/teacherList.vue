@@ -3,24 +3,17 @@
     	
     	<div class="clearfix">
     		<p class="floatLeft"><i class="el-icon-location-outline"></i> 教师列表 </p>
-    		<!-- <el-button type="primary" round class="floatRight m-l-10" size="small"><i class="el-icon-upload2"></i> 批量导入</el-button> -->
-    		<!-- <el-upload
-		      ref="upload"
-			  class="upload-demo floatRight m-l-10"
-			  :action="uploadUrl"
-			  :multiple="false"
-			  :before-upload="beforeExcelUpload"
-			  :on-success="handleExcelSuccess">
-			  <el-button slot="trigger" round size="small" type="primary"><i class="el-icon-upload2"></i> 批量导入</el-button>
-			</el-upload> -->
     		<el-button type="primary" round class="floatRight" size="small" @click="showTeacherForm('add')"><i class="el-icon-plus"></i> 添加用户</el-button>
 
     	</div>
+    	<el-input v-model="params.searchKey" placeholder="请输入姓名或手机号" size="small" @input="handleChangeSearchKey" clearable style="width: 220px" ></el-input>
     	<el-table :data="tableData" class="m-t-20" v-loading="loading">
     		<el-table-column
-		      type="index"
 		      label="序号"
 		      width="50">
+		      <template slot-scope="scope">
+				{{(params.page-1)*10+(scope.$index+1)}}
+		      </template>
 		    </el-table-column>
 		    <el-table-column prop="teacherName" label="账号" width="120">
 	        </el-table-column>
@@ -53,7 +46,8 @@
 		      </template>
 		    </el-table-column>
 		</el-table>
-
+		<!-- 分页 -->
+	    <page-pagination :pageParams="params" :pageTotla="pageTotla" :getdataFunction="getData"></page-pagination>
 		<!-- 添加用户弹出框 -->
 		<el-dialog
 		  title="编辑教师信息"
@@ -111,10 +105,14 @@
     </div>
 </template>
 <script>
-import {studentsApi} from '@/services/apis/students/students'
-import {teachersApi} from '@/services/apis/teachers/teachers'
+import {studentsApi} from '@/services/apis/students/students';
+import {teachersApi} from '@/services/apis/teachers/teachers';
+import Pagination from '@/components/page/pagination';
 export default {
 	name: 'teacher',
+	components: {
+        "page-pagination":Pagination,
+    },
 	data () {
 	    return {
 	    	loading:true,
@@ -139,6 +137,12 @@ export default {
 	    	passwordForm:{ //修改密码
 	    		teacherPassword:'',
 	    	},
+	    	params:{
+	    		searchKey:'', //姓名和手机号
+	    		count:10, //每页数量
+	        	page:1 //当前页码
+	    	},
+	    	pageTotla: null, //总条数
 	    	addOrEdit:'',  //新增还是编辑
 	    	currentData:'', //当前操作对象
 	    	uploadUrl:'',
@@ -167,11 +171,18 @@ export default {
 	},
   	methods: {
       	getData(){
-			teachersApi.list().then(response=>{
-				this.tableData = response.data.data;
+      		this.loading = true;
+			teachersApi.list(this.params).then(response=>{
+				this.pageTotla = response.data.data.pageTotla;
+				this.tableData = response.data.data.teacher;
 				this.loading = false;
 			})
       	},
+      	handleChangeSearchKey(val){
+      		this.params.page = 1;
+	    	this.params.searchKey = val;
+	    	this.getData();
+	    },
       	showTeacherForm(type){
       		this.dialogVisibleStudents = true;
       		this.addOrEdit = type;
@@ -204,7 +215,6 @@ export default {
 				            type: 'success',
 				            message: '编辑成功!'
 				        });
-
 						this.dialogVisibleStudents = false;
 					})
                 }
@@ -262,36 +272,10 @@ export default {
       	dialogClose(){
       		this.$refs.form.resetFields();
       		this.btnLoading = false;
-      // 		this.teachersForm={
-	    	// 	name:'',
-	    	// 	sex:'男',
-	    	// 	teacherName:'',
-	    	// 	teacherPassword:'', 
-	    	// 	permissionId:[]//权限
-	    	// },
 	    	this.passwordForm.teacherPassword = '';
 	    	this.activeName = 'first';
       	},
-      	beforeExcelUpload(file) {
-	    	var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)				
-			const extension = testmsg === 'xls'
-			const extension2 = testmsg === 'xlsx'
-	        const isLt2M = file.size / 1024 / 1024 < 2;
-	        if (!extension && !extension2) {
-	          this.$message.error('只能上传 Excel 文件!');
-	        }
-	        if (!isLt2M) {
-	          this.$message.error('文件大小不能超过 2MB!');
-	        }
-	        return extension || extension2 && isLt2M;
-	    },
-      	handleExcelSuccess(res, file) {
-	    	this.$message({
-	            type: 'success',
-	            message: '上传成功!'
-	        });
-	        this.getData();
-	    },
+
     }
 }
 </script>

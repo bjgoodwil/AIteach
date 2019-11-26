@@ -102,6 +102,7 @@ export default {
 				this.formatPermissionId.push(this.permissionId[i][1])
 			}
 		}
+
         diseaseApi.listDiseaseType({fatherTypeId:0}).then(response=>{
             this.data = response.data.data.diseaseTypeList;
             this.activeName = this.data[0].id.toString();

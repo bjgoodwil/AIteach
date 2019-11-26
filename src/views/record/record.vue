@@ -270,15 +270,15 @@ export default {
     		}else {}
     	})
 		this.uploadUrl = process.env.BASE_API+'/teachai/med/disease/uploadSampleModelFile.json'
-		this.getListRecord(this.form);
+		this.getListRecord();
     	//判断是添加还是编辑
     	if (this.$route.params.diseaseName) {
     		this.disabled = true;
     	}else{this.disabled = false;}
     },
   	methods: {
-  		getListRecord(params){
-  			recordApi.listRecord(params).then(response=>{
+  		getListRecord(){
+  			recordApi.listRecord(this.form).then(response=>{
 				this.tableData = response.data.data.diseaseRecord;
 				this.pageTotla = response.data.data.pageTotla;
 				this.loading = false;
@@ -332,7 +332,7 @@ export default {
 				// })
 	        }
 	        this.form.page = 1;
-	        this.getListRecord(this.form);
+	        this.getListRecord();
 	    },
 	    //选择疾病
 	    selectDisease(val){
@@ -346,21 +346,21 @@ export default {
 	   //  	}
 	    	this.form.page = 1;
 	    	this.form.diseaseId = val;
-	    	this.getListRecord(this.form);
+	    	this.getListRecord();
 	    },
 	    //选择状态
 	    selectStatus(val){
 	    	this.loading = true;
 	    	this.form.status = val;
 	    	this.form.page = 1;
-	    	this.getListRecord(this.form);
+	    	this.getListRecord();
 	    },
 	    //选择性别
 	    selectGender(val){
 	    	this.loading = true;
 	    	this.form.gender = val;
 	    	this.form.page = 1;
-	    	this.getListRecord(this.form);
+	    	this.getListRecord();
 	    },
 	    selectScope(val,id){
 	    	recordApi.updateSampleScope({sampleId:id,scope:val}).then(response=>{
@@ -499,7 +499,7 @@ export default {
 	    //to搜索结果列表页
 	    toSearch(){
 	    	let main = '';
-	    	main = process.env.NODE_ENV == 'production'?process.env.HOST:window.location.host;
+	    	main = process.env.NODE_ENV == 'production'?process.env.BASE_YWD:window.location.host;
 	    	if (this.diseaseForm.disease == '') {
 	    		this.$message({
 		          message: '请选择疾病',
@@ -524,7 +524,7 @@ export default {
 	        //console.log(`当前页: ${val}`);
 	        this.loading = true;
 	        this.form.page = val;
-	        this.getListRecord(this.form);
+	        this.getListRecord();
 	    },
 	    //to结构化病历
 	    setRecord(row){

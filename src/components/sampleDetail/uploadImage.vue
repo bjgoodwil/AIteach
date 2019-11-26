@@ -80,7 +80,12 @@ export default {
                     message: '上传成功!'
                 });
                 this.loading = false;
-                this.$emit('save',this.$route.query.status);
+                if (imgType == 'dicom') {
+                    this.questionData.hasDicomImage = 'yes'
+                }else if (imgType == 'image') {
+                    this.questionData.hasImage = 'yes'
+                }else {return false}
+                //this.$emit('save',this.$route.query.status);
             })
         },
         handleImgSuccess(res, file) {
@@ -116,7 +121,9 @@ export default {
                         type: 'success',
                         message: '删除成功!'
                     });
-                    this.$emit('save',this.$route.query.status);
+                    this.questionData.hasDicomImage = 'no';
+                    this.questionData.hasImage = 'no'
+                    //this.$emit('save',this.$route.query.status);
                 })
             }).catch(() => {});
         },

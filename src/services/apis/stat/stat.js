@@ -16,4 +16,20 @@ export const statApi = {
             data: data
         });
     },
+    //多维度统计
+    statisticalScore(data){
+        return axios({
+            url: '/teachai/med/user/getStudentsScore.json',
+            method: 'post',
+            data: data
+        });
+    },
+    //操作日志
+    operationLog(data){
+        return axios({
+            url: '/teachai/med/user/getTeacherTimeNumber.json',
+            method: 'post',
+            data: data
+        });
+    },
 }

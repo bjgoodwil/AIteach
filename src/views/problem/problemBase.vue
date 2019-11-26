@@ -300,7 +300,7 @@ export default {
 	    searchQuestion(){
 	    	let _this = this;
 	    	let scene = _this.classes2[this.activeScene].children;
-	   		let newArray = JSON.parse(JSON.stringify(scene));;
+	   		let newArray = JSON.parse(JSON.stringify(scene));
 	   		let search = _this.searchQuestion;
 			scene.forEach((value,index,array)=>{
 				scene[index].children.forEach((v,i,arr)=>{

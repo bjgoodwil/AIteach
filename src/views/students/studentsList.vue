@@ -69,15 +69,7 @@
 		    </el-table-column>
 		</el-table>
 		<!-- 分页 -->
-	    <el-pagination
-          class="textRight"
-	      @size-change="handleSizeChange"
-	      @current-change="handleCurrentChange"
-	      :current-page.sync="params.page"
-	      :page-size="params.count"
-	      layout="total, prev, pager, next"
-	      :total="pageTotla">
-		</el-pagination>
+	    <page-pagination :pageParams="params" :pageTotla="pageTotla" :getdataFunction="getData"></page-pagination>
 		<!-- 添加用户弹出框 -->
 		<el-dialog
 		  title="编辑学生信息"
@@ -136,7 +128,7 @@
 							    :props="props"
 							    :value="studentsForm.permissionId"
 							    @change="handleChange"
-							    clearable>
+							    >
 							</el-cascader>
 						</el-form-item>
 					</el-form>
@@ -173,10 +165,12 @@ import {teachersApi} from '@/services/apis/teachers/teachers'
 //import Blob from '@/vendor/Blob'
 import Export2Excel from '@/vendor/Export2Excel.js'
 import StatisticsScore from '@/components/statistics/statistics'
+import Pagination from '@/components/page/pagination';
 export default {
 	name: 'students',
 	components: {
         StatisticsScore,
+        "page-pagination":Pagination,
     },
 	data () {
 	    return {
@@ -250,7 +244,6 @@ export default {
 	    }
 	},
 	mounted() {
-		console.log(StatisticsScore)
 		this.resetStudentsForm = JSON.parse(JSON.stringify(this.studentsForm));
 		this.uploadUrl = process.env.BASE_API+'/teachai/med/user/uploadStudentDetail.json'
 		this.getData();
@@ -290,18 +283,9 @@ export default {
 	    	this.getData();
 	    },
 	    handleChangeSearchKey(val){
+	    	this.params.page = 1;
 	    	this.params.searchKey = val;
 	    	this.getData();
-	    },
-	    // 分页相关
-	    handleSizeChange(val) {
-	        console.log(`每页 ${val} 条`);
-	    },
-	    handleCurrentChange(val) {
-	        //console.log(`当前页: ${val}`);
-	        this.loading = true;
-	        this.params.page = val;
-	        this.getData();
 	    },
       	addStudent(formName){
       		console.log(this.studentsForm)
@@ -385,115 +369,7 @@ export default {
       	},
       	lookStatistics(id){
       		this.userId = id;
-  			//studentsApi.statisticalSampleByUserId({userId:id}).then(response=>{
-
-  		// 		let statisticScore = echarts.init(this.$refs.statisticScore);
-  		// 		let startTime = [];
-  		// 		let scoreData = [];
-  		// 		let chiefComplaintData = [];
-  		// 		response.data.data.forEach(v=>{  
-				//     if (v.chiefComplaint) {
-    //                     chiefComplaintData.push(v.chiefComplaint)
-    //                 }else{
-    //                     chiefComplaintData.push('xx病例');
-    //                 } 
-    //                 startTime.push(v.startTime);
-    //                 scoreData.push(v.score);
-				// });
-  				
-  		// 		let option = {
-    //                 tooltip: {
-    //                     trigger: 'axis',
-    //                     axisPointer: {
-    //                         snap: true,
-    //                         lineStyle: {
-    //                             color: '#1790cf',
-    //                             width: 2
-    //                         }
-    //                     },
-    //                 },
-    //                 xAxis:  {
-    //                     type: 'category',
-    //                     boundaryGap: false,
-    //                     nameGap:20,
-    //                     axisTick: {
-    //                         show: false
-    //                     },
-    //                     splitArea : {
-    //                         show : true,
-    //                     },//保留网格区域
-    //                     data: startTime.reverse(),
-    //                     name:'学习时间',
-    //                     splitLine:{
-    //                         show:true
-    //                     },
-    //                     nameTextStyle: {
-    //                         color: ['#0087ED'],
-    //                         fontSize:'14',
-    //                     },
-    //                     axisLine:{
-    //                         lineStyle:{
-    //                             color:'#1790cf',
-    //                             style:'solid',
-    //                             width:'2'//坐标线的宽度
-    //                         }
-    //                     },
-    //                     axisLabel: {
-    //                         textStyle: {
-    //                             color:'#333',
-    //                             fontSize:'13',
-    //                         }
-    //                     }
-
-    //                 },
-    //                 yAxis: {
-    //                     type: 'value',
-    //                     name:'分数',
-    //                     min:0,
-    //                     max:100,
-    //                     nameGap:30,
-    //                     axisTick: {
-    //                         show: false
-    //                     },
-    //                     splitArea : {
-    //                         show : true,
-        
-    //                     },//保留网格区域
-    //                     splitLine:{
-    //                         show:true
-    //                     },
-
-    //                 },
-    //                 dataZoom: [
-    //                     {
-    //                         type: 'inside',
-    //                         start: 0,
-    //                         end: 100
-    //                     },
-    //                     {
-    //                         start: 0,
-    //                         end: 100
-    //                     }
-    //                 ],
-    //                 series: [
-    //                     {
-    //                         name:'本人成绩',
-    //                         type:'line',
-    //                         lineStyle:{
-    //                             normal:{
-    //                                 width:2,  //连线粗细
-    //                                 color: "#f1797c"  //连线颜色
-    //                             }
-    //                         },
-    //                         data:scoreData.reverse()
-    //                     }
-    //                 ]
-    //             };
-    //             statisticScore.setOption(option);
-    //   			console.log(response.data)
-				this.statisticsDialogVisible = true;
-			//})
-
+			this.statisticsDialogVisible = true;
       	},
       	dialogClose(){
       		this.btnLoading = false;

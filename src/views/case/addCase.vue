@@ -54,7 +54,7 @@
 									<table style="width: 100%;">
 										<tbody>
 											<draggable v-model="it.parms" @update="datadragEnd" :options = "{animation:500}">
-												<tr v-for="(i,index) in it.parms" :key="i.id" class="questionList">
+												<tr v-for="(i,index) in it.parms" :key="setQuestionNum(i,index)" class="questionList">
 													<td style="width: 5%">{{index+1}}</td>
 													<td style="width: 35%"><el-input v-model="i.questionName" size="small" placeholder="问题"></el-input></td>
 													<td>{{i.questionPath}}</td>
@@ -387,22 +387,17 @@ export default {
 	        }).catch(() => {});
 
      	},
+     	//设置问题序号
+	    setQuestionNum(item,index){
+	    	item.questionNum = index+1;
+	    	item.questionScore = parseInt(item.questionScore);
+	    	return item.id;
+	    },
 	    //保存
 	    save(){
 	    	this.loading = true
 	    	this.dataForm.disease.diseaseName = this.form.caseName;
 	    	this.dataForm.disease.teachPurpose = this.form.teachingAims;
-	    	for (var i = 0; i < this.dataForm.questions.length; i++) {
-	    		for (var j = 0; j < this.dataForm.questions[i].children.length; j++) {
-	    			for (var k = 0; k < this.dataForm.questions[i].children[j].children.length; k++) {
-		    			for (var l = 0; l < this.dataForm.questions[i].children[j].children[k].parms.length; l++) {
-		    				let a = this.dataForm.questions[i].children[j].children[k].parms[l];
-			    			a.questionNum = l+1;
-			    			a.questionScore = parseInt(a.questionScore);
-			    		}
-		    		}
-	    		}
-			}
 			if (this.$route.query.diseaseId == 0) {
     			this.dataForm.disease.id = '';
     		}
@@ -468,7 +463,7 @@ export default {
     	searchQuestion(){
     		let _this = this
     		let scene = _this.allQuestion2[this.activeScene].children;
-	   		let newArray = JSON.parse(JSON.stringify(scene));;
+	   		let newArray = JSON.parse(JSON.stringify(scene));
 	   		let search = _this.searchQuestion;
 			scene.forEach((value,index,array)=>{
 				scene[index].children.forEach((v,i,arr)=>{

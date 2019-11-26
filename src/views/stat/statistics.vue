@@ -20,7 +20,7 @@
         <el-card class="box-card m-t-20 pos-r" ref="elCard">
             <div class="explain pos-a" :style="tipOffset" v-show="showtooltip">{{tipcontent}}</div>
             <div slot="header" class="clearfix">
-                <span class="p-l-10">多维度统计</span> <el-button type="text" size="mini"><i class="el-icon-warning-outline"></i></el-button>
+                <span class="p-l-10">多维度统计</span> 
                 <el-select v-model="timeRange" placeholder="请选择" size="small" class="floatRight" style="width: 100px;">
                     <el-option  v-for="item in [{label:'近7天', value:7},{label:'近30天', value:30},{label:'近一年', value:365}]"
                       :key="item.value"
@@ -33,6 +33,24 @@
                 <div id="statisticsDimensions " ref="statisticsDimensions" style="height: 360px"></div>
             </div>
             
+        </el-card>
+        <el-card class="box-card m-t-20">
+            <div slot="header" class="clearfix">
+                <span class="p-l-10">教师使用统计</span>（教师登陆时间）
+            </div>
+            <div class="text item">
+                <el-table :data="teacherData" stripe >
+                    <el-table-column
+                      label="序号"
+                      type="index"
+                      width="50">
+                    </el-table-column>
+                    <el-table-column prop="name" label="教师名字">
+                    </el-table-column>
+                    <el-table-column prop="loginTime" label="登陆时间">
+                    </el-table-column>
+                </el-table>
+            </div>
         </el-card>
     </div>
 </template>
@@ -58,6 +76,7 @@ export default {
                 拓展性: { text: "诊断与鉴别诊断的准确性评价"},
                 多维度: { text: "对整体健康情况做出诊疗的综合评价"},
             },
+            teacherData:[]
         }
     },
     mounted() {
@@ -65,6 +84,7 @@ export default {
         this.draw();
         this.draw2();
         this.draw3();
+        this.getLog();
     },
     methods: {
         draw(){
@@ -175,65 +195,71 @@ export default {
             
         },
         draw3(){
+            let Vdata = [
+                {
+                    value: [60,73,85,40,70,40],
+                    name: '住培生[一阶段]',
+                },{
+                    value: [64,70,56,48,60,50],
+                    name: '住培生[二阶段]'
+                },{
+                    value: [86,64,70,54,76,60],
+                    name: '研究生[硕士]'
+                },{
+                    value: [67,87,85,65,74,47],
+                    name: '研究生[博士]'
+                },{
+                    value: [65,68,75,60,75,53],
+                    name: '医学生[本科]'
+                },{
+                    value: [70,86,85,64,73,60],
+                    name: '医学生[博士]'
+                }
+            ]; //虚拟数据
             let statisticsDimensions = echarts.init(this.$refs.statisticsDimensions);
-            let option = {
-                legend: {
-                    data: ['住培生[一阶段]','住培生[二阶段]', '研究生[硕士]', '研究生[博士]', '医学生[本科]', '医学生[博士]'],
-                    orient: 'vertical',
-                    x: 'left',
-                },
-                tooltip: {},
-                radar: {
-                    // shape: 'circle',
-                    name: {
-
-                        textStyle: {
-                            color: '#fff',
-                            backgroundColor: '#999',
-                            borderRadius: 3,
-                            padding: [3, 5]
-                       }
+            statApi.statisticalScore().then(response=>{
+                let responseData = response.data.data;
+                console.log(responseData)
+                let option = {
+                    legend: {
+                        data: ['住培生[一阶段]','住培生[二阶段]', '研究生[硕士]', '研究生[博士]', '医学生[本科]', '医学生[博士]'],
+                        orient: 'vertical',
+                        x: 'left',
                     },
-                    indicator: [
-                       { name: '系统性', max: 100,describe:'答题完成率的综合评价'},
-                       { name: '敏捷性', max: 100,describe:'答题时间的综合评价'},
-                       { name: '逻辑性', max: 100,describe:'问诊、查体、诊断的逻辑顺序评价'},
-                       { name: '拓展性', max: 100,describe:'诊断与鉴别诊断的准确性评价'},
-                       { name: '多维度', max: 100,describe:'对整体健康情况做出诊疗的综合评价'},
-                       { name: '严谨性', max: 100,describe:'诊断与鉴别诊断的全面性评价'},
-                    ],
-                    triggerEvent: true
-                },
-                series: [{
-                    type: 'radar',
-                    tooltip: { trigger: 'item'},
-                    data: [
-                        {
-                            value: [60,73,85,40,70,40],
-                            name: '住培生[一阶段]'
-                        },{
-                            value: [64,70,56,48,60,50],
-                            name: '住培生[二阶段]'
-                        },{
-                            value: [86,64,70,54,76,60],
-                            name: '研究生[硕士]'
-                        },{
-                            value: [67,87,85,65,74,47],
-                            name: '研究生[博士]'
-                        },{
-                            value: [65,68,75,60,75,53],
-                            name: '医学生[本科]'
-                        },{
-                            value: [70,86,85,64,73,60],
-                            name: '医学生[博士]'
-                        }
-                    ]
-                }]
-            };
-            statisticsDimensions.setOption(option);
+                    tooltip: {},
+                    radar: {
+                        // shape: 'circle',
+                        name: {
+                            textStyle: {
+                                color: '#fff',
+                                backgroundColor: '#999',
+                                borderRadius: 3,
+                                padding: [3, 5]
+                           }
+                        },
+                        indicator: [
+                           { name: '系统性', max: 100},
+                           { name: '敏捷性', max: 100},
+                           { name: '逻辑性', max: 100},
+                           { name: '拓展性', max: 100},
+                           { name: '多维度', max: 100},
+                           { name: '严谨性', max: 100},
+                        ],
+                        triggerEvent: true
+                    },
+                    series: [{
+                        type: 'radar',
+                        tooltip: { trigger: 'item'},
+                        data: responseData.map(function (item) {
+                            return {value:[item.xtxScore||0,item.mjxScore||0,item.ljxScore||0,item.zstzScore||0,item.dwdScore||0,item.yjxScore||0],name:item.identity}
+                        })
+                    }]
+                };
+                statisticsDimensions.setOption(option);
+            })
             statisticsDimensions.on('mouseover', params=> {
-                this.showtooltip = true;
                 if(params.componentType == 'radar'){
+                    this.showtooltip = true;
                     //console.log(params.event.offsetX+":"+params.event.offsetY)
                     this.tipcontent = this.appraiseList[params.name].text;
                     this.tipOffset = {
@@ -244,13 +270,16 @@ export default {
                         this.tipOffset.left = (params.event.offsetX-100) + "px"
                   
                     }
-                    
-                    console.log(this.$refs.elCard.$el.clientWidth)
                 } 
             });
             statisticsDimensions.on('mouseout', params=> {
                 this.showtooltip = false;
             });
+        },
+        getLog(){
+            statApi.operationLog().then(response=>{
+                this.teacherData = response.data.data;
+            })
         }
     }
 }
