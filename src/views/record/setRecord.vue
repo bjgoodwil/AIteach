@@ -1,5 +1,5 @@
 <template>
-    <div class="setRecord" v-loading="loading">
+    <div class="setRecord" v-loading="loading" element-loading-text="拼命加载中...">
     	<el-breadcrumb separator-class="el-icon-arrow-right">
 		    <el-breadcrumb-item to="/list">虚拟病例</el-breadcrumb-item>
 		    <el-breadcrumb-item>结构化病例</el-breadcrumb-item>

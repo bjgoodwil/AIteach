@@ -1,5 +1,5 @@
 <template>
-    <div class="addCase" v-loading="loading">
+    <div class="addCase" v-loading="loading" element-loading-text="拼命加载中...">
     	<el-breadcrumb separator-class="el-icon-arrow-right">
 		    <el-breadcrumb-item :to="{ path: '/case' }">疾病库</el-breadcrumb-item>
 		    <el-breadcrumb-item v-if="$route.query.activeName">编辑疾病</el-breadcrumb-item>

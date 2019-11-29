@@ -219,7 +219,6 @@ export default {
             let statisticsDimensions = echarts.init(this.$refs.statisticsDimensions);
             statApi.statisticalScore().then(response=>{
                 let responseData = response.data.data;
-                console.log(responseData)
                 let option = {
                     legend: {
                         data: ['住培生[一阶段]','住培生[二阶段]', '研究生[硕士]', '研究生[博士]', '医学生[本科]', '医学生[博士]'],
