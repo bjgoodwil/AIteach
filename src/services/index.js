@@ -47,7 +47,6 @@ instance.interceptors.request.use(function (config) {
         config.data = formData;
     }else{
         if (config.data && config.data.token) {
-            debugger
             config.headers['Content-Type'] = 'application/json';
             config.data = JSON.stringify({
                 userId:"liruidong",

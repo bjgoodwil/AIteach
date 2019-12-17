@@ -7,7 +7,7 @@
 		    <el-breadcrumb-item to="/list">病例库</el-breadcrumb-item>
 		    <el-breadcrumb-item>病历列表</el-breadcrumb-item>
 		</el-breadcrumb>
-		<el-table :data="tableData" class="m-t-20" v-loading="loading">
+		<el-table :data="tableData" class="m-t-20" v-loading="loading" element-loading-text="拼命加载中...">
     		<el-table-column
 		      type="index"
 		      label="序号"
@@ -132,6 +132,7 @@ export default {
 				     		})
 			     			recordApi.addDiseaseRecord({
 								diseaseId:this.$route.query.diseaseId,
+								teacherId:localStorage.getItem("uerId"),
 								relationJson:JSON.stringify(params)
 							}).then(response=>{
 								this.loading = false;

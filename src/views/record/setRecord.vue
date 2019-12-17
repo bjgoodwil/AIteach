@@ -59,18 +59,22 @@
 			    </el-select>
 			    <el-button size="small" @click="addScene">确定</el-button>
 			</el-popover>
+			
 			<el-tabs type="border-card" v-model="activeScene" @tab-click="tabClick" class="m-t-10"
 			    closable @tab-remove="removeScene">
 				<el-tab-pane :key="scene.name+indexScene" :label="scene.name.split('_')[0]+'_'+(indexScene+1)" v-for="(scene,indexScene) in allQuestion.trees" :name="indexScene.toString()" >
+					<el-form :model="scene" label-width="68px" class="m-b-10" v-if="scene.name.split('_')[0] !='入院'">
+						<el-form-item label="场景描述"><el-input type="textarea" autosize v-model="scene.scene_desc" placeholder="请输入场景描述"></el-input></el-form-item>
+					</el-form>
 					<div v-if="scene.name.split('_')[0] =='首次查房'" :ref="'editorElem'+(indexScene+1)" class="editorElem"></div>
 					<div v-else>
-						<el-button :disabled="!showAddButton" type="primary" round class="addBtn" size="small" @click="showQuestinForm" ><i class="el-icon-plus"></i> 添加</el-button>
+						<el-button :disabled="!showAddButton" type="primary" round class="addBtn pos-a" size="small" @click="showQuestinForm('0')" style="z-index: 99;right: 10px"><i class="el-icon-plus"></i> 添加</el-button>
 						<el-tabs v-model="activeName" @tab-click="tabClick1">
 						    <el-tab-pane v-for="item in scene.children" :key="item.id" :label="item.name" :name="item.id">	
 						    	<p class="history" v-if="item.name == '查体' && indexScene == 0"><span>体格检查：</span>{{allQuestion.chatisrc}}</p>
 						    	<el-tabs tab-position="left" v-model="activeClass" v-if="item.name == '报告'">
 									<el-tab-pane v-for="(it,eq) in item.children" :key="it.id" :label="it.name+'('+it.parms.length+')'" :name="it.id">
-										
+										<div class="scroll-y">
 										<el-table :data="it.parms">
 											<el-table-column type="expand" v-if="it.name == '检验'" >
 										      <template slot-scope="props">
@@ -114,7 +118,7 @@
 										    </el-table-column>
 										    <el-table-column type="expand" v-else>
 										      <template slot-scope="props">
-										      	<el-input type="textarea" autosize v-model="props.row.questionAnswer" size="small" placeholder="请输入答案"></el-input>
+										      	<el-input type="textarea" autosize v-model="props.row.questionAnswer" size="small" placeholder="请输入检查结果"></el-input>
 										      	<upload-image :questionData="props.row" v-on:save="save"></upload-image>
 										      </template>
 										    </el-table-column>
@@ -125,7 +129,7 @@
 										    </el-table-column>
 									        <el-table-column :label="it.name">
 									        	<template slot-scope="scope">
-													<el-input size="small" v-model="scope.row.questionName" placeholder="it.name"></el-input>
+													<el-input size="small" v-model="scope.row.questionName" placeholder="请输入检查项目"></el-input>
 									        	</template>
 									        </el-table-column>
 									        <!-- <el-table-column label="得分" width="100px" v-if="activeScene == 0">
@@ -142,6 +146,7 @@
 									        	</template>
 									        </el-table-column>
 									    </el-table>
+									    </div>
 									</el-tab-pane>
 						    	</el-tabs>
 								<el-tabs tab-position="left" v-model="activeClass" v-else>
@@ -215,7 +220,7 @@
 						    		<el-tab-pane label="诊断" name="诊断">
 						    			<div class="scroll-y">
 											<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].support">
-												<p class="clearfix p-10 pos-r">{{index+1}},诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
+												<p class="clearfix p-10 pos-r">{{index+1}}.诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="诊断名称：" style="width: 300px"></el-input>
 													<el-input size="small" type="number" v-model="item.diagnosisNumber" class="pos-a" style="width: 144px">
 									        			<template slot="prepend">第</template>
 									        			<template slot="append">诊断</template>
@@ -224,7 +229,10 @@
 														<difficult-set :value="item" style="width: 62px"></difficult-set>
 													</span>
 													<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-													<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">删除</a>
+													<el-button
+											          title="删除"
+											          type="text" class="floatRight" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].support,index)">
+											          <i class="el-icon-delete"></i></el-button>
 												</p>
 												<p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('zhenduan',index)">添加依据</span></p>
 												<el-table :data="item.supportQuestions" :show-header="false">
@@ -256,12 +264,25 @@
 									<el-tab-pane label="鉴别诊断" name="鉴别诊断" v-if="activeScene == 0">
 										<div class="scroll-y">
 										<div class="zhenduanItem" v-for="(item,index) in zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport">
-											<p class="clearfix p-10 pos-r">{{index+1}},鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input>
+											<p class="clearfix p-10 pos-r">{{index+1}}.鉴别诊断名称：<el-input size="small" v-model="item.diagnosisName" placeholder="鉴别诊断名称：" style="width: 300px"></el-input><el-button type="text" style="font-size: 14px" @click="showQuestinForm('1',item)"> &nbsp;添加子鉴别诊断</el-button>
 												<span class="pos-a" style="right: 60px">难度：
 													<difficult-set :value="item" style="width: 62px"></difficult-set>
 												</span>
 												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="item.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
-												<a href="javascript:;" class="floatRight delete" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport,index)">删除</a>
+												<el-button
+										          title="删除"
+										          type="text" class="floatRight" @click="deleteRow(zhenduan[indexScene][allQuestion.trees[indexScene].name].unsupport,index)">
+										          <i class="el-icon-delete"></i></el-button>
+											</p>
+											<p class="clearfix p-r-10 p-l-20 p-t-10 pos-r" v-for="(Citem,Cindex) in item.childDiagnosis">{{index+1}}.{{Cindex+1}}.子鉴别诊断名称：<el-input size="small" v-model="Citem.diagnosisName" placeholder="鉴别诊断名称：" style="width: 270px"></el-input>
+												<span class="pos-a" style="right: 60px">难度：
+													<difficult-set :value="Citem" style="width: 62px"></difficult-set>
+												</span>
+												<span class="pos-a" style="right: 180px">得分：<el-input type="number" size="small" v-model="Citem.diagnosisScore" placeholder="得分" style="width: 62px"></el-input></span>
+												<el-button
+										          title="删除"
+										          type="text" class="floatRight" @click="deleteRow(item.childDiagnosis,Cindex)">
+										          <i class="el-icon-delete"></i></el-button>
 											</p>
 											<!-- <p class="reason clearfix">支持依据<span class="floatRight" @click="showReasonLog('unsupport',index)">添加</span></p>
 											<el-table :data="item.supportQuestions" :show-header="false">
@@ -641,7 +662,9 @@ export default {
 	        gist:[],  //依据
 	        fileList: [],
 	        editor: [], //富文本编辑相关数据
-      		editorContent:''
+      		editorContent:'',
+      		isChildDiagnosis:'', //判断是否添加的是子鉴别诊断 1：是，0：否
+      		unsupport:[] //暂存鉴别诊断
 	    }
 	},
 	mounted() {
@@ -870,8 +893,10 @@ export default {
      		if(this.activeScene !=0 && tag.label == '报告'){this.showAddButton = false;}else{this.showAddButton = true;}
      	},
      	//显示添加问题弹出框
-     	showQuestinForm(){
+     	showQuestinForm(type,item){
      		this.dialogVisibleQuestion = true;
+     		this.isChildDiagnosis = type;
+     		this.unsupport = item;
      		if (this.activeClass == '诊断') {
 
      		}else if (this.activeClass == this.chuzhi[0].diagnosisName) {
@@ -893,14 +918,26 @@ export default {
 						difficultyDegree:formParam.difficultyDegree
      				})
      			}else{
-     				this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport.push({
+     				if (this.isChildDiagnosis == '1') {
+     					this.unsupport.childDiagnosis.push({
+     					fatherId:this.unsupport.id || '',
      					diagnosisName: formParam.diagnosisName,
 						diagnosisScore: formParam.questionScore,
 						diagnosisType: "unsupport",
-						supportQuestions: [],
-						unSupportQuestions: [],
 						difficultyDegree:formParam.difficultyDegree
      				})
+     				}else if(this.isChildDiagnosis == '0'){
+     					this.zhenduan[this.activeScene][this.allQuestion.trees[this.activeScene].name].unsupport.push({
+     						childDiagnosis:[],
+	     					diagnosisName: formParam.diagnosisName,
+							diagnosisScore: formParam.questionScore,
+							diagnosisType: "unsupport",
+							supportQuestions: [],
+							unSupportQuestions: [],
+							difficultyDegree:formParam.difficultyDegree
+	     				})
+     				}
+     				
      			}
      		}else if (this.activeName == '处置') {
      			for (var i = 0; i < this.chuzhi[this.activeScene][this.allQuestion.trees[this.activeScene].name].length; i++) {
@@ -1056,6 +1093,7 @@ export default {
      		this.allQuestion.updateByUserName = this.formInline.updateByUserName || JSON.parse(localStorage.getItem("uerInfo")).name;
      		this.allQuestion.teachaiPoint = this.formInline.teachaiPoint;
      		this.allQuestion.status = type;
+
      		let j = 0;
      		for (var i = 0; i < this.allQuestion.trees.length; i++) {
      			//保存首次查房
@@ -1079,6 +1117,7 @@ export default {
         	if (this.$route.query.type == 'edit') {
      			recordApi.updateRecord({
 					sampleId:this.$route.query.sampleId,
+					teacherId:localStorage.getItem("uerId"),
 					relationJson:JSON.stringify(this.allQuestion)
 				}).then(response=>{
 					this.loading = false;
@@ -1096,6 +1135,7 @@ export default {
 	     		})
      			recordApi.addDiseaseRecord({
 					diseaseId:this.$route.query.diseaseId || this.$route.parms.diseaseId,
+					teacherId:localStorage.getItem("uerId"),
 					relationJson:JSON.stringify(this.allQuestion)
 				}).then(response=>{
 					this.loading = false;
@@ -1125,6 +1165,7 @@ export default {
 	}
 	.el-button.el-button--text{
 		font-size: 18px;
+		padding: 6px 0;
 		.el-icon-delete,.delete{
 			color: red;
 		}
@@ -1161,12 +1202,12 @@ export default {
 		span{
 			color: red;
 		}
-	}
-	.el-tabs.el-tabs--left{
+	}.el-tabs.el-tabs--left{
+		height: 500px;
 		.el-tabs__content{
 			.scroll-y{
-				max-height: 640px;
-	    		overflow-y: auto;
+				max-height: 500px;
+	    		overflow-y: scroll;
 			}
 		}
 	}
@@ -1195,6 +1236,20 @@ export default {
 	.el-input-group__append, .el-input-group__prepend{
 		padding: 0 10px;
 	}
+}
+/*滚动条样式*/
+.scroll-y::-webkit-scrollbar {/*滚动条整体样式*/
+    width: 4px;     /*高宽分别对应横竖滚动条的尺寸*/
+    height: 4px;
+}
+.scroll-y::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+    background: rgba(0,0,0,0.1);
+}
+.scroll-y::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+
 }
 /deep/ .editorElem .w-e-text-container a{
 	color:blue;
