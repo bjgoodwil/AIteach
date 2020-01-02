@@ -1,4 +1,5 @@
 import axios from "../../index";
+import axiosT from "axios"
 export const recordApi = {
     //新增病例
     addDiseaseRecord(data) {
@@ -135,6 +136,15 @@ export const recordApi = {
             url: '/teachai/med/disease/deleteSampleJianchaImage.json',
             method: 'post',
             data: data
+        });
+    },
+    //获取icd名称
+    getSchemeICD(data) {
+        return axios({
+            url: '/ICD/med/statistical/getSchemeICD.json',
+            method: 'post',
+            data: data,
+
         });
     },
 }

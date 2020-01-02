@@ -12,10 +12,10 @@ let instance = axios.create({
     baseURL: process.env.BASE_API,  //在config中配置
     timeout: 60000,  //请求超时
     withCredentials: false, //加了这段就可以跨域了
-    transformRequest: [function (data) { // 只能用在 'PUT', 'POST' 和 'PATCH' 这几个请求方法
-                //data = qs.stringify(data)
-                return data
-    }]
+    // transformRequest: [function (data) { // 只能用在 'PUT', 'POST' 和 'PATCH' 这几个请求方法
+    //             //data = qs.stringify(data)
+    //             return data
+    // }]
 });
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
@@ -33,7 +33,7 @@ instance.interceptors.request.use(function (config) {
     let token=localStorage.getItem('token') || ''
     // 在发送请求之前做些什么
     config.headers['Accept'] = '*/*';
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+    //config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
     config.headers['token'] = token;
     //上传影像的请求头
     if (config.data && config.data.jianchaUpload) {
@@ -54,7 +54,8 @@ instance.interceptors.request.use(function (config) {
                 targetId:"1747959d56e9aee1d81ae31ba3c92d18"
             })
         }else{
-            config.data = qs.stringify(config.data)
+            //config.data = qs.stringify(config.data);
+            config.data = (config.data&&config.data.bizContent)?config.data:qs.stringify(config.data);
         }
     }
 

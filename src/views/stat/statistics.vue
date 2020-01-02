@@ -34,7 +34,7 @@
             </div>
             
         </el-card>
-        <el-card class="box-card m-t-20">
+        <!-- <el-card class="box-card m-t-20">
             <div slot="header" class="clearfix">
                 <span class="p-l-10">教师使用统计</span>（教师登陆时间）
             </div>
@@ -51,7 +51,7 @@
                     </el-table-column>
                 </el-table>
             </div>
-        </el-card>
+        </el-card> -->
     </div>
 </template>
 

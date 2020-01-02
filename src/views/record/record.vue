@@ -146,6 +146,16 @@
 					    </el-option>
 					</el-select>
 			    </el-form-item>
+			    <!-- <el-form-item label="病种">
+			        <el-select v-model="diseaseForm.scheme" placeholder="请选择" size="small" style="width: 300px" @change="handleChangeGetICD">
+					    <el-option
+					      v-for="item in optionsDis2"
+					      :key="item.id"
+					      :label="item.diseaseName"
+					      :value="item">
+					    </el-option>
+					</el-select>
+			    </el-form-item> -->
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 			    <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -221,6 +231,8 @@ export default {
         		diseaseType:[],
         		disease:'',
         		diseaseId:'',
+        		scheme:'', //病种
+        		icd:'', //ICD
         	},
         	importForm:{
         		mrKey:'',
@@ -269,6 +281,11 @@ export default {
 
     		}else {}
     	})
+    	//获取ICD名称
+    	recordApi.getSchemeICD({bizContent:"{}"}).then(response=>{
+			console.log(response.data);
+		})
+    	//上传文件地址
 		this.uploadUrl = process.env.BASE_API+'/teachai/med/disease/uploadSampleModelFile.json'
 		this.getListRecord();
     	//判断是添加还是编辑
@@ -338,12 +355,6 @@ export default {
 	    selectDisease(val){
 	    	this.loading = true;
 	    	this.form.diseaseId = val;
-	   //  	if (val == ''){
-	   //  		recordApi.listRecordByTypeId({typeId:this.form.selectedOptions}).then(response=>{
-				// 	this.tableData = response.data.data.diseaseRecord;
-				// 	this.loading = false;
-				// })
-	   //  	}
 	    	this.form.page = 1;
 	    	this.form.diseaseId = val;
 	    	this.getListRecord();
@@ -399,6 +410,10 @@ export default {
 	    handleChangeGetId(val){
 	    	this.diseaseForm.disease = val.diseaseName;
 	    	this.diseaseForm.diseaseId = val.id;
+	    },
+	    //选择病种ICD
+	    handleChangeGetICD(val){
+
 	    },
 	    //导入病例 选择专业
 	    handleChangeImport(val){
@@ -469,7 +484,6 @@ export default {
 		            message: '请选择疾病并且上传病例'
 		        });
 	    	}
-	    	
 	    },
 	    /**
 		 * 删除病例
